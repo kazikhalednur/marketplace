@@ -1,0 +1,4 @@
+[flake8]
+exclude = venv, .git, */migrations/*, */migrations_generated/*, config/settings/*, __init__.py
+extend-ignore = F405, F811
+max-line-length = 88
