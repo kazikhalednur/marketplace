@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # local apps
+    "accounts.apps.AccountsConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",
@@ -96,6 +98,9 @@ DATABASES = {
         "PORT": config("DB_PORT", cast=int),
     }
 }
+
+
+AUTH_USER_MODEL = "accounts.User"
 
 
 # Password validation
