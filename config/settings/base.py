@@ -150,6 +150,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 
 OTP_TIMEOUT = 300
+EMAIL_VERIFIY_TIMEOUT = 300
 
 
 from .rest_framework import *

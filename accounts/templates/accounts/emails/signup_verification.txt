@@ -1,0 +1,8 @@
+You're receiving this email because you have created a freelancer account reset. Please verify your email address by click link below:
+{{protocol}}://{{domain}}{% url 'accounts:verify_email' uidb64=uid64 token=token %}
+
+This verification link is only valid for the next 5 minutes.
+If you did not create a freelancer account, please ignore this email.
+
+Thanks for using our site!
+DIU CPC Marketplace Team
