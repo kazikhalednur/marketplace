@@ -30,6 +30,7 @@ export default function LoginPage() {
       password: "",
       remember: false,
     },
+    mode: "onBlur",
   });
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -63,14 +64,21 @@ export default function LoginPage() {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@diu\.edu\.bd$/,
+                    message: "Email must be a valid @diu.edu.bd address",
+                  },
+                }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder="example@diu.edu.bd"
                           autoComplete="email"
                           {...field}
                           className="pl-10"
@@ -80,14 +88,17 @@ export default function LoginPage() {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                rules={{ required: "Password is required" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
@@ -117,7 +128,28 @@ export default function LoginPage() {
                         </button>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              {/* Remember me checkbox */}
+              <FormField
+                control={form.control}
+                name="remember"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-2 mt-2">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={e => field.onChange(e.target.checked)}
+                      className="accent-primary w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary"
+                    />
+                    <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
+                      Remember me
+                    </label>
                   </FormItem>
                 )}
               />

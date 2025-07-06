@@ -43,6 +43,7 @@ export default function RegisterPage() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onBlur",
   });
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +108,8 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="fullName"
-                render={({ field }) => (
+                rules={{ required: "Full name is required" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
@@ -123,14 +125,17 @@ export default function RegisterPage() {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="studentId"
-                render={({ field }) => (
+                rules={{ required: "Student ID is required" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Student ID</FormLabel>
                     <FormControl>
@@ -146,14 +151,17 @@ export default function RegisterPage() {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="phone"
-                render={({ field }) => (
+                rules={{ required: "Phone number is required" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
@@ -169,7 +177,9 @@ export default function RegisterPage() {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
@@ -208,7 +218,14 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@diu\.edu\.bd$/,
+                    message: "Email must be a valid @diu.edu.bd address",
+                  },
+                }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
@@ -225,14 +242,17 @@ export default function RegisterPage() {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                rules={{ required: "Password is required" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
@@ -294,7 +314,8 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="confirmPassword"
-                render={({ field }) => (
+                rules={{ required: "Please confirm your password" }}
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
@@ -324,7 +345,9 @@ export default function RegisterPage() {
                         </button>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
