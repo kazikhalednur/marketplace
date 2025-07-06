@@ -20,8 +20,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
-import { User, IdCard, Phone, Mail, Eye, EyeOff, Lock } from "lucide-react";
+import { useState, useCallback } from "react";
+import { User, IdCard, Phone, Mail, Eye, EyeOff, Lock, RefreshCw } from "lucide-react";
 import Icon from "@/components/ui/Icon";
 
 export default function RegisterPage() {
@@ -48,6 +48,28 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [remember, setRemember] = useState(false);
+
+  // Password strength checker
+  const checkStrength = useCallback((password: string) => {
+    if (!password) return "";
+    if (password.length < 6) return "Weak";
+    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password)) return "Strong";
+    if (password.length >= 8) return "Medium";
+    return "Weak";
+  }, []);
+
+  // Password generator
+  const generatePassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+    let pwd = "";
+    for (let i = 0; i < 12; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    form.setValue("password", pwd);
+    setPasswordStrength(checkStrength(pwd));
+  };
 
   const onSubmit = async (data: {
     fullName: string;
@@ -193,7 +215,7 @@ export default function RegisterPage() {
                       <div className="relative">
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder="example@diu.edu.bd"
                           autoComplete="email"
                           {...field}
                           className="pl-10"
@@ -214,13 +236,17 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <div className="relative">
+                      <div className="relative flex items-center">
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
                           autoComplete="new-password"
                           {...field}
-                          className="pl-10 pr-10"
+                          className="pl-10 pr-20"
+                          onChange={e => {
+                            field.onChange(e);
+                            setPasswordStrength(checkStrength(e.target.value));
+                          }}
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
                           <Icon icon={Lock} size={20} className="text-muted-foreground" />
@@ -228,7 +254,7 @@ export default function RegisterPage() {
                         <button
                           type="button"
                           tabIndex={-1}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                          className="absolute right-12 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                           onClick={() => setShowPassword((v) => !v)}
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
@@ -238,8 +264,29 @@ export default function RegisterPage() {
                             <Icon icon={Eye} size={20} className="w-5 h-5" />
                           )}
                         </button>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                          onClick={generatePassword}
+                          aria-label="Generate strong password"
+                        >
+                          <Icon icon={RefreshCw} size={20} className="w-5 h-5" />
+                        </button>
                       </div>
                     </FormControl>
+                    {/* Password strength checker */}
+                    {passwordStrength && (
+                      <div className={`mt-2 text-xs font-medium ${
+                        passwordStrength === "Strong"
+                          ? "text-green-600"
+                          : passwordStrength === "Medium"
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                      }`}>
+                        Password strength: {passwordStrength}
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -281,6 +328,19 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
+              {/* Remember me checkbox */}
+              <FormItem className="flex flex-row items-center gap-2 mt-2">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  checked={remember}
+                  onChange={e => setRemember(e.target.checked)}
+                  className="accent-primary w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary"
+                />
+                <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
+                  Remember me
+                </label>
+              </FormItem>
               {error && (
                 <div className="text-destructive font-medium text-sm" role="alert">
                   {error}

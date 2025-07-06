@@ -28,6 +28,7 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
       password: "",
+      remember: false,
     },
   });
   const router = useRouter();
@@ -117,6 +118,25 @@ export default function LoginPage() {
                       </div>
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Remember me checkbox */}
+              <FormField
+                control={form.control}
+                name="remember"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-2 mt-2">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={e => field.onChange(e.target.checked)}
+                      className="accent-primary w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary"
+                    />
+                    <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
+                      Remember me
+                    </label>
                   </FormItem>
                 )}
               />
