@@ -171,9 +171,9 @@ export default function LandingPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-24 px-6 text-center bg-white border-b border-neutral-100">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-gray-900">Why Choose Our Platform?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto text-left">
+      <section className="py-24 px-6 text-center bg-blue-50/60 border-b border-neutral-100">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-blue-900">Why Choose Our Platform?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto text-left">
           {[
             {
               icon: <Star className="text-blue-500 mt-1" />,
@@ -198,10 +198,10 @@ export default function LandingPage() {
           ].map(({ icon, title, desc }, i) => (
             <motion.div
               key={i}
-              whileHover={{ scale: 1.02 }}
-              className="flex gap-4 items-start bg-neutral-50 rounded-xl border border-neutral-100 p-7"
+              whileHover={{ y: -4, scale: 1.03 }}
+              className="flex gap-5 items-start bg-white rounded-2xl border border-blue-100 p-8 shadow-md transition-all hover:shadow-lg hover:border-blue-200"
             >
-              <div className="shrink-0">{icon}</div>
+              <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 border border-blue-100">{icon}</div>
               <div>
                 <h4 className="font-semibold text-lg mb-1 text-gray-900">{title}</h4>
                 <p className="text-gray-600">{desc}</p>
@@ -227,27 +227,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-28 px-6 flex justify-center items-center bg-white">
-        <Card className="w-full max-w-2xl border border-neutral-200 shadow-lg rounded-2xl bg-white text-center">
-          <CardContent className="space-y-8 py-16 px-10">
-            <motion.h2
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl font-bold mb-2 text-gray-900"
-            >
-              Ready to Get Started?
-            </motion.h2>
-            <p className="text-lg mb-6 max-w-xl mx-auto text-gray-700">
-              Whether you're a student looking to build your future or an individual seeking remote help — we've got you covered.
-            </p>
-            <Button asChild size="lg" className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700">
-              <Link href="/register">Create Your Free Account</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      {/* Final CTA - Full Width Modern */}
+      <section className="w-full bg-blue-600 py-14 px-4 flex flex-col items-center justify-center text-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Ready to Get Started?</h2>
+        <p className="text-base md:text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
+          Join UniMarket today and unlock real opportunities. Whether you're a student or an employer, it's free to get started.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xl justify-center items-center">
+          <a
+            href="/register"
+            className="inline-flex items-center justify-center px-7 py-3 text-base font-semibold rounded-lg bg-white text-blue-700 shadow-sm hover:bg-blue-50 transition-colors w-full sm:w-auto"
+          >
+            Create Your Free Account
+          </a>
+          <a
+            href="mailto:contact@unimarket.com"
+            className="inline-flex items-center justify-center px-7 py-3 text-base font-semibold rounded-lg border border-white text-white bg-blue-600 hover:bg-blue-700 hover:border-blue-200 transition-colors w-full sm:w-auto"
+          >
+            Contact Sales
+          </a>
+        </div>
       </section>
 
       {/* Footer */}
