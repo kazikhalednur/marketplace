@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Marketplace Client
 
-## Getting Started
+A modern, full-stack-ready marketplace web app built with **Next.js 15**, **React 19**, **Tailwind CSS v4**, and **shadcn/ui**. This project features a clean authentication flow, role-based dashboards, and a scalable architecture for rapid development.
 
-First, run the development server:
+---
+
+## ✨ Features
+
+- 🔒 Modern authentication (login/register) with role-based access (Student, Employer, Admin)
+- 🎨 Beautiful, responsive UI with [shadcn/ui](https://ui.shadcn.com/) and Tailwind v4
+- 🧑‍🎓 Student, 🏢 Employer, and 🛡️ Admin dashboards (with protected routes)
+- 🪪 JWT-based middleware for secure route protection
+- 🧩 Modular structure: features, hooks, store, types, utils
+- 🌙 Dark mode ready (customizable via Tailwind)
+- ⚡️ Fast, accessible, and production-ready
+
+---
+
+## 🛠️ Tech Stack
+
+- [Next.js 15](https://nextjs.org/) (App Router, SSR, API routes)
+- [React 19](https://react.dev/)
+- [Tailwind CSS v4](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/) (UI components)
+- [lucide-react](https://lucide.dev/) (icons)
+- [react-hook-form](https://react-hook-form.com/) (forms)
+- [jose](https://github.com/panva/jose) (JWT)
+- [TypeScript](https://www.typescriptlang.org/)
+
+---
+
+## ⚡️ Quick Start
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 3. Open your browser
+http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Directory Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+src/
+  app/           # Next.js app directory (routes, pages, layouts)
+    (auth)/      # Auth pages (login, register)
+    (student)/   # Student dashboard
+    (employer)/  # Employer dashboard
+    (admin)/     # Admin dashboard
+    globals.css  # Tailwind & global styles
+    layout.tsx   # App layout
+    page.tsx     # Landing page
+  components/    # Reusable UI components (shadcn/ui)
+  features/      # Feature modules (business logic)
+  hooks/         # Custom React hooks
+  lib/           # Utilities, constants
+  store/         # State management (e.g., Zustand, Redux)
+  types/         # TypeScript types & interfaces
+  utils/         # Helper functions
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🧑‍💻 Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork this repo
+2. Create your feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All contributions are welcome! Please see the code structure and follow the conventions.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)
+
+---
+
+## 🙌 Acknowledgements
+
+- [Next.js](https://nextjs.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [lucide-react](https://lucide.dev/)
+
+---
+
+> Made with ❤️ by the Marketplace Team
