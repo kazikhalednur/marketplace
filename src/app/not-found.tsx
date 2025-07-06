@@ -28,9 +28,9 @@ export default function NotFound() {
             hover:bg-foreground/10 hover:shadow-lg hover:-translate-y-0.5"
         >
           <Icon icon={Home} size={20} className="text-foreground" />
-          Go back to homepage
-        </Link>
-      </div>
+        Go back to homepage
+      </Link>
+    </div>
     </main>
   );
 }
