@@ -171,40 +171,40 @@ export default function LandingPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-28 px-6 text-center bg-neutral-100">
-        <h2 className="text-3xl md:text-4xl font-bold mb-14 text-gray-900">Why Choose Our Platform?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto text-left">
+      <section className="py-24 px-6 text-center bg-white border-b border-neutral-100">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-gray-900">Why Choose Our Platform?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto text-left">
           {[
             {
-              icon: <Star className="text-blue-600 mt-1" />,
+              icon: <Star className="text-blue-500 mt-1" />,
               title: "Verified Students Only",
               desc: "We verify all students via university credentials before they can bid."
             },
             {
-              icon: <Users className="text-blue-600 mt-1" />,
+              icon: <Users className="text-blue-500 mt-1" />,
               title: "Real Experience",
               desc: "Students build real-world portfolios while earning on flexible schedules."
             },
             {
-              icon: <ShieldCheck className="text-blue-600 mt-1" />,
+              icon: <ShieldCheck className="text-blue-500 mt-1" />,
               title: "Secure Escrow & Disputes",
               desc: "Escrow-based payment ensures fairness and transparency."
             },
             {
-              icon: <Briefcase className="text-blue-600 mt-1" />,
+              icon: <Briefcase className="text-blue-500 mt-1" />,
               title: "Remote-first Platform",
               desc: "Post and work from anywhere — fully remote system."
             }
           ].map(({ icon, title, desc }, i) => (
             <motion.div
               key={i}
-              whileHover={{ scale: 1.03 }}
-              className="flex gap-4 items-start bg-white rounded-xl shadow-lg border border-neutral-200 hover:shadow-xl transition-shadow p-8"
+              whileHover={{ scale: 1.02 }}
+              className="flex gap-4 items-start bg-neutral-50 rounded-xl border border-neutral-100 p-7"
             >
               <div className="shrink-0">{icon}</div>
               <div>
                 <h4 className="font-semibold text-lg mb-1 text-gray-900">{title}</h4>
-                <p className="text-gray-700">{desc}</p>
+                <p className="text-gray-600">{desc}</p>
               </div>
             </motion.div>
           ))}
@@ -212,16 +212,16 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-28 px-6 bg-neutral-100">
+      <section className="py-24 px-6 bg-blue-50/60">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-600 text-lg">Find answers to common questions about UniMarket.</p>
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-3">Frequently Asked Questions</h2>
+            <p className="text-blue-800/80 text-lg">Find answers to common questions about UniMarket.</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-lg border border-neutral-200 p-8">
-            <FAQAccordion />
-            <div className="mt-10 pt-6 border-t border-neutral-100 text-center">
-              <span className="text-gray-700 text-base">Still have questions? <a href="mailto:contact@unimarket.com" className="text-blue-600 underline">Contact us</a></span>
+          <div className="bg-white rounded-2xl border border-neutral-100 divide-y divide-neutral-300">
+            <FAQAccordionFlat />
+            <div className="mt-3 py-5 border-t border-neutral-100 text-center">
+              <span className="text-blue-900 text-base">Still have questions? <a href="mailto:contact@unimarket.com" className="text-blue-600 underline">Contact us</a></span>
             </div>
           </div>
         </div>
@@ -265,43 +265,38 @@ export default function LandingPage() {
   );
 }
 
-function FAQAccordion() {
+function FAQAccordionFlat() {
   const faqs = [
-    {
-      q: "Who can join UniMarket?",
-      a: "Only verified university students and employers can join. Students must provide valid university credentials during registration.",
-    },
-    {
-      q: "How does escrow work?",
-      a: "Employers fund the project upfront. Payment is held securely and only released to the student after the employer approves the completed work.",
-    },
-    {
-      q: "What types of jobs can be posted?",
-      a: "Any remote-friendly development, design, or tech-related job suitable for university students. All jobs must comply with our terms of service.",
-    },
-    {
-      q: "Is there a fee to use UniMarket?",
-      a: "Registration is free. A small service fee is deducted from each completed transaction to support platform operations and security.",
-    },
-    {
-      q: "How do I get support?",
-      a: "You can contact our support team anytime at contact@unimarket.com.",
-    },
+    { q: "Who can join UniMarket?", a: "Only verified university students and employers can join. Students must provide valid university credentials during registration." },
+    { q: "Is there a fee to use UniMarket?", a: "Registration is free. A small service fee is deducted from each completed transaction to support platform operations and security." },
+    { q: "How do I apply for jobs?", a: "Browse available jobs, submit your proposal, and attach relevant work or portfolio. Employers will review and respond if interested." },
+    { q: "How do I get paid?", a: "Once your work is approved by the employer, payment is released from escrow directly to your account." },
+    { q: "How does escrow work?", a: "Employers fund the project upfront. Payment is held securely and only released to the student after the employer approves the completed work." },
+    { q: "What types of jobs can be posted?", a: "Any remote-friendly development, design, or tech-related job suitable for university students. All jobs must comply with our terms of service." },
+    { q: "How do I get support?", a: "You can contact our support team anytime at contact@unimarket.com." },
+    { q: "Is my payment information safe?", a: "All transactions are processed securely using industry-standard encryption and payment providers." },
   ];
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState<number>(0);
   return (
-    <div>
+    <div className="bg-white rounded-2xl border border-neutral-100 divide-y divide-neutral-300">
       {faqs.map((item, i) => (
-        <div key={i} className="border-b border-neutral-100 last:border-b-0">
+        <div key={i}>
           <button
-            className={`w-full flex items-center justify-between py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 group ${open === i ? 'text-blue-600' : 'text-gray-900'} font-semibold text-lg transition-colors`}
+            className={`w-full flex items-center justify-between py-3 px-3 md:py-4 md:px-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 group transition-colors
+              ${open === i ? 'text-blue-700' : 'text-gray-900'}
+              font-semibold text-base md:text-lg
+              hover:bg-blue-50/60
+              rounded-lg
+            `}
             aria-expanded={open === i}
             aria-controls={`faq-panel-${i}`}
             onClick={() => setOpen(open === i ? -1 : i)}
           >
-            <span>{item.q}</span>
+            <span className="flex-1 text-left text-base md:text-lg font-semibold transition-colors">{item.q}</span>
             <ChevronDown
-              className={`ml-4 h-6 w-6 transform transition-transform duration-300 ${open === i ? 'rotate-180 text-blue-600' : 'text-gray-400'}`}
+              className={`ml-4 h-5 w-5 md:h-6 md:w-6 transform transition-transform duration-400 ease-in-out
+                ${open === i ? 'rotate-180 text-blue-700' : 'text-gray-400'}
+              `}
               aria-hidden="true"
             />
           </button>
@@ -310,7 +305,7 @@ function FAQAccordion() {
             className={`overflow-hidden transition-all duration-300 ${open === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
             aria-hidden={open !== i}
           >
-            <div className="pb-5 pr-2 text-gray-700 text-base">
+            <div className="pb-3 pr-3 pl-5 bg-blue-50/60 text-blue-900 text-base rounded-b-lg">
               {item.a}
             </div>
           </div>
