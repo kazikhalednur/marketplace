@@ -12,6 +12,14 @@ class OTP(models.Model):
     code = models.CharField(max_length=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "OTP"
+        verbose_name_plural = "OTPs"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"OTP for {self.user.email} - {self.code}"
+
     def save(self, *args, **kwargs):
         self.code = str(uuid4()).upper()[:6]
         super().save(*args, **kwargs)
