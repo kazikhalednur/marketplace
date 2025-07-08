@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +41,15 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        router.replace('/dashboard');
+      }
+    }
+  }, [router]);
+
   const onSubmit = async (data: LoginPayload) => {
     try {
       const res = await login(data).unwrap();
@@ -47,7 +57,7 @@ export default function LoginPage() {
         showToast({ type: 'success', message: 'Login successful!' });
         localStorage.setItem('accessToken', res.data.access);
         localStorage.setItem('refreshToken', res.data.refresh);
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       } else {
         showToast({ type: 'error', message: res?.message || 'Invalid email or password.' });
       }

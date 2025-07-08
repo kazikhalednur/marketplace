@@ -3,9 +3,10 @@
 import { Card } from '@/components/ui/card';
 import JobList from './_views/JobList';
 import JobDetailModal, { JobDetail } from './_views/JobDetailModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardFilters from './_views/DashboardFilters';
 import { useAppSelector } from '@/hooks/useTypedSelector';
+import { useRouter } from 'next/navigation';
 
 const dummyJobs: JobDetail[] = [
   {
@@ -161,6 +162,15 @@ const dummyJobs: JobDetail[] = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        router.replace('/login?next=/dashboard');
+      }
+    }
+  }, [router]);
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);

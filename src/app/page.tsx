@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Briefcase, ChevronDown, GraduationCap, Quote, ShieldCheck, Star, Users } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 const testimonials = [
   {
@@ -31,6 +32,20 @@ const testimonials = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [checked, setChecked] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        router.replace('/dashboard');
+      } else {
+        setChecked(true);
+      }
+    }
+  }, [router]);
+  if (!checked) return null;
+
   return (
     <main className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)] relative">
       {/* Sticky Navbar */}

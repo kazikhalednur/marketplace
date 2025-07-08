@@ -2,11 +2,22 @@
 
 import { Card } from "@/components/ui/card";
 import { Briefcase, GraduationCap } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EmployerForm from "./EmployerForm";
 import StudentForm from "./StudentForm";
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        router.replace('/dashboard');
+      }
+    }
+  }, [router]);
+
   const [role, setRole] = useState<"student" | "employer" | null>(null);
 
   if (role === "student") return <StudentForm onBack={() => setRole(null)} />;
