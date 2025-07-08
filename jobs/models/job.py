@@ -41,6 +41,21 @@ class Job(models.Model):
         decimal_places=2,
         help_text="Maximum budget for the job",
     )
+    is_fixed = models.BooleanField(default=True, help_text="Is the job budget fixed?")
+    min_hourly_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Minimum hourly rate for the job (if applicable)",
+    )
+    max_hourly_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Maximum hourly rate for the job (if applicable)",
+    )
     duration = models.CharField(
         max_length=50,
         help_text="Estimated duration for the job (e.g., '1 month', '3 months')",
