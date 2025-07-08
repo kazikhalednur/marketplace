@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from ...helpers import match_email_domain
 from ...mails import send_signup_verification_email
 from ...models import Client, ClientProfile
 
@@ -29,11 +28,6 @@ class ClientSignupSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if not match_email_domain(attrs["email"]):
-            raise serializers.ValidationError(
-                {"email": "Try with your varsity mail address"}
-            )
-
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError({"password": "Password doesn't matched"})
         attrs.pop("confirm_password")

@@ -17,6 +17,8 @@ class User(AbstractUser):
         CLIENT = "client", "Client"
         FREELANCER = "freelancer", "Freelancer"
         ADMIN = "admin", "Admin"
+        ARBITRATOR = "arbitrator", "Arbitrator"
+        AUDITOR = "auditor", "Auditor"
 
     id = models.UUIDField(
         primary_key=True, editable=False, serialize=False, unique=True
