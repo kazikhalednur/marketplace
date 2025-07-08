@@ -50,7 +50,7 @@ urlpatterns = [
         name="signup_google",
     ),
     path(
-        "accepted-domain",
+        "accepted-domain/",
         freelancers_views.AcceptedDomainView.as_view(),
         name="accepted_domain",
     ),
