@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, Layers, Tag, Clock, TrendingUp, CheckCircle, XCircle, DollarSign, User } from 'lucide-react';
 import * as React from 'react';
+import { useToast } from '@/components/ui/toast-provider';
 
 export interface JobDetail {
   id: number;
@@ -28,6 +29,7 @@ interface JobDetailModalProps {
 export default function JobDetailModal({ open, onClose, job }: JobDetailModalProps) {
   const modalRef = React.useRef<HTMLDivElement>(null);
   const [applyLoading, setApplyLoading] = React.useState(false);
+  const { showToast } = useToast();
 
   // Accessibility: Focus trap and Escape key
   React.useEffect(() => {
@@ -148,10 +150,22 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
           className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
           onClick={async () => {
             setApplyLoading(true);
-            // Simulate async apply action
-            await new Promise((r) => setTimeout(r, 1200));
-            setApplyLoading(false);
-            // You can add a callback or toast here
+            try {
+              // Simulate async apply action
+              await new Promise((r) => setTimeout(r, 1200));
+              showToast({
+                type: 'success',
+                message: 'Application submitted successfully!'
+              });
+            } catch (err) {
+              showToast({
+                type: 'error',
+                message: 'Failed to apply for this job. Please try again.'
+              });
+              console.error(err);
+            } finally {
+              setApplyLoading(false);
+            }
           }}
           disabled={applyLoading}
           aria-busy={applyLoading}
@@ -164,4 +178,4 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
       </Card>
     </div>
   );
-} 
+}

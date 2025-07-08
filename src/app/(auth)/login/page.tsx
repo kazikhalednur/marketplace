@@ -24,6 +24,7 @@ import { Mail, Eye, EyeOff, Lock } from "lucide-react";
 import Icon from "@/components/ui/Icon";
 import { useLoginMutation, LoginPayload } from '@/features/api/apiSlice';
 import { getErrorMessage } from '@/utils/error';
+import { useToast } from '@/components/ui/toast-provider';
 
 export default function LoginPage() {
   const form = useForm({
@@ -35,23 +36,23 @@ export default function LoginPage() {
     mode: "onBlur",
   });
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [login, { isLoading, error: apiError }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const onSubmit = async (data: LoginPayload) => {
-    setError(null);
     try {
       const res = await login(data).unwrap();
       if (res?.success && res?.data?.access && res?.data?.refresh) {
+        showToast({ type: 'success', message: 'Login successful!' });
         localStorage.setItem('accessToken', res.data.access);
         localStorage.setItem('refreshToken', res.data.refresh);
-        router.push('/student/dashboard');
+        router.push('/dashboard');
       } else {
-        setError(res?.message || 'Invalid email or password.');
+        showToast({ type: 'error', message: res?.message || 'Invalid email or password.' });
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Invalid email or password.'));
+      showToast({ type: 'error', message: getErrorMessage(err, 'Invalid email or password.') });
     }
   };
 
@@ -155,16 +156,6 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              {error && (
-                <div className="text-destructive font-medium text-sm" role="alert">
-                  {error}
-                </div>
-              )}
-              {apiError && (
-                <div className="text-destructive font-medium text-sm" role="alert">
-                  {getErrorMessage(apiError, 'Invalid email or password.')}
-                </div>
-              )}
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>

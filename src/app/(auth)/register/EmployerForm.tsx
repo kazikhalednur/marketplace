@@ -25,6 +25,7 @@ import { ArrowLeft, Building, Eye, EyeOff, Lock, Mail, Phone, RefreshCw, User } 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/ui/toast-provider';
 
 export default function EmployerForm({ onBack }: { onBack?: () => void }) {
   const form = useForm<EmployerSignupPayload>({
@@ -41,25 +42,25 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
     mode: "onBlur",
   });
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<string>("");
-  const [employerSignup, { isLoading, error: apiError }] = useEmployerSignupMutation();
+  const [employerSignup, { isLoading }] = useEmployerSignupMutation();
 
   // Password strength checker and generator are now imported
 
   const onSubmit = async (data: EmployerSignupPayload) => {
-    setError(null);
     try {
       const res = await employerSignup(data).unwrap();
       if (res?.success) {
+        showToast({ type: 'success', message: 'Registration successful! Please login.' });
         router.push('/login');
       } else {
-        setError(res?.message || 'Registration failed.');
+        showToast({ type: 'error', message: res?.message || 'Registration failed.' });
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Registration failed.'));
+      showToast({ type: 'error', message: getErrorMessage(err, 'Registration failed.') });
     }
   };
 
@@ -346,14 +347,6 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                   </FormItem>
                 )}
               />
-              {error && (
-                <div className="text-destructive text-sm text-center mt-2">{error}</div>
-              )}
-              {apiError && (
-                <div className="text-destructive text-sm text-center mt-2">
-                  {getErrorMessage(apiError)}
-                </div>
-              )}
               <Button type="submit" className="w-full mt-4" disabled={isLoading}>
                 {isLoading ? 'Registering...' : 'Register'}
               </Button>

@@ -25,6 +25,7 @@ import { ArrowLeft, Eye, EyeOff, IdCard, Lock, Mail, Phone, RefreshCw, User } fr
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useToast } from '@/components/ui/toast-provider';
 
 export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const form = useForm<StudentSignupPayload>({
@@ -41,7 +42,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
     mode: "onBlur",
   });
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<string>("");
@@ -51,20 +52,20 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
   // Password strength checker and generator are now imported
 
   const onSubmit = async (data: StudentSignupPayload) => {
-    setError(null);
     if (data.password !== data.confirm_password) {
-      setError("Passwords do not match");
+      showToast({ type: 'error', message: 'Passwords do not match' });
       return;
     }
     try {
       const res = await studentSignup(data).unwrap();
       if (res?.success) {
+        showToast({ type: 'success', message: 'Registration successful! Please login.' });
         router.push('/login');
       } else {
-        setError(res?.message || 'Registration failed.');
+        showToast({ type: 'error', message: res?.message || 'Registration failed.' });
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Registration failed.'));
+      showToast({ type: 'error', message: getErrorMessage(err, 'Registration failed.') });
     }
   };
 
@@ -372,11 +373,6 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   Remember me
                 </label>
               </FormItem>
-              {error && (
-                <div className="text-destructive font-medium text-sm" role="alert">
-                  {error}
-                </div>
-              )}
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? 'Registering...' : 'Create Account'}
               </Button>
