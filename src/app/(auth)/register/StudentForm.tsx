@@ -22,27 +22,19 @@ import {
 import { useState, useCallback } from "react";
 import { User, IdCard, Phone, Mail, Eye, EyeOff, Lock, RefreshCw, ArrowLeft } from "lucide-react";
 import Icon from "@/components/ui/Icon";
+import { useStudentSignupMutation, StudentSignupPayload } from '@/features/api/apiSlice';
 
 export default function StudentForm({ onBack }: { onBack?: () => void }) {
-  const form = useForm<{
-    first_name: string;
-    last_name: string;
-    username: string;
-    studentId: string;
-    phone: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }>({
+  const form = useForm<StudentSignupPayload>({
     defaultValues: {
       first_name: "",
       last_name: "",
       username: "",
-      studentId: "",
+      student_id: "",
       phone: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      confirm_password: "",
     },
     mode: "onBlur",
   });
@@ -52,6 +44,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [remember, setRemember] = useState(false);
+  const [studentSignup, { isLoading }] = useStudentSignupMutation();
 
   // Password strength checker
   const checkStrength = useCallback((password: string) => {
@@ -73,28 +66,53 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
     setPasswordStrength(checkStrength(pwd));
   };
 
-  const onSubmit = async (data: {
-    first_name: string;
-    last_name: string;
-    username: string;
-    studentId: string;
-    phone: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => {
+  // Utility to extract error message
+  function hasMessage(obj: unknown): obj is { message: string } {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'message' in obj &&
+      typeof (obj as { message?: unknown }).message === 'string'
+    );
+  }
+  function hasDataMessage(obj: unknown): obj is { data: { message: string } } {
+    const o: unknown = obj;
+    return (
+      typeof o === 'object' &&
+      o !== null &&
+      'data' in o &&
+      typeof (o as { data?: unknown }).data === 'object' &&
+      (o as { data?: unknown }).data !== null &&
+      'message' in ((o as { data?: { message?: unknown } }).data ?? {}) &&
+      typeof ((o as { data: { message?: unknown } }).data?.message) === 'string'
+    );
+  }
+
+  function getErrorMessage(err: unknown): string {
+    if (hasDataMessage(err)) {
+      return (err as { data: { message: string } }).data.message;
+    }
+    if (hasMessage(err)) {
+      return (err as { message: string }).message;
+    }
+    return 'Registration failed.';
+  }
+
+  const onSubmit = async (data: StudentSignupPayload) => {
     setError(null);
-    if (data.password !== data.confirmPassword) {
+    if (data.password !== data.confirm_password) {
       setError("Passwords do not match");
       return;
     }
     try {
-      // TODO: Replace with your actual registration API call
-      // const res = await fetch("/api/register", { ... });
-      // if (!res.ok) throw new Error("Registration failed");
-      router.push("/login");
-    } catch {
-      setError("Failed to register. Please try again.");
+      const res = await studentSignup(data).unwrap();
+      if (res?.success) {
+        router.push('/login');
+      } else {
+        setError(res?.message || 'Registration failed.');
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -199,7 +217,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
               />
               <FormField
                 control={form.control}
-                name="studentId"
+                name="student_id"
                 rules={{ required: "Student ID is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem className="flex-1">
@@ -347,7 +365,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
               />
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name="confirm_password"
                 rules={{ required: "Please confirm your password" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
@@ -403,8 +421,8 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   {error}
                 </div>
               )}
-              <Button type="submit" className="w-full" size="lg">
-                Create Account
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                {isLoading ? 'Registering...' : 'Create Account'}
               </Button>
               <div className="flex items-center mb-2 mt-4">
                 <div className="flex-1 h-px bg-border" />

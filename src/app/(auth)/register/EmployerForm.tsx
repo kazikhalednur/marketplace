@@ -19,41 +19,95 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
-import { User, Mail, Phone, Building, ArrowLeft } from "lucide-react";
+import { useState, useCallback } from "react";
+import { User, Mail, Phone, Building, ArrowLeft, Eye, EyeOff, Lock, RefreshCw } from "lucide-react";
 import Icon from "@/components/ui/Icon";
+import { useEmployerSignupMutation, EmployerSignupPayload } from '@/features/api/apiSlice';
+
+function hasMessage(obj: unknown): obj is { message: string } {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'message' in obj &&
+    typeof (obj as { message?: unknown }).message === 'string'
+  );
+}
+function hasDataMessage(obj: unknown): obj is { data: { message: string } } {
+  const o: unknown = obj;
+  return (
+    typeof o === 'object' &&
+    o !== null &&
+    'data' in o &&
+    typeof (o as { data?: unknown }).data === 'object' &&
+    (o as { data?: unknown }).data !== null &&
+    'message' in ((o as { data?: { message?: unknown } }).data ?? {}) &&
+    typeof ((o as { data: { message?: unknown } }).data?.message) === 'string'
+  );
+}
 
 export default function EmployerForm({ onBack }: { onBack?: () => void }) {
-  const form = useForm<{
-    first_name: string;
-    last_name: string;
-    username: string;
-    email: string;
-    phone: string;
-    company?: string;
-  }>({
+  const form = useForm<EmployerSignupPayload>({
     defaultValues: {
       first_name: "",
       last_name: "",
       username: "",
       email: "",
       phone: "",
-      company: "",
+      company_name: "",
+      password: "",
+      confirm_password: "",
     },
     mode: "onBlur",
   });
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [employerSignup, { isLoading, error: apiError }] = useEmployerSignupMutation();
 
-  const onSubmit = async () => {
+  // Password strength checker
+  const checkStrength = useCallback((password: string) => {
+    if (!password) return "";
+    if (password.length < 6) return "Weak";
+    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password)) return "Strong";
+    if (password.length >= 8) return "Medium";
+    return "Weak";
+  }, []);
+
+  // Password generator
+  const generatePassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+    let pwd = "";
+    for (let i = 0; i < 12; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    form.setValue("password", pwd);
+    setPasswordStrength(checkStrength(pwd));
+  };
+
+  // Utility to extract error message
+  function getErrorMessage(err: unknown): string {
+    if (hasDataMessage(err)) {
+      return (err as { data: { message: string } }).data.message;
+    }
+    if (hasMessage(err)) {
+      return (err as { message: string }).message;
+    }
+    return 'Registration failed.';
+  }
+
+  const onSubmit = async (data: EmployerSignupPayload) => {
     setError(null);
     try {
-      // TODO: Replace with your actual registration API call
-      // const res = await fetch("/api/register", { ... });
-      // if (!res.ok) throw new Error("Registration failed");
-      router.push("/login");
-    } catch {
-      setError("Failed to register. Please try again.");
+      const res = await employerSignup(data).unwrap();
+      if (res?.success) {
+        router.push('/login');
+      } else {
+        setError(res?.message || 'Registration failed.');
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -211,7 +265,7 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
               />
               <FormField
                 control={form.control}
-                name="company"
+                name="company_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company (optional)</FormLabel>
@@ -231,10 +285,122 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="password"
+                rules={{ required: "Password is required" }}
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel>Password <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <div className="relative flex items-center">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Password"
+                          autoComplete="new-password"
+                          {...field}
+                          className="pl-10 pr-20"
+                          onChange={e => {
+                            field.onChange(e);
+                            setPasswordStrength(checkStrength(e.target.value));
+                          }}
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                        </span>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          className="absolute right-12 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? (
+                            <Icon icon={EyeOff} size={20} className="w-5 h-5" />
+                          ) : (
+                            <Icon icon={Eye} size={20} className="w-5 h-5" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                          onClick={generatePassword}
+                          aria-label="Generate strong password"
+                        >
+                          <Icon icon={RefreshCw} size={20} className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </FormControl>
+                    {/* Password strength checker */}
+                    {passwordStrength && (
+                      <div className={`mt-2 text-xs font-medium ${
+                        passwordStrength === "Strong"
+                          ? "text-green-600"
+                          : passwordStrength === "Medium"
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                      }`}>
+                        Password strength: {passwordStrength}
+                      </div>
+                    )}
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirm_password"
+                rules={{ required: "Please confirm your password" }}
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm Password"
+                          autoComplete="new-password"
+                          {...field}
+                          className="pl-10 pr-10"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                        </span>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                          onClick={() => setShowConfirmPassword((v) => !v)}
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showConfirmPassword ? (
+                            <Icon icon={EyeOff} size={20} className="w-5 h-5" />
+                          ) : (
+                            <Icon icon={Eye} size={20} className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
               {error && (
                 <div className="text-destructive text-sm text-center mt-2">{error}</div>
               )}
-              <Button type="submit" className="w-full mt-4">Register</Button>
+              {apiError && (
+                <div className="text-destructive text-sm text-center mt-2">
+                  {getErrorMessage(apiError)}
+                </div>
+              )}
+              <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+                {isLoading ? 'Registering...' : 'Register'}
+              </Button>
               <div className="flex items-center mb-1 mt-4">
                 <div className="flex-1 h-px bg-border" />
                 <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>

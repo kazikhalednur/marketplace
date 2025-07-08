@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import { Mail, Eye, EyeOff, Lock } from "lucide-react";
 import Icon from "@/components/ui/Icon";
+import { useLoginMutation, LoginPayload } from '@/features/api/apiSlice';
 
 export default function LoginPage() {
   const form = useForm({
@@ -35,17 +36,53 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [login, { isLoading, error: apiError }] = useLoginMutation();
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  // Utility to extract error message
+  function hasMessage(obj: unknown): obj is { message: string } {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'message' in obj &&
+      typeof (obj as { message?: unknown }).message === 'string'
+    );
+  }
+  function hasDataMessage(obj: unknown): obj is { data: { message: string } } {
+    const o: unknown = obj;
+    return (
+      typeof o === 'object' &&
+      o !== null &&
+      'data' in o &&
+      typeof (o as { data?: unknown }).data === 'object' &&
+      (o as { data?: unknown }).data !== null &&
+      'message' in ((o as { data?: { message?: unknown } }).data ?? {}) &&
+      typeof ((o as { data: { message?: unknown } }).data?.message) === 'string'
+    );
+  }
+
+  function getErrorMessage(err: unknown): string {
+    if (hasDataMessage(err)) {
+      return err.data.message;
+    }
+    if (hasMessage(err)) {
+      return err.message;
+    }
+    return 'Invalid email or password.';
+  }
+
+  const onSubmit = async (data: LoginPayload) => {
     setError(null);
     try {
-      console.log(data);
-      // TODO: Replace with your actual API call
-      // const res = await fetch("/api/login", { ... });
-      // if (!res.ok) throw new Error("Invalid credentials");
-      router.push("/student/dashboard");
-    } catch {
-      setError("Invalid email or password.");
+      const res = await login(data).unwrap();
+      if (res?.success && res?.data?.access && res?.data?.refresh) {
+        localStorage.setItem('accessToken', res.data.access);
+        localStorage.setItem('refreshToken', res.data.refresh);
+        router.push('/student/dashboard');
+      } else {
+        setError(res?.message || 'Invalid email or password.');
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -154,8 +191,13 @@ export default function LoginPage() {
                   {error}
                 </div>
               )}
-              <Button type="submit" className="w-full" size="lg">
-                Sign In
+              {apiError && (
+                <div className="text-destructive font-medium text-sm" role="alert">
+                  {getErrorMessage(apiError)}
+                </div>
+              )}
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
           </Form>
