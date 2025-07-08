@@ -22,6 +22,9 @@ class User(AbstractUser):
         primary_key=True, editable=False, serialize=False, unique=True
     )
     email = models.EmailField(unique=True)
+    phone = models.CharField(
+        max_length=20, blank=True, null=True, help_text="Phone number"
+    )
     sub = models.CharField(
         max_length=100, unique=True, blank=True, null=True, help_text="Google user ID"
     )
