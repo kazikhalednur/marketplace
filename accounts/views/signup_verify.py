@@ -6,11 +6,10 @@ from rest_framework.views import APIView
 
 from utils.helpers import Response
 
-from ...models import Freelancer
+from ..models import Freelancer
 
 
 @extend_schema(
-    tags=["freelancer"],
     responses={
         200: inline_serializer(
             name="SignupVerifyViewResponse",

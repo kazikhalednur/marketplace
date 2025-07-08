@@ -5,12 +5,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from utils.helpers import Response
 
-from ...models import Freelancer
-from ...serializers.freelancers import SigninSerializer
+from ..models import Freelancer
+from ..serializers import SigninSerializer
 
 
 @extend_schema(
-    tags=["freelancer"],
     responses={
         200: inline_serializer(
             name="LoginViewResponse",

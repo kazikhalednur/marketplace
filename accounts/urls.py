@@ -2,12 +2,19 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+from .views import clients as clients_views
 from .views import freelancers as freelancers_views
 
 app_name = "accounts"
 urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify/", views.TokenVerifyView.as_view(), name="token_verify"),
+    path("signin/", views.SigninView.as_view(), name="signin"),
+    path(
+        "signin-google/",
+        views.SigninGoogleView.as_view(),
+        name="signin_google",
+    ),
     path("logout/", views.LogoutView.as_view(), name="logout"),
     path(
         "password-reset-mail/",
@@ -29,28 +36,24 @@ urlpatterns = [
         views.PasswordChangeView.as_view(),
         name="password_change",
     ),
-    # Freelancer specific URLs
-    path("signup/", freelancers_views.SignupView.as_view(), name="signup"),
     path(
         "verify/email/<uidb64>/<token>/",
-        freelancers_views.SignupVerifyView.as_view(),
+        views.SignupVerifyView.as_view(),
         name="verify_email",
     ),
+    path("info/", views.UserInfoView.as_view(), name="info"),
+    # Freelancer specific URLs
+    path("signup/", freelancers_views.SignupView.as_view(), name="signup"),
     path(
         "signup-google/",
         freelancers_views.SignupGoogleView.as_view(),
         name="signup_google",
     ),
-    path("signin/", freelancers_views.SigninView.as_view(), name="signin"),
-    path(
-        "signin-google/",
-        freelancers_views.SigninGoogleView.as_view(),
-        name="signin_google",
-    ),
-    path("info/", freelancers_views.UserInfoView.as_view(), name="info"),
     path(
         "accepted-domain",
         freelancers_views.AcceptedDomainView.as_view(),
         name="accepted_domain",
     ),
+    # Client specific URLs
+    path("clients/signup/", clients_views.SignupView.as_view(), name="clients_signup"),
 ]

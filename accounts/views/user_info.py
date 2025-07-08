@@ -4,13 +4,12 @@ from rest_framework.generics import RetrieveUpdateAPIView
 
 from utils.helpers import Response
 
-from ...models import User
-from ...serializers.freelancers import UserInfoSerializer
+from ..models import User
+from ..serializers import UserInfoSerializer
 
 
 @extend_schema_view(
     patch=extend_schema(
-        tags=["freelancer"],
         responses={
             200: inline_serializer(
                 name="UserInfoViewResponse",
@@ -20,7 +19,6 @@ from ...serializers.freelancers import UserInfoSerializer
             ),
         },
     ),
-    get=extend_schema(tags=["freelancer"]),
 )
 class UserInfoView(RetrieveUpdateAPIView):
     """User detail Read and Update API"""

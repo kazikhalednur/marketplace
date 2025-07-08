@@ -3,8 +3,8 @@ from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer as JWTTokenObtainPairSerializer,
 )
 
-from ...helpers import google_user_details
-from ...models import User
+from ..helpers import google_user_details
+from ..models import User
 
 
 class SigninGoogleSerializer(JWTTokenObtainPairSerializer):

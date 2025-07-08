@@ -5,11 +5,10 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 from utils.helpers import Response
 
-from ...serializers.freelancers import SigninGoogleSerializer
+from ..serializers import SigninGoogleSerializer
 
 
 @extend_schema(
-    tags=["freelancer"],
     responses={
         200: inline_serializer(
             name="SigninGoogleViewResponse",
