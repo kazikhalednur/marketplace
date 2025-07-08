@@ -5,7 +5,7 @@ from ...mails import send_signup_verification_email
 from ...models import Client, ClientProfile
 
 
-class SignupSerializer(serializers.ModelSerializer):
+class ClientSignupSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(max_length=128, write_only=True)
     company_name = serializers.CharField(
         max_length=100,

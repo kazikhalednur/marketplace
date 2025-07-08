@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 
 from utils.helpers import Response
 
-from ...serializers.clients import SignupSerializer
+from ...serializers.clients import ClientSignupSerializer
 
 
 @extend_schema(
@@ -26,7 +26,7 @@ class SignupView(CreateAPIView):
 
     authentication_classes = ()
     permission_classes = [AllowAny]
-    serializer_class = SignupSerializer
+    serializer_class = ClientSignupSerializer
 
     def get_serializer_context(self):
         """Add custom context to the serializer."""
