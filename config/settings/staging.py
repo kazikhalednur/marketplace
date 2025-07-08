@@ -9,3 +9,9 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 EMAIL_PORT = config("EMAIL_PORT", cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 SUPPORT_EMAIL = config("SUPPORT_EMAIL")
+
+REST_FRAMEWORK.update(
+    {
+        "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    }
+)
