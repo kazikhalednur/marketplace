@@ -14,5 +14,5 @@ class JobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        exclude = ["created_at", "updated_at"]
+        exclude = ["created_at", "updated_at", "created_by"]
         depth = 1

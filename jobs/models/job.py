@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from accounts.models import User  # Assuming User model is defined in accounts app
+
 from .category import Category
 
 
@@ -68,6 +70,12 @@ class Job(models.Model):
             ("expert", "Expert"),
         ],
         help_text="Required experience level for the job",
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="created_jobs",
+        help_text="User who created the job",
     )
     status = models.CharField(
         max_length=20,
