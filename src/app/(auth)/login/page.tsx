@@ -23,6 +23,7 @@ import { useState } from "react";
 import { Mail, Eye, EyeOff, Lock } from "lucide-react";
 import Icon from "@/components/ui/Icon";
 import { useLoginMutation, LoginPayload } from '@/features/api/apiSlice';
+import { getErrorMessage } from '@/utils/error';
 
 export default function LoginPage() {
   const form = useForm({
@@ -38,38 +39,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading, error: apiError }] = useLoginMutation();
 
-  // Utility to extract error message
-  function hasMessage(obj: unknown): obj is { message: string } {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      'message' in obj &&
-      typeof (obj as { message?: unknown }).message === 'string'
-    );
-  }
-  function hasDataMessage(obj: unknown): obj is { data: { message: string } } {
-    const o: unknown = obj;
-    return (
-      typeof o === 'object' &&
-      o !== null &&
-      'data' in o &&
-      typeof (o as { data?: unknown }).data === 'object' &&
-      (o as { data?: unknown }).data !== null &&
-      'message' in ((o as { data?: { message?: unknown } }).data ?? {}) &&
-      typeof ((o as { data: { message?: unknown } }).data?.message) === 'string'
-    );
-  }
-
-  function getErrorMessage(err: unknown): string {
-    if (hasDataMessage(err)) {
-      return err.data.message;
-    }
-    if (hasMessage(err)) {
-      return err.message;
-    }
-    return 'Invalid email or password.';
-  }
-
   const onSubmit = async (data: LoginPayload) => {
     setError(null);
     try {
@@ -82,7 +51,7 @@ export default function LoginPage() {
         setError(res?.message || 'Invalid email or password.');
       }
     } catch (err) {
-      setError(getErrorMessage(err));
+      setError(getErrorMessage(err, 'Invalid email or password.'));
     }
   };
 
@@ -193,7 +162,7 @@ export default function LoginPage() {
               )}
               {apiError && (
                 <div className="text-destructive font-medium text-sm" role="alert">
-                  {getErrorMessage(apiError)}
+                  {getErrorMessage(apiError, 'Invalid email or password.')}
                 </div>
               )}
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>

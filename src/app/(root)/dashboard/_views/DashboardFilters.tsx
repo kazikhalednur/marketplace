@@ -1,12 +1,12 @@
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { TAGS } from '@/lib/constants';
+import { Input } from '@/components/ui/input';
+import { setSearchText, toggleTag } from '@/features/jobs/jobsFilterSlice';
 import { useAppDispatch } from '@/hooks/useTypedDispatch';
 import { useAppSelector } from '@/hooks/useTypedSelector';
-import { setSearchText, toggleTag } from '@/features/jobs/jobsFilterSlice';
-import { useCallback, useState, useRef } from 'react';
+import { TAGS } from '@/lib/constants';
+import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
 
 export default function DashboardFilters() {
   const dispatch = useAppDispatch();

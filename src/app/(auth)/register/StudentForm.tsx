@@ -1,28 +1,30 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { useState, useCallback } from "react";
-import { User, IdCard, Phone, Mail, Eye, EyeOff, Lock, RefreshCw, ArrowLeft } from "lucide-react";
 import Icon from "@/components/ui/Icon";
-import { useStudentSignupMutation, StudentSignupPayload } from '@/features/api/apiSlice';
+import { Input } from "@/components/ui/input";
+import { StudentSignupPayload, useStudentSignupMutation } from '@/features/api/apiSlice';
+import { getErrorMessage } from '@/utils/error';
+import { checkStrength, generatePassword } from '@/utils/password';
+import { ArrowLeft, Eye, EyeOff, IdCard, Lock, Mail, Phone, RefreshCw, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const form = useForm<StudentSignupPayload>({
@@ -46,57 +48,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const [remember, setRemember] = useState(false);
   const [studentSignup, { isLoading }] = useStudentSignupMutation();
 
-  // Password strength checker
-  const checkStrength = useCallback((password: string) => {
-    if (!password) return "";
-    if (password.length < 6) return "Weak";
-    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password)) return "Strong";
-    if (password.length >= 8) return "Medium";
-    return "Weak";
-  }, []);
-
-  // Password generator
-  const generatePassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-    let pwd = "";
-    for (let i = 0; i < 12; i++) {
-      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    form.setValue("password", pwd);
-    setPasswordStrength(checkStrength(pwd));
-  };
-
-  // Utility to extract error message
-  function hasMessage(obj: unknown): obj is { message: string } {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      'message' in obj &&
-      typeof (obj as { message?: unknown }).message === 'string'
-    );
-  }
-  function hasDataMessage(obj: unknown): obj is { data: { message: string } } {
-    const o: unknown = obj;
-    return (
-      typeof o === 'object' &&
-      o !== null &&
-      'data' in o &&
-      typeof (o as { data?: unknown }).data === 'object' &&
-      (o as { data?: unknown }).data !== null &&
-      'message' in ((o as { data?: { message?: unknown } }).data ?? {}) &&
-      typeof ((o as { data: { message?: unknown } }).data?.message) === 'string'
-    );
-  }
-
-  function getErrorMessage(err: unknown): string {
-    if (hasDataMessage(err)) {
-      return (err as { data: { message: string } }).data.message;
-    }
-    if (hasMessage(err)) {
-      return (err as { message: string }).message;
-    }
-    return 'Registration failed.';
-  }
+  // Password strength checker and generator are now imported
 
   const onSubmit = async (data: StudentSignupPayload) => {
     setError(null);
@@ -112,7 +64,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
         setError(res?.message || 'Registration failed.');
       }
     } catch (err) {
-      setError(getErrorMessage(err));
+      setError(getErrorMessage(err, 'Registration failed.'));
     }
   };
 
@@ -340,7 +292,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           type="button"
                           tabIndex={-1}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-                          onClick={generatePassword}
+                          onClick={() => {
+                            const pwd = generatePassword();
+                            form.setValue("password", pwd);
+                            setPasswordStrength(checkStrength(pwd));
+                          }}
                           aria-label="Generate strong password"
                         >
                           <Icon icon={RefreshCw} size={20} className="w-5 h-5" />
