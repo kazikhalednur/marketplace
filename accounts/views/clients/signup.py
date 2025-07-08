@@ -12,7 +12,7 @@ from ...serializers.clients import SignupSerializer
     tags=["client"],
     responses={
         200: inline_serializer(
-            name="SignupViewResponse",
+            name="ClientSignupViewResponse",
             fields={
                 "message": drf_serializers.CharField(
                     default="User Created Successfully"
