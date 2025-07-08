@@ -48,4 +48,9 @@ urlpatterns = [
         name="signin_google",
     ),
     path("info/", freelancers_views.UserInfoView.as_view(), name="info"),
+    path(
+        "accepted-domain",
+        freelancers_views.AcceptedDomainView.as_view(),
+        name="accepted_domain",
+    ),
 ]

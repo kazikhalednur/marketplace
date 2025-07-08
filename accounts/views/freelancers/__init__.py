@@ -1,3 +1,4 @@
+from .accepted_domain import AcceptedDomainView
 from .signin import SigninView
 from .signin_google import SigninGoogleView
 from .signup import SignupView
@@ -12,4 +13,5 @@ __all__ = [
     "SignupGoogleView",
     "SigninGoogleView",
     "SignupVerifyView",
+    "AcceptedDomainView",
 ]

@@ -1,3 +1,4 @@
+from .accepted_domain import AcceptedDomainSerializer
 from .signin import SigninSerializer
 from .signin_google import SigninGoogleSerializer
 from .signup import SignupSerializer
@@ -10,4 +11,5 @@ __all__ = [
     "SignupSerializer",
     "SignupGoogleSerializer",
     "UserInfoSerializer",
+    "AcceptedDomainSerializer",
 ]

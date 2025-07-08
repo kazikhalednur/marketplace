@@ -1,6 +1,24 @@
 from django.db import models
 
 
+class AcceptedDomainManager(models.Manager):
+    """
+    Custom manager for AcceptedDomain model to handle domain-related queries.
+    """
+
+    def active_domains(self):
+        """
+        Returns all active accepted domains.
+        """
+        return self.filter(is_active=True)
+
+    def inactive_domains(self):
+        """
+        Returns all inactive accepted domains.
+        """
+        return self.filter(is_active=False)
+
+
 class AcceptedDomain(models.Model):
     """
     Model to store accepted email domains for user registration.
@@ -15,6 +33,8 @@ class AcceptedDomain(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = AcceptedDomainManager()
 
     def __str__(self):
         return self.domain
