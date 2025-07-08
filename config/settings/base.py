@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # local apps
     "accounts.apps.AccountsConfig",
-    # "jobs.apps.JobsConfig",
+    "jobs.apps.JobsConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",

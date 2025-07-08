@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema")),
     # local apps
     path("accounts/", include("accounts.urls")),
+    path("jobs/", include("jobs.urls")),
 ]
 
 if settings.SERVER_TYPE == "local":

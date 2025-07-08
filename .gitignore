@@ -11,6 +11,7 @@ log/
 export/
 uploads/
 static/
+google_credentials.json
 
 
 # Backup files # 
