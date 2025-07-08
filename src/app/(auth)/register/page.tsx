@@ -252,7 +252,7 @@ export default function RegisterPage() {
                 control={form.control}
                 name="password"
                 rules={{ required: "Password is required" }}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
@@ -381,7 +381,6 @@ export default function RegisterPage() {
             className="w-full flex items-center justify-center gap-2 mt-2"
             type="button"
             aria-label="Sign up with Google"
-            // onClick={handleGoogleSignIn} // You can add this if you want
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

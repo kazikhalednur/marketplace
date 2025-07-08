@@ -7,6 +7,7 @@ import { Briefcase, ChevronDown, GraduationCap, Quote, ShieldCheck, Star, Users 
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -160,7 +161,7 @@ export default function LandingPage() {
           {testimonials.map((t, i) => (
             <Card key={i} className="rounded-2xl p-8 text-left shadow-lg border border-[var(--border)] bg-[var(--card)] hover:shadow-xl transition-shadow flex flex-col items-center">
               <div className="flex items-center gap-3 mb-4">
-                <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full border border-[var(--border)] object-cover" />
+                <Image src={t.avatar} alt={t.name} width={40} height={40} className="w-10 h-10 rounded-full border border-[var(--border)] object-cover" />
                 <div>
                   <div className="font-semibold text-[var(--foreground)]">{t.name}</div>
                   <div className="text-xs text-muted-foreground">{t.role}</div>
@@ -237,7 +238,7 @@ export default function LandingPage() {
       <section className="w-full bg-[var(--primary)] py-14 px-4 flex flex-col items-center justify-center text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-[var(--primary-foreground)] mb-2">Ready to Get Started?</h2>
         <p className="text-base md:text-lg text-[var(--secondary)] mb-6 max-w-2xl mx-auto">
-          Join UniMarket today and unlock real opportunities. Whether you're a student or an employer, it's free to get started.
+          Join UniMarket today and unlock real opportunities. Whether you&apos;re a student or an employer, it&apos;s free to get started.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xl justify-center items-center">
           <a

@@ -39,6 +39,7 @@ export default function LoginPage() {
   const onSubmit = async (data: { email: string; password: string }) => {
     setError(null);
     try {
+      console.log(data);
       // TODO: Replace with your actual API call
       // const res = await fetch("/api/login", { ... });
       // if (!res.ok) throw new Error("Invalid credentials");
@@ -46,10 +47,6 @@ export default function LoginPage() {
     } catch {
       setError("Invalid email or password.");
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google sign-in
   };
 
   return (
