@@ -46,7 +46,7 @@ def send_signup_verification_email(user: User, request):
     current_site = get_current_site(request)
     domain = current_site.domain
     uid64 = urlsafe_base64_encode(force_bytes(user.pk))
-    protocol = ("https" if request.is_secure() else "http",)
+    protocol = "https" if request.is_secure() else "http"
 
     text_content = render_to_string(
         "accounts/emails/signup_verification.txt",
