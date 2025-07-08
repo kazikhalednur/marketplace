@@ -1,5 +1,5 @@
 SPECTACULAR_SETTINGS = {
-    "TITLE": "DIU CPC Marketplace API",
+    "TITLE": "DIU CPC Workhub Marketplace API",
     "DESCRIPTION": "",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,

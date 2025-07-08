@@ -1,7 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import OTP, AcceptedDomain, Client, Freelancer, User
+from .models import (
+    OTP,
+    AcceptedDomain,
+    Arbitrator,
+    Auditor,
+    Client,
+    ClientProfile,
+    Freelancer,
+    FreelancerProfile,
+    User,
+)
 
 
 @admin.register(User)
@@ -142,4 +152,92 @@ class ClientAdmin(UserAdmin):
     ordering = ("id",)
 
 
+@admin.register(Arbitrator)
+class ClientAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("username", "email", "password")}),
+        (
+            "Personal info",
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                )
+            },
+        ),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "role",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+    )
+
+    list_display = ("email", "first_name", "last_name")
+    list_filter = ("is_active", "groups")
+    search_fields = ("first_name", "last_name", "email")
+    ordering = ("id",)
+
+
+@admin.register(Auditor)
+class ClientAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("username", "email", "password")}),
+        (
+            "Personal info",
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                )
+            },
+        ),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "role",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+    )
+
+    list_display = ("email", "first_name", "last_name")
+    list_filter = ("is_active", "groups")
+    search_fields = ("first_name", "last_name", "email")
+    ordering = ("id",)
+
+
 admin.site.register(OTP)
+admin.site.register(ClientProfile)
+admin.site.register(FreelancerProfile)
