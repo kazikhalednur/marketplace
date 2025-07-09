@@ -76,4 +76,4 @@ export default function JobList({ jobs, onJobClick }: JobListProps) {
       ))}
     </div>
   );
-} 
+}

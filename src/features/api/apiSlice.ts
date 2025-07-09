@@ -39,7 +39,7 @@ export interface LoginResponse {
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://203.190.14.56:8080/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_BASE_URL }),
   endpoints: (builder) => ({
     studentSignup: builder.mutation<SignupResponse, StudentSignupPayload>({
       query: (body) => ({

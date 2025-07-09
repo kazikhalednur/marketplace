@@ -355,7 +355,7 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                 <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
-            </form>
+      </form>
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
@@ -391,7 +391,7 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
             <a href="/login" className="text-primary hover:underline font-medium">
               Login here
             </a>
-          </div>
+    </div>
         </CardFooter>
       </Card>
     </main>
