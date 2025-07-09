@@ -6,7 +6,7 @@ app_name = "jobs"
 urlpatterns = [
     path("categories/", views.CategoryListView.as_view(), name="category_list"),
     path(
-        "categories/<int:pk>/",
+        "categories/<str:slug>/",
         views.CategoryDetailView.as_view(),
         name="category_detail",
     ),

@@ -1,7 +1,6 @@
 [tool.isort]
 profile = "black"
-extend_skip = "migrations_verified"
 
 [tool.black]
 line-length = 88
-exclude = ".*/(migrations|venv|migrations_verified)/.*"
+exclude = ".*/(migrations|venv)/.*"

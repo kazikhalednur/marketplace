@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from ..user.freelancer import Freelancer
 
@@ -16,6 +17,7 @@ class FreelancerProfile(models.Model):
         verbose_name="Student ID",
         help_text="Your student ID, e.g., 2019-12345-1",
     )
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "Freelancer Profile"

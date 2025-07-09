@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from ...tokens import email_verify_token
 
@@ -37,6 +38,7 @@ class User(AbstractUser):
         choices=UserRole.choices,
         default=UserRole.FREELANCER,
     )
+    history = HistoricalRecords()
 
     objects = CustomUserManager()
 

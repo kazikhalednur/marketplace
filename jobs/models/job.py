@@ -1,9 +1,13 @@
+from uuid import uuid4
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from simple_history.models import HistoricalRecords
 
-from accounts.models import User  # Assuming User model is defined in accounts app
+from accounts.models import User
 
 from .category import Category
+from .skills import Skill
 
 
 class Job(models.Model):
@@ -14,6 +18,17 @@ class Job(models.Model):
         IN_PROGRESS = "in_progress", "In Progress"
         COMPLETED = "completed", "Completed"
 
+    class JobExperienceLevel(models.TextChoices):
+        ENTRY = "entry", "Entry"
+        INTERMEDIATE = "intermediate", "Intermediate"
+        EXPERT = "expert", "Expert"
+
+    id = models.UUIDField(
+        primary_key=True,
+        editable=False,
+        serialize=False,
+        unique=True,
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     tags = ArrayField(
@@ -27,6 +42,12 @@ class Job(models.Model):
         on_delete=models.CASCADE,
         related_name="jobs",
         help_text="Category to which the job belongs",
+    )
+    skills = models.ManyToManyField(
+        Skill,
+        related_name="jobs",
+        blank=True,
+        help_text="Skills required for the job",
     )
     currency = models.CharField(
         max_length=10,
@@ -64,12 +85,15 @@ class Job(models.Model):
     )
     experience_level = models.CharField(
         max_length=50,
-        choices=[
-            ("entry", "Entry Level"),
-            ("intermediate", "Intermediate"),
-            ("expert", "Expert"),
-        ],
+        choices=JobExperienceLevel.choices,
         help_text="Required experience level for the job",
+    )
+    min_proposal_count = models.PositiveIntegerField(
+        default=1,
+        help_text="Minimum number of proposals required to consider the job",
+    )
+    max_proposal_count = models.PositiveIntegerField(
+        help_text="Maximum number of proposals allowed for the job",
     )
     created_by = models.ForeignKey(
         User,
@@ -85,11 +109,17 @@ class Job(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.title
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "Job"
         verbose_name_plural = "Jobs"
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.id = uuid4()
+        super().save(*args, **kwargs)

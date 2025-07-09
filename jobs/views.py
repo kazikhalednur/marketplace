@@ -34,7 +34,7 @@ class CategoryDetailView(RetrieveAPIView):
     permission_classes = []
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = "id"
+    lookup_field = "slug"
 
 
 class JobCreateView(CreateAPIView):
@@ -51,9 +51,3 @@ class JobRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = JobSerializer
     permission_classes = [IsClient]
     lookup_field = "id"
-
-
-class CategoryCreateView(CreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsClient]
