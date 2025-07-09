@@ -54,4 +54,5 @@ class JobSerializer(serializers.ModelSerializer):
             "max_proposal_count",
             "created_by",
             "created_at",
+            "status",
         ]

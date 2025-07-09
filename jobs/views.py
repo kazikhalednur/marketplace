@@ -13,21 +13,21 @@ from .serializers import CategorySerializer, JobSerializer
 
 class JobListView(ListAPIView):
     permission_classes = []
-    queryset = Job.objects.all()
+    queryset = Job.objects.published()
     serializer_class = JobSerializer
+
+
+class JobDetailView(RetrieveAPIView):
+    permission_classes = []
+    queryset = Job.objects.published()
+    serializer_class = JobSerializer
+    lookup_field = "id"
 
 
 class CategoryListView(ListAPIView):
     permission_classes = []
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-
-class JobDetailView(RetrieveAPIView):
-    permission_classes = []
-    queryset = Job.objects.all()
-    serializer_class = JobSerializer
-    lookup_field = "id"
 
 
 class CategoryDetailView(RetrieveAPIView):

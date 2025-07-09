@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import Q
 from simple_history.models import HistoricalRecords
 
 from accounts.models import User
@@ -9,6 +10,22 @@ from accounts.models import User
 from .category import Category
 from .currency import Currency
 from .skills import Skill
+
+
+class JobManager(models.Manager):
+    def published(self, **kwargs):
+        return (
+            self.filter(
+                Q(status=Job.JobStatus.OPEN)
+                | Q(status=Job.JobStatus.IN_PROGRESS)
+                | Q(status=Job.JobStatus.COMPLETED)
+                | Q(status=Job.JobStatus.CLOSED),
+                **kwargs
+            )
+            .select_related("category", "currency")
+            .prefetch_related("skills")
+            .distinct()
+        )
 
 
 class Job(models.Model):
@@ -112,6 +129,8 @@ class Job(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
+
+    objects = JobManager()
 
     class Meta:
         verbose_name = "Job"
