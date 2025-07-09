@@ -40,7 +40,7 @@ class CategoryListView(ListAPIView):
 
 @extend_schema(tags=["Client Jobs"])
 class DropdownView(APIView):
-    permission_classes = []
+    permission_classes = [IsClient]
     serializer_class = DropdownSerializer
 
     def get(self, request, *args, **kwargs):
