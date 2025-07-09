@@ -91,20 +91,38 @@ class DropdownCurrencySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "symbol"]
 
 
+class DropdownStatusSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        return [
+            {"label": label, "value": value} for value, label in Job.JobStatus.choices
+        ]
+
+
+class DropdownExperienceLevelSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        return [
+            {"label": label, "value": value}
+            for value, label in Job.JobExperienceLevel.choices
+        ]
+
+
 class DropdownSerializer(serializers.Serializer):
     categories = DropdownCategorySerializer(many=True, read_only=True)
     skills = DropdownSkillSerializer(many=True, read_only=True)
     currencies = DropdownCurrencySerializer(many=True, read_only=True)
+    status = DropdownStatusSerializer()
+    experience_levels = DropdownExperienceLevelSerializer()
 
     def to_representation(self, instance):
         return {
             "categories": CategorySerializer(Category.objects.all(), many=True).data,
             "skills": SkillSerializer(Skill.objects.all(), many=True).data,
             "currencies": CurrencySerializer(Currency.objects.all(), many=True).data,
+            "status": DropdownStatusSerializer().to_representation(None),
+            "experience_levels": DropdownExperienceLevelSerializer().to_representation(
+                None
+            ),
         }
-
-    class Meta:
-        fields = ["categories", "skills", "currencies"]
 
 
 class JobCreateSerializer(serializers.ModelSerializer):
