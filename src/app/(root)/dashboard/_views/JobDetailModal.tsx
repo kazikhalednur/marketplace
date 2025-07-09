@@ -2,9 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast-provider';
 import { getExperienceBadge } from '@/utils/experienceBadge';
+import { getCurrencySymbol } from '@/utils/getCurrencySymbol';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
-import { CheckCircle, Clock, DollarSign, Layers, Tag, TrendingUp, User, X, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import type { JobDetail } from './JobList';
@@ -128,50 +129,47 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
             </div>
           </div>
           {/* Right/Meta & Apply */}
-          <div className="md:w-96 w-full flex flex-col gap-6 bg-muted/40 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl p-8 border-t md:border-t-0 md:border-l border-border/20">
-            {/* Budget & Terms */}
-            <div className="flex flex-col gap-6">
+          <div className="md:w-96 w-full flex flex-col gap-6 p-8 border-t md:border-t-0 md:border-l border-border/20 bg-white">
+            <div>
               <div className="font-semibold text-lg text-primary mb-2 tracking-wide">Budget & Terms</div>
-              <div className="flex flex-col gap-4 bg-background rounded-xl p-5 border border-border/10 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <DollarSign className="w-6 h-6 text-green-600" aria-hidden="true" />
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Budget:</span>
-                  <span className="text-lg font-bold">{job.currency}{job.min_budget}</span>
+                  <span className="text-lg font-extrabold align-middle text-green-700">{getCurrencySymbol(job.currency)}</span>
+                  <span className="text-lg font-bold">{job.min_budget}</span>
                   {job.max_budget && job.max_budget !== job.min_budget && (
-                    <span className="text-sm text-muted-foreground">- {job.currency}{job.max_budget}</span>
+                    <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">{getCurrencySymbol(job.currency)}</span>{job.max_budget}</span>
                   )}
                 </div>
                 {job.duration && (
-                  <div className="flex items-center gap-4">
-                    <Clock className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
                     <span className="font-medium text-base">Duration:</span>
                     <span className="text-base">{job.duration}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Type:</span>
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}>
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}> 
                     {job.is_fixed ? <CheckCircle className="w-4 h-4 text-primary" /> : <XCircle className="w-4 h-4 text-muted-foreground" />} {job.is_fixed ? 'Fixed' : 'Flexible'}
                   </span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Experience:</span>
                   <span className="w-full flex justify-start">{getExperienceBadge(job.experience_level)}</span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Proposals:</span>
                   <span className="text-base">{job.min_proposal_count} - {job.max_proposal_count}</span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Status:</span>
                   {getStatusBadge(job.status)}
                 </div>
               </div>
             </div>
-            {/* Divider */}
-            <div className="border-t border-border/20 my-4" />
-            {/* Meta Info */}
-            <div className="flex flex-col gap-3 text-xs text-muted-foreground bg-background rounded-xl p-4 border border-border/10 shadow-sm">
+            <hr className="my-4 border-border/20" />
+            <div className="flex flex-col gap-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
                 <span>Posted {job.created_at ? getRelativeTime(job.created_at) : ''}</span>
@@ -197,7 +195,6 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                 </div>
               )}
             </div>
-            {/* Job Link */}
             <div className="mt-6">
               <div className="font-semibold mb-1 text-sm">Job link</div>
               <div className="flex items-center gap-2">
