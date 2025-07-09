@@ -36,7 +36,7 @@ class SigninView(TokenObtainPairView):
             expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
             secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-            samesite=None,
+            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
         )
 
         return response
