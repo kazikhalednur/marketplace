@@ -7,6 +7,7 @@ from simple_history.models import HistoricalRecords
 from accounts.models import User
 
 from .category import Category
+from .currency import Currency
 from .skills import Skill
 
 
@@ -49,10 +50,11 @@ class Job(models.Model):
         blank=True,
         help_text="Skills required for the job",
     )
-    currency = models.CharField(
-        max_length=10,
-        default="USD",
-        help_text="Currency for the job payment",
+    currency = models.ForeignKey(
+        Currency,
+        on_delete=models.CASCADE,
+        related_name="jobs",
+        help_text="Currency in which the job budget is specified",
     )
     min_budget = models.DecimalField(
         max_digits=10,
