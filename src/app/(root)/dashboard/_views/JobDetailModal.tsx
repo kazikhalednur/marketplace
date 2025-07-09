@@ -1,24 +1,13 @@
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X, Layers, Tag, Clock, TrendingUp, CheckCircle, XCircle, DollarSign, User } from 'lucide-react';
-import * as React from 'react';
+import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast-provider';
-
-export interface JobDetail {
-  id: number;
-  title: string;
-  description: string;
-  tags: string[];
-  posted: string;
-  employer: string;
-  category?: string;
-  currency?: string;
-  min_budget?: number;
-  max_budget?: number;
-  duration?: string;
-  experience_level?: string;
-  status?: string;
-}
+import { getExperienceBadge } from '@/utils/experienceBadge';
+import { getStatusBadge } from '@/utils/statusBadge';
+import { getRelativeTime } from '@/utils/time';
+import { CheckCircle, Clock, DollarSign, Layers, Tag, TrendingUp, User, X, XCircle } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
+import type { JobDetail } from './JobList';
 
 interface JobDetailModalProps {
   open: boolean;
@@ -30,6 +19,7 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
   const modalRef = React.useRef<HTMLDivElement>(null);
   const [applyLoading, setApplyLoading] = React.useState(false);
   const { showToast } = useToast();
+  const [copied, setCopied] = useState(false);
 
   // Accessibility: Focus trap and Escape key
   React.useEffect(() => {
@@ -72,109 +62,196 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
     >
       <Card
         ref={modalRef}
-        className="relative w-full max-w-xl md:max-w-2xl p-6 md:p-10 rounded-2xl shadow-2xl bg-background animate-in fade-in zoom-in-95 focus:outline-none"
+        className="relative w-full max-w-3xl md:max-w-4xl p-0 rounded-2xl shadow-2xl bg-background animate-in fade-in zoom-in-95 focus:outline-none"
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
+          className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10"
           aria-label="Close"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
-        <header className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
-            {job.title}
-            {job.status && (
-              <span
-                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium shadow-sm ${job.status === 'Open' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                title={job.status === 'Open' ? 'Job is open for applications' : 'Job is closed'}
-              >
-                {job.status === 'Open' ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />} {job.status}
-              </span>
-            )}
-          </h2>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 md:mt-0">
-            <User className="w-4 h-4" aria-hidden="true" />
-            <span className="font-semibold text-foreground">{job.employer}</span>
-            <span className="mx-2">•</span>
-            <span>{job.posted}</span>
+        <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-0 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
+          {/* Left/Main Info */}
+          <div className="flex-1 p-6 md:p-0 flex flex-col gap-6">
+            {/* Job Overview */}
+            <div className="flex flex-col gap-2 border-b pb-4">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h2 className="text-2xl md:text-3xl font-bold text-primary flex items-center gap-3">
+                  {job.title}
+                </h2>
+                {getStatusBadge(job.status)}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <User className="w-4 h-4" aria-hidden="true" />
+                  <span className="font-semibold text-foreground">{job.created_by?.full_name || 'Unknown'}</span>
+                </span>
+                <span className="mx-2 hidden md:inline">•</span>
+                <span>{job.created_at ? getRelativeTime(job.created_at) : ''}</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold text-lg text-primary mb-1">Tags & Skills</div>
+              <div className="flex flex-wrap gap-2">
+                {job.tags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 bg-muted text-xs px-3 py-1 rounded-full text-muted-foreground border border-muted-foreground/10 hover:bg-primary/10 hover:text-primary transition-colors"
+                    title={`Tag: ${tag}`}
+                  >
+                    <Tag className="w-3 h-3" /> {tag}
+                  </span>
+                ))}
+                {job.category && (
+                  <span
+                    className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200 hover:bg-blue-200/60 transition-colors"
+                    title={`Category: ${typeof job.category === 'string' ? job.category : job.category.name}`}
+                  >
+                    <Layers className="w-3 h-3" /> {typeof job.category === 'string' ? job.category : job.category.name}
+                  </span>
+                )}
+                {job.skills && job.skills.length > 0 && job.skills.map((skill) => (
+                  <span
+                    key={skill.slug}
+                    className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full border border-green-200 hover:bg-green-200/60 transition-colors"
+                    title={`Skill: ${skill.name}`}
+                  >
+                    <TrendingUp className="w-3 h-3" /> {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="font-semibold text-lg text-primary mt-4 mb-1">Description</div>
+            <div className="text-base text-foreground whitespace-pre-line leading-relaxed bg-muted/40 rounded-lg p-4 border border-muted-foreground/10">
+              {job.description}
+            </div>
           </div>
-        </header>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {job.tags?.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1 bg-muted text-xs px-3 py-1 rounded-full text-muted-foreground border border-muted-foreground/10"
-              title={`Tag: ${tag}`}
+          {/* Right/Meta & Apply */}
+          <div className="md:w-96 w-full flex flex-col gap-6 bg-muted/40 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl p-8 border-t md:border-t-0 md:border-l border-border/20">
+            {/* Budget & Terms */}
+            <div className="flex flex-col gap-6">
+              <div className="font-semibold text-lg text-primary mb-2 tracking-wide">Budget & Terms</div>
+              <div className="flex flex-col gap-4 bg-background rounded-xl p-5 border border-border/10 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <DollarSign className="w-6 h-6 text-green-600" aria-hidden="true" />
+                  <span className="font-medium text-base">Budget:</span>
+                  <span className="text-lg font-bold">{job.currency}{job.min_budget}</span>
+                  {job.max_budget && job.max_budget !== job.min_budget && (
+                    <span className="text-sm text-muted-foreground">- {job.currency}{job.max_budget}</span>
+                  )}
+                </div>
+                {job.duration && (
+                  <div className="flex items-center gap-4">
+                    <Clock className="w-5 h-5 text-primary" aria-hidden="true" />
+                    <span className="font-medium text-base">Duration:</span>
+                    <span className="text-base">{job.duration}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-base">Type:</span>
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}>
+                    {job.is_fixed ? <CheckCircle className="w-4 h-4 text-primary" /> : <XCircle className="w-4 h-4 text-muted-foreground" />} {job.is_fixed ? 'Fixed' : 'Flexible'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-base">Experience:</span>
+                  <span className="w-full flex justify-start">{getExperienceBadge(job.experience_level)}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-base">Proposals:</span>
+                  <span className="text-base">{job.min_proposal_count} - {job.max_proposal_count}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-base">Status:</span>
+                  {getStatusBadge(job.status)}
+                </div>
+              </div>
+            </div>
+            {/* Divider */}
+            <div className="border-t border-border/20 my-4" />
+            {/* Meta Info */}
+            <div className="flex flex-col gap-3 text-xs text-muted-foreground bg-background rounded-xl p-4 border border-border/10 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+                <span>Posted {job.created_at ? getRelativeTime(job.created_at) : ''}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" aria-hidden="true" />
+                <span>{job.created_by?.full_name || 'Unknown'}</span>
+              </div>
+              {job.created_by?.date_joined && (
+                <div className="ml-6">
+                  Member since <span className="font-medium">{new Date(job.created_by.date_joined).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                </div>
+              )}
+              {job.created_by?.is_payment_verified ? (
+                <div className="flex items-center gap-2 text-green-600 font-medium ml-6">
+                  <CheckCircle className="w-4 h-4" />
+                  Payment method verified
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-muted-foreground ml-6">
+                  <XCircle className="w-4 h-4" />
+                  Payment not verified
+                </div>
+              )}
+            </div>
+            {/* Job Link */}
+            <div className="mt-6">
+              <div className="font-semibold mb-1 text-sm">Job link</div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={typeof window !== 'undefined' ? window.location.href : ''}
+                  readOnly
+                  className="bg-muted text-muted-foreground rounded px-3 py-2 text-xs w-full font-mono border border-border/20 focus:ring-2 focus:ring-primary/30 transition-all"
+                  style={{ cursor: 'not-allowed' }}
+                />
+                <button
+                  className={`text-green-600 font-medium text-xs px-2 py-1 rounded hover:bg-green-50 focus:bg-green-100 transition-all border border-green-100 ${copied ? 'bg-green-100' : ''}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(typeof window !== 'undefined' ? window.location.href : '');
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1200);
+                  }}
+                  type="button"
+                >
+                  {copied ? 'Copied!' : 'Copy link'}
+                </button>
+              </div>
+            </div>
+            <Button
+              className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
+              onClick={async () => {
+                setApplyLoading(true);
+                try {
+                  // Simulate async apply action
+                  await new Promise((r) => setTimeout(r, 1200));
+                  showToast({
+                    type: 'success',
+                    message: 'Application submitted successfully!'
+                  });
+                } catch (err) {
+                  showToast({
+                    type: 'error',
+                    message: 'Failed to apply for this job. Please try again.'
+                  });
+                  console.error(err);
+                } finally {
+                  setApplyLoading(false);
+                }
+              }}
+              disabled={applyLoading}
+              aria-busy={applyLoading}
             >
-              <Tag className="w-3 h-3" /> {tag}
-            </span>
-          ))}
-          {job.category && (
-            <span
-              className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200"
-              title={`Category: ${job.category}`}
-            >
-              <Layers className="w-3 h-3" /> {job.category}
-            </span>
-          )}
+              {applyLoading ? (
+                <span className="animate-spin mr-2 w-4 h-4 border-2 border-t-transparent border-primary rounded-full" />
+              ) : null}
+              Apply for this Job
+            </Button>
+          </div>
         </div>
-        <section className="mb-6 text-base text-foreground whitespace-pre-line leading-relaxed">
-          {job.description}
-        </section>
-        <section className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2" title="Budget Range">
-            <DollarSign className="w-4 h-4 text-green-600" aria-hidden="true" />
-            <span className="font-semibold">Budget:</span>
-            <span>
-              {job.currency || '$'}{job.min_budget}
-              {job.max_budget && job.max_budget !== job.min_budget ? ` - ${job.currency || '$'}${job.max_budget}` : ''}
-            </span>
-          </div>
-          {job.duration && (
-            <div className="flex items-center gap-2" title="Expected Duration">
-              <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span className="font-semibold">Duration:</span>
-              <span>{job.duration}</span>
-            </div>
-          )}
-          {job.experience_level && (
-            <div className="flex items-center gap-2" title="Experience Level Required">
-              <TrendingUp className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span className="font-semibold">Experience:</span>
-              <span>{job.experience_level}</span>
-            </div>
-          )}
-        </section>
-        <Button
-          className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
-          onClick={async () => {
-            setApplyLoading(true);
-            try {
-              // Simulate async apply action
-              await new Promise((r) => setTimeout(r, 1200));
-              showToast({
-                type: 'success',
-                message: 'Application submitted successfully!'
-              });
-            } catch (err) {
-              showToast({
-                type: 'error',
-                message: 'Failed to apply for this job. Please try again.'
-              });
-              console.error(err);
-            } finally {
-              setApplyLoading(false);
-            }
-          }}
-          disabled={applyLoading}
-          aria-busy={applyLoading}
-        >
-          {applyLoading ? (
-            <span className="animate-spin mr-2 w-4 h-4 border-2 border-t-transparent border-primary rounded-full" />
-          ) : null}
-          Apply for this Job
-        </Button>
       </Card>
     </div>
   );

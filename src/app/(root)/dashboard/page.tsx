@@ -1,13 +1,16 @@
 "use client";
 
 import { Card } from '@/components/ui/card';
-import JobList from './_views/JobList';
-import JobDetailModal, { JobDetail } from './_views/JobDetailModal';
+import JobList, { JobDetail } from './_views/JobList';
+import JobDetailModal from './_views/JobDetailModal';
 import { useState, useEffect } from 'react';
 import DashboardFilters from './_views/DashboardFilters';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 import { useRouter } from 'next/navigation';
 import { useGetJobsQuery } from '@/features/api/jobsApi';
+import { Button } from '@/components/ui/button';
+import JobCreateModal from './_views/JobCreateModal';
+import { Plus } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -21,6 +24,7 @@ export default function DashboardPage() {
   }, [router]);
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
 
   // Fetch jobs from API
@@ -31,8 +35,7 @@ export default function DashboardPage() {
     const matchesSearch =
       !searchText ||
       job.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchText.toLowerCase()) ||
-      (job.employer?.toLowerCase?.().includes(searchText.toLowerCase?.()) ?? false);
+      job.description.toLowerCase().includes(searchText.toLowerCase());
     const matchesTags =
       selectedTags.length === 0 || selectedTags.every((tag) => job.tags.includes(tag));
     return matchesSearch && matchesTags;
@@ -55,6 +58,16 @@ export default function DashboardPage() {
         <Card className="p-6 mb-8">
           <DashboardFilters />
         </Card>
+        {/* Create Job Button */}
+        <div className="flex flex-col sm:flex-row sm:justify-end mb-6">
+          <Button
+            className="w-full sm:w-auto px-8 py-3 text-base font-semibold shadow-md flex items-center gap-2"
+            onClick={() => setCreateModalOpen(true)}
+          >
+            <Plus className="w-6 h-6" />
+            Create Job
+          </Button>
+        </div>
         {/* Job List */}
         <section className="space-y-4 min-h-[200px]">
           {isLoading ? (
@@ -77,6 +90,7 @@ export default function DashboardPage() {
           )}
         </section>
         <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
+        <JobCreateModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
       </div>
     </main>
   );

@@ -1,22 +1,45 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { JobDetail } from '@/app/(root)/dashboard/_views/JobDetailModal';
+import type { JobDetail } from '@/app/(root)/dashboard/_views/JobList';
 
 // Define types for API response and job
+interface JobApiCategory {
+  name: string;
+  slug: string;
+}
+
+interface JobApiSkill {
+  name: string;
+  slug: string;
+}
+
+interface JobApiCreator {
+  full_name: string;
+  is_payment_verified: boolean | null;
+  date_joined: string;
+}
+
 interface JobApi {
-  id: string | number;
+  id: string;
   title: string;
   description: string;
-  tags?: string[];
-  category?: { name: string };
-  currency?: string;
-  min_budget?: number | string;
-  max_budget?: number | string;
-  duration?: string;
-  experience_level?: string;
-  status?: string;
-  posted?: string;
-  employer?: string;
+  tags: string[];
+  category: JobApiCategory;
+  skills: JobApiSkill[];
+  currency: string;
+  is_fixed: boolean;
+  min_budget: string;
+  max_budget: string;
+  min_hourly_rate: string | null;
+  max_hourly_rate: string | null;
+  duration: string;
+  experience_level: string;
+  min_proposal_count: number;
+  max_proposal_count: number;
+  status: string;
+  created_by: JobApiCreator;
+  created_at: string;
 }
+
 interface JobsApiResponse {
   data: JobApi[];
 }
@@ -28,26 +51,31 @@ export const jobsApi = createApi({
     getJobs: builder.query<JobDetail[], void>({
       query: () => '/jobs/',
       transformResponse: (response: JobsApiResponse) => {
-        // Map API response to JobDetail[]
         if (response && Array.isArray(response.data)) {
           return response.data.map((job: JobApi) => ({
-            id: Number(job.id),
+            id: job.id,
             title: job.title,
             description: job.description,
-            tags: job.tags || [],
-            category: job.category?.name || '',
-            currency: job.currency || '',
-            min_budget: Number(job.min_budget) || 0,
-            max_budget: Number(job.max_budget) || 0,
-            duration: job.duration || '',
-            experience_level: job.experience_level || '',
-            status: job.status || '',
-            posted: job.posted || '', // You may want to format this if available
-            employer: job.employer || '', // You may want to map this if available
+            tags: job.tags,
+            category: job.category,
+            skills: job.skills,
+            currency: job.currency,
+            is_fixed: job.is_fixed,
+            min_budget: job.min_budget,
+            max_budget: job.max_budget,
+            min_hourly_rate: job.min_hourly_rate,
+            max_hourly_rate: job.max_hourly_rate,
+            duration: job.duration,
+            experience_level: job.experience_level,
+            min_proposal_count: job.min_proposal_count,
+            max_proposal_count: job.max_proposal_count,
+            status: job.status,
+            created_by: job.created_by,
+            created_at: job.created_at,
           }));
         }
         return [];
-      },
+      }
     }),
   }),
 });
