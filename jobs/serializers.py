@@ -107,17 +107,15 @@ class DropdownExperienceLevelSerializer(serializers.Serializer):
 
 
 class DropdownSerializer(serializers.Serializer):
-    categories = DropdownCategorySerializer(many=True, read_only=True)
-    skills = DropdownSkillSerializer(many=True, read_only=True)
-    currencies = DropdownCurrencySerializer(many=True, read_only=True)
-    status = DropdownStatusSerializer()
-    experience_levels = DropdownExperienceLevelSerializer()
-
     def to_representation(self, instance):
         return {
-            "categories": CategorySerializer(Category.objects.all(), many=True).data,
-            "skills": SkillSerializer(Skill.objects.all(), many=True).data,
-            "currencies": CurrencySerializer(Currency.objects.all(), many=True).data,
+            "categories": DropdownCategorySerializer(
+                Category.objects.all(), many=True
+            ).data,
+            "skills": DropdownSkillSerializer(Skill.objects.all(), many=True).data,
+            "currencies": DropdownCurrencySerializer(
+                Currency.objects.all(), many=True
+            ).data,
             "status": DropdownStatusSerializer().to_representation(None),
             "experience_levels": DropdownExperienceLevelSerializer().to_representation(
                 None
