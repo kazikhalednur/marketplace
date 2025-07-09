@@ -130,7 +130,7 @@ class Job(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
 
-    objects = JobManager()
+    objects: JobManager = JobManager()
 
     class Meta:
         verbose_name = "Job"

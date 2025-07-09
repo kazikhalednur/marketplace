@@ -56,4 +56,9 @@ urlpatterns = [
     ),
     # Client specific URLs
     path("clients/signup/", clients_views.SignupView.as_view(), name="clients_signup"),
+    path(
+        "clients/signup-google/",
+        clients_views.SignupGoogleView.as_view(),
+        name="clients_signup_google",
+    ),
 ]

@@ -5,7 +5,7 @@ from ...helpers import (
     google_user_details,
     match_email_domain,
 )
-from ...models import User
+from ...models import Freelancer, User
 
 
 class SignupGoogleSerializer(serializers.Serializer):
@@ -24,7 +24,7 @@ class SignupGoogleSerializer(serializers.Serializer):
                 {"email": "Try with your DIU email address"}
             )
 
-        user = User.objects.create_user(
+        user = Freelancer.objects.create_user(
             sub=google_data["sub"],
             is_google_login=True,
             email=email,
