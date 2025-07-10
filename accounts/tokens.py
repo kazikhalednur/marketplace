@@ -43,7 +43,7 @@ class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
 
             return (
                 self._num_seconds(self._now()) - ts
-            ) <= settings.EMAIL_VERIFIY_TIMEOUT
+            ) > settings.EMAIL_VERIFIY_TIMEOUT
 
         return False
 

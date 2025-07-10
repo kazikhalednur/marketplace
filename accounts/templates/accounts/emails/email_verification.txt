@@ -1,0 +1,8 @@
+You're receiving this email because you have created an account on {{ frontend_domain }}. Please verify your email address by click link below:
+{{ frontend_url }}/email-verified/{{ uidb64 }}/{{token}}
+
+This verification link is only valid for the next 5 minutes.
+If you did not create a freelancer account, please ignore this email.
+
+Thanks for using our site!
+DIU CPC Marketplace Team

@@ -166,6 +166,8 @@ CORS_ALLOW_CREDENTIALS = True
 OTP_TIMEOUT = 300
 EMAIL_VERIFIY_TIMEOUT = 300
 
+FRONTEND_URL = config("FRONTEND_URL", cast=str)
+
 
 from .rest_framework import *
 from .simple_jwt import *

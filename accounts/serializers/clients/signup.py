@@ -38,5 +38,5 @@ class ClientSignupSerializer(serializers.ModelSerializer):
         company_name = validated_data.pop("company_name", "")
         instance = Client.objects.create_user(**validated_data, is_active=False)
         ClientProfile.objects.create(client=instance, company_name=company_name)
-        send_signup_verification_email(instance, self.context["request"])
+        send_signup_verification_email(instance)
         return instance

@@ -6,52 +6,45 @@ from rest_framework.views import APIView
 
 from utils.helpers import Response
 
+from ..mails import send_signup_verification_email
 from ..models import User
 
 
 @extend_schema(
     responses={
         200: inline_serializer(
-            name="SignupVerifyViewResponse",
+            name="EmailResendViewResponse",
             fields={
                 "message": drf_serializers.CharField(
-                    default="Email verified successfully. You can now login."
+                    default="A new verification link has been sent to your email."
                 )
             },
         ),
         400: inline_serializer(
-            name="SignupVerifyViewResponse",
+            name="EmailResendViewBadResponse",
             fields={"message": drf_serializers.CharField(default="Invalid link")},
         ),
     },
 )
-class SignupVerifyView(APIView):
+class EmailResendView(APIView):
     permission_classes = []
     authentication_classes = []
 
     def get(self, request, uidb64, token, *args, **kwargs):
         """
-        Verify the email address of a freelancer.
+        Resend verification link.
         """
         user: User = self.get_user(uidb64)
         if user is None or not user.check_email_verification_token(token):
+            return Response(status_code=400, message="Invalid link")
+
+        if user.check_email_verification_timeout(token):
+            send_signup_verification_email(user)
             return Response(
-                status_code=400,
-                message="Invalid link",
+                message="A new verification link has been sent to your email."
             )
 
-        if not user.check_email_verification_timeout(token):
-            user.generate_email_verification_token()
-            return Response(
-                status_code=400,
-                message="This link has expired. A new link has been sent to your email.",  # noqa: E501
-            )
-
-        user.is_active = True
-        user.email_verified = True
-        user.save(update_fields=["is_active", "email_verified"])
-
-        return Response(message="Email verified successfully. You can now login.")
+        return Response(message="Verification link already has been sent successfully.")
 
     def get_user(self, uidb64):
         try:

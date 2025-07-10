@@ -28,12 +28,6 @@ class SignupView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = ClientSignupSerializer
 
-    def get_serializer_context(self):
-        """Add custom context to the serializer."""
-        context = super().get_serializer_context()
-        context["request"] = self.request
-        return context
-
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
         return Response(message="User Created Successfully")

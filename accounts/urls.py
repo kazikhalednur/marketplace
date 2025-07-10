@@ -38,8 +38,13 @@ urlpatterns = [
     ),
     path(
         "verify/email/<uidb64>/<token>/",
-        views.SignupVerifyView.as_view(),
+        views.EmailVerifyView.as_view(),
         name="verify_email",
+    ),
+    path(
+        "resend/email/<uidb64>/<token>/",
+        views.EmailResendView.as_view(),
+        name="resend_email",
     ),
     path("info/", views.UserInfoView.as_view(), name="info"),
     # Freelancer specific URLs

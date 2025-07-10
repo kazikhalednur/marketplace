@@ -80,6 +80,14 @@ class FreelancerAdmin(UserAdmin):
             },
         ),
         (
+            "Verification",
+            {"fields": ("email_verified",)},
+        ),
+        (
+            "Google Login",
+            {"fields": ("is_google_login",)},
+        ),
+        (
             "Permissions",
             {
                 "fields": (
@@ -110,132 +118,18 @@ class FreelancerAdmin(UserAdmin):
 
 
 @admin.register(Client)
-class ClientAdmin(UserAdmin):
-    fieldsets = (
-        (None, {"fields": ("username", "email", "password")}),
-        (
-            "Personal info",
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                )
-            },
-        ),
-        (
-            "Permissions",
-            {
-                "fields": (
-                    "is_active",
-                    "role",
-                    "groups",
-                    "user_permissions",
-                ),
-            },
-        ),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
-    )
-
-    add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": ("username", "email", "password1", "password2"),
-            },
-        ),
-    )
-
-    list_display = ("email", "first_name", "last_name")
-    list_filter = ("is_active", "groups")
-    search_fields = ("first_name", "last_name", "email")
-    ordering = ("id",)
+class ClientAdmin(FreelancerAdmin):
+    pass
 
 
 @admin.register(Arbitrator)
-class ClientAdmin(UserAdmin):
-    fieldsets = (
-        (None, {"fields": ("username", "email", "password")}),
-        (
-            "Personal info",
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                )
-            },
-        ),
-        (
-            "Permissions",
-            {
-                "fields": (
-                    "is_active",
-                    "role",
-                    "groups",
-                    "user_permissions",
-                ),
-            },
-        ),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
-    )
-
-    add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": ("username", "email", "password1", "password2"),
-            },
-        ),
-    )
-
-    list_display = ("email", "first_name", "last_name")
-    list_filter = ("is_active", "groups")
-    search_fields = ("first_name", "last_name", "email")
-    ordering = ("id",)
+class ArbitratorAdmin(FreelancerAdmin):
+    pass
 
 
 @admin.register(Auditor)
-class ClientAdmin(UserAdmin):
-    fieldsets = (
-        (None, {"fields": ("username", "email", "password")}),
-        (
-            "Personal info",
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                )
-            },
-        ),
-        (
-            "Permissions",
-            {
-                "fields": (
-                    "is_active",
-                    "role",
-                    "groups",
-                    "user_permissions",
-                ),
-            },
-        ),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
-    )
-
-    add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": ("username", "email", "password1", "password2"),
-            },
-        ),
-    )
-
-    list_display = ("email", "first_name", "last_name")
-    list_filter = ("is_active", "groups")
-    search_fields = ("first_name", "last_name", "email")
-    ordering = ("id",)
+class AuditorAdmin(FreelancerAdmin):
+    pass
 
 
 admin.site.register(OTP)

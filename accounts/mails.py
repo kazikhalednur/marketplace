@@ -1,5 +1,6 @@
+from urllib.parse import urlparse
+
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -37,29 +38,29 @@ def send_reset_mail(user):
     return True
 
 
-def send_signup_verification_email(user: User, request):
+def send_signup_verification_email(user: User):
     subject = "Verify your email"
     from_mail = f"DIU CPC Workhub <{settings.DEFAULT_FROM_EMAIL}>"
     to_mail = user.email
 
     token = user.generate_email_verification_token()
-    current_site = get_current_site(request)
-    domain = current_site.domain
-    uid64 = urlsafe_base64_encode(force_bytes(user.pk))
-    protocol = "https" if request.is_secure() else "http"
+    frontend_url = settings.FRONTEND_URL
+    frontend_parsed_url = urlparse(frontend_url)
+    frontend_domain = frontend_parsed_url.hostname
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
 
     text_content = render_to_string(
-        "accounts/emails/signup_verification.txt",
+        "accounts/emails/email_verification.txt",
         context={
+            "frontend_domain": frontend_domain,
+            "frontend_url": frontend_url,
+            "uidb64": uidb64,
             "token": token,
-            "uid64": uid64,
-            "domain": domain,
-            "protocol": protocol,
         },
     )
 
     # html_content = render_to_string(
-    #     "accounts/emails/signup_verification.html",
+    #     "accounts/emails/email_verification.html",
     #     context={
     #         "token": token,
     #         "uid64": uid64,

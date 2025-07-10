@@ -48,5 +48,5 @@ class SignupSerializer(serializers.ModelSerializer):
         student_id = validated_data.pop("student_id", "")
         instance = Freelancer.objects.create_user(**validated_data, is_active=False)
         FreelancerProfile.objects.create(freelancer=instance, student_id=student_id)
-        send_signup_verification_email(instance, self.context["request"])
+        send_signup_verification_email(instance)
         return instance
