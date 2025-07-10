@@ -59,6 +59,12 @@ class User(AbstractUser):
         """
         return email_verify_token.check_token(self, token)
 
+    def check_email_verification_timeout(self, token):
+        """
+        Check if the provided token is still valid (not expired).
+        """
+        return email_verify_token.check_timeout(self, token)
+
     def generate_email_verification_token(self):
         """
         Generate a token for email verification.

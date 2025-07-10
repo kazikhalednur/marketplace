@@ -17,25 +17,7 @@ class FreelancerProfile(models.Model):
         verbose_name="Student ID",
         help_text="Your student ID, e.g., 2019-12345-1",
     )
-    hours_per_week = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        verbose_name="Hours per Week",
-        help_text="The number of hours you can work per week",
-    )
-    is_more_available = models.BooleanField(
-        default=True,
-        verbose_name="More Available",
-        help_text="Are you available for more work?",
-    )
-    hour_rate = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=10,
-        decimal_places=2,
-        verbose_name="Hourly Rate",
-        help_text="Your hourly rate in USD",
-    )
+    available_connects = models.PositiveIntegerField(default=30)
     history = HistoricalRecords()
 
     class Meta:
@@ -44,3 +26,33 @@ class FreelancerProfile(models.Model):
 
     def __str__(self):
         return f"{self.freelancer.username}'s Profile"
+
+    # def use_connects(self, job, amount, reason="Job Application"):
+    #     if self.available_connects < amount:
+    #         raise ValueError("Not enough connects.")
+
+    #     # Check if already applied
+    #     if ConnectUsage.objects.filter(profile=self, job=job).exists():
+    #         raise ValueError("Already applied to this job.")
+
+    #     # Deduct connects
+    #     self.available_connects -= amount
+    #     self.save()
+
+    #     # Record usage
+    #     return ConnectUsage.objects.create(
+    #         profile=self,
+    #         job=job,
+    #         used_connects=amount,
+    #         reason=reason
+    #     )
+
+    # def add_connects(self, amount, reason="Admin Top-up"):
+    #     self.available_connects += amount
+    #     self.save()
+    #     return ConnectHistory.objects.create(
+    #         profile=self,
+    #         change_type='add',
+    #         connects_changed=amount,
+    #         reason=reason
+    #     )

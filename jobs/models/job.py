@@ -8,7 +8,6 @@ from simple_history.models import HistoricalRecords
 from accounts.models import User
 
 from .category import Category
-from .currency import Currency
 from .skills import Skill
 
 
@@ -22,7 +21,7 @@ class JobManager(models.Manager):
                 | Q(status=Job.JobStatus.CLOSED),
                 **kwargs
             )
-            .select_related("category", "currency")
+            .select_related("category")
             .prefetch_related("skills")
             .distinct()
         )
@@ -40,6 +39,10 @@ class Job(models.Model):
         ENTRY = "entry", "Entry"
         INTERMEDIATE = "intermediate", "Intermediate"
         EXPERT = "expert", "Expert"
+
+    class JobPrivacy(models.TextChoices):
+        PUBLIC = "public", "Public"
+        PRIVATE = "private", "Private"
 
     id = models.UUIDField(
         primary_key=True,
@@ -66,12 +69,6 @@ class Job(models.Model):
         related_name="jobs",
         blank=True,
         help_text="Skills required for the job",
-    )
-    currency = models.ForeignKey(
-        Currency,
-        on_delete=models.CASCADE,
-        related_name="jobs",
-        help_text="Currency in which the job budget is specified",
     )
     min_budget = models.DecimalField(
         max_digits=10,
@@ -125,6 +122,16 @@ class Job(models.Model):
         choices=JobStatus.choices,
         default=JobStatus.DRAFT,
         help_text="Current status of the job",
+    )
+    connect = models.PositiveIntegerField(
+        default=1,
+        help_text="Number of connects required to apply for the job",
+    )
+    privacy = models.CharField(
+        max_length=20,
+        choices=JobPrivacy.choices,
+        default=JobPrivacy.PUBLIC,
+        help_text="Visibility of the job",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -40,6 +40,13 @@ class SignupVerifyView(APIView):
                 message="Invalid link",
             )
 
+        if not user.check_email_verification_timeout(token):
+            user.generate_email_verification_token()
+            return Response(
+                status_code=400,
+                message="This link has expired. A new link has been sent to your email.",  # noqa: E501
+            )
+
         user.is_active = True
         user.email_verified = True
         user.save(update_fields=["is_active", "email_verified"])

@@ -34,11 +34,18 @@ class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
         else:
             return False
 
-        # Check the timestamp is within limit.
-        if (self._num_seconds(self._now()) - ts) > settings.EMAIL_VERIFIY_TIMEOUT:
-            return False
-
         return True
+
+    def check_timeout(self, user, token):
+        if self.check_token(user, token):
+            ts_b36, _ = token.split("-")
+            ts = base36_to_int(ts_b36)
+
+            return (
+                self._num_seconds(self._now()) - ts
+            ) <= settings.EMAIL_VERIFIY_TIMEOUT
+
+        return False
 
 
 email_verify_token = EmailVerifyTokenGenerator()

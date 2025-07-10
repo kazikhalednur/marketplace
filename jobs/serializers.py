@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from accounts.models import Client
 
-from .models import Category, Currency, Job, Skill
+from .models import Category, Job, Skill
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,12 +25,6 @@ class CategorySkillSerializer(serializers.ModelSerializer):
         fields = ["name", "slug", "skills"]
 
 
-class CurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Currency
-        fields = ["name", "symbol"]
-
-
 class ClientSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source="get_full_name", read_only=True)
     is_payment_verified = serializers.BooleanField(
@@ -45,7 +39,6 @@ class ClientSerializer(serializers.ModelSerializer):
 class JobSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     skills = SkillSerializer(many=True, read_only=True)
-    currency = CurrencySerializer(read_only=True)
     created_by = ClientSerializer(read_only=True)
 
     class Meta:
@@ -57,7 +50,6 @@ class JobSerializer(serializers.ModelSerializer):
             "tags",
             "category",
             "skills",
-            "currency",
             "min_budget",
             "max_budget",
             "is_fixed",
@@ -85,12 +77,6 @@ class DropdownSkillSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "slug"]
 
 
-class DropdownCurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Currency
-        fields = ["id", "name", "symbol"]
-
-
 class DropdownStatusSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return [
@@ -106,6 +92,13 @@ class DropdownExperienceLevelSerializer(serializers.Serializer):
         ]
 
 
+class DropdownPrivacySerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        return [
+            {"label": label, "value": value} for value, label in Job.JobPrivacy.choices
+        ]
+
+
 class DropdownSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return {
@@ -113,13 +106,11 @@ class DropdownSerializer(serializers.Serializer):
                 Category.objects.all(), many=True
             ).data,
             "skills": DropdownSkillSerializer(Skill.objects.all(), many=True).data,
-            "currencies": DropdownCurrencySerializer(
-                Currency.objects.all(), many=True
-            ).data,
             "status": DropdownStatusSerializer().to_representation(None),
             "experience_levels": DropdownExperienceLevelSerializer().to_representation(
                 None
             ),
+            "privacy": DropdownPrivacySerializer().to_representation(None),
         }
 
 
@@ -132,7 +123,6 @@ class JobCreateSerializer(serializers.ModelSerializer):
             "tags",
             "category",
             "skills",
-            "currency",
             "min_budget",
             "max_budget",
             "is_fixed",
@@ -145,5 +135,4 @@ class JobCreateSerializer(serializers.ModelSerializer):
             "status",
             "category",
             "skills",
-            "currency",
         ]
