@@ -1,4 +1,4 @@
-from django.conf import settings
+# from django.conf import settings
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -27,16 +27,16 @@ class SigninView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         serializer = super().post(request, *args, **kwargs)
-        # return Response(data=serializer.data, message="Login Successfully")
+        return Response(data=serializer.data, message="Login Successfully")
 
-        response = Response(data=serializer.data, message="Login Successfully")
-        response.set_cookie(
-            key=settings.SIMPLE_JWT["AUTH_COOKIE"],
-            value=serializer.data["access"],
-            expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
-            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
-        )
+        # response = Response(data=serializer.data, message="Login Successfully")
+        # response.set_cookie(
+        #     key=settings.SIMPLE_JWT["AUTH_COOKIE"],
+        #     value=serializer.data["access"],
+        #     expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+        #     secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+        #     httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+        #     samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+        # )
 
-        return response
+        # return response
