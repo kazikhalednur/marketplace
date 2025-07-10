@@ -59,10 +59,13 @@ export default function LoginPage() {
         localStorage.setItem('refreshToken', res.data.refresh);
         window.location.href = '/dashboard';
       } else {
-        showToast({ type: 'error', message: res?.message || 'Invalid email or password.' });
+        const errorDetail = res?.error?.detail;
+        showToast({ type: 'error', message: errorDetail || res?.message || 'Invalid email or password.' });
       }
-    } catch (err) {
-      showToast({ type: 'error', message: getErrorMessage(err, 'Invalid email or password.') });
+    } catch (err: any) {
+      // Try to extract error?.detail from the error response if possible
+      const errorDetail = err?.data?.error?.detail || err?.error?.detail;
+      showToast({ type: 'error', message: errorDetail || getErrorMessage(err, 'Invalid email or password.') });
     }
   };
 
@@ -81,8 +84,8 @@ export default function LoginPage() {
                 rules={{
                   required: "Email is required",
                   pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@diu\.edu\.bd$/,
-                    message: "Email must be a valid @diu.edu.bd address",
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Email must be a valid email address",
                   },
                 }}
                 render={({ field, fieldState }) => (
@@ -92,7 +95,7 @@ export default function LoginPage() {
                       <div className="relative">
                         <Input
                           type="email"
-                          placeholder="example@diu.edu.bd"
+                          placeholder="example@email.com"
                           autoComplete="email"
                           {...field}
                           className="pl-10"

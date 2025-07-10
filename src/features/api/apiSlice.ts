@@ -31,9 +31,13 @@ export interface LoginResponse {
   success: boolean;
   status_code: number;
   message: string;
-  data: {
-    access: string;
-    refresh: string;
+  data?: {
+    access?: string;
+    refresh?: string;
+  };
+  error?: {
+    detail?: string;
+    [key: string]: any;
   };
 }
 
