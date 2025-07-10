@@ -1,10 +1,12 @@
- "use client";
+"use client";
 
-import { useGetMeQuery } from '@/features/api/apiSlice';
-import { clearUser, setUser } from '@/features/userSlice';
-import { useCallback, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useGetMeQuery } from '../features/api/apiSlice';
 import { useAppDispatch } from './useTypedDispatch';
 import { useAppSelector } from './useTypedSelector';
+import { setUser, clearUser } from '../features/userSlice';
+import React from 'react';
+import isEqual from 'lodash.isequal';
 
 export function Loader() {
   return (
@@ -17,16 +19,17 @@ export function Loader() {
 export function useAuth() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const skip = !!user.email;
-  const { data, isLoading, isError, refetch } = useGetMeQuery(undefined, { skip });
+  const { data, isLoading, isError, refetch } = useGetMeQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
   useEffect(() => {
-    if (data && !user.email) {
+    if (data && !isEqual(data, user)) {
       dispatch(setUser(data));
     } else if (isError) {
       dispatch(clearUser());
     }
-  }, [data, isError, dispatch, user.email]);
+  }, [data, isError, dispatch, user]);
 
   // Helper: is authenticated
   const isAuthenticated = !!user && !!user.email;

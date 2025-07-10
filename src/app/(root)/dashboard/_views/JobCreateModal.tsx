@@ -1,27 +1,27 @@
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SelectField, MultiSelectField } from "@/components/ui/select-field";
+import { MultiSelectField, SelectField } from "@/components/ui/select-field";
 import { TagsInput } from "@/components/ui/tags-input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast-provider";
-import { useForm } from "react-hook-form";
-import { Briefcase, DollarSign, TrendingUp } from "lucide-react";
 import { useCreateJobMutation, useGetDropdownsQuery } from '@/features/api/jobsApi';
+import { Briefcase, DollarSign, TrendingUp } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 // Define a type for the form values
 interface JobFormValues {
@@ -61,7 +61,6 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
       status: "draft",
     },
   });
-
   const [createJob, { isLoading }] = useCreateJobMutation();
   const { data: dropdowns, isLoading: dropdownsLoading } = useGetDropdownsQuery();
   const CATEGORY_OPTIONS = dropdowns?.categories?.map(c => ({ value: c.id, label: c.name })) || [];

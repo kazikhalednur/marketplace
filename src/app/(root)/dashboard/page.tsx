@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useGetJobsQuery } from '@/features/api/jobsApi';
+import { useAuth } from '@/hooks/useAuth';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -12,11 +13,12 @@ import JobDetailModal from './_views/JobDetailModal';
 import JobList, { JobDetail } from './_views/JobList';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
-  const user = useAppSelector((state) => state.user);
+
 
   // Fetch jobs from API
   const { data: jobs = [], isLoading, isError } = useGetJobsQuery();
@@ -51,7 +53,6 @@ export default function DashboardPage() {
         </Card>
         {/* Create Job Button */}
         <div className="flex flex-col sm:flex-row sm:justify-end mb-6">
-          {/* Example: Only show for a specific email, or add your own logic */}
           {user.role === 'client' && (
             <Button
               className="w-full sm:w-auto px-8 py-3 text-base font-semibold shadow-md flex items-center gap-2"
@@ -84,7 +85,9 @@ export default function DashboardPage() {
           )}
         </section>
         <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
-        <JobCreateModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
+        {user.role === 'client' && (
+          <JobCreateModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
+        )}
       </div>
     </main>
   );
