@@ -1,10 +1,12 @@
+"use clien";
+
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ToastProvider } from '@/components/ui/toast-provider';
+import ReduxProvider from '@/store/Provider';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import React from 'react';
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import ReduxProvider from '@/store/Provider';
-import { ToastProvider } from '@/components/ui/toast-provider';
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

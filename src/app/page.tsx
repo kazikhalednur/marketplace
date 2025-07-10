@@ -1,14 +1,15 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Loader, useAuth } from '@/hooks/useAuth';
 import { motion } from "framer-motion";
 import { Briefcase, ChevronDown, GraduationCap, Quote, ShieldCheck, Star, Users } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
 
 const testimonials = [
   {
@@ -33,18 +34,13 @@ const testimonials = [
 
 export default function LandingPage() {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { isAuthenticated, showLoader } = useAuth();
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        router.replace('/dashboard');
-      } else {
-        setChecked(true);
-      }
+    if (isAuthenticated) {
+      router.replace('/dashboard');
     }
-  }, [router]);
-  if (!checked) return null;
+  }, [isAuthenticated, router]);
+  if (showLoader || isAuthenticated) return <Loader />;
 
   return (
     <main className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)] relative">

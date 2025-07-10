@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { JobDetail } from '@/app/(root)/dashboard/_views/JobList';
+import Cookies from 'js-cookie';
 
 // Define types for API response and job
 interface JobApiCategory {
@@ -79,13 +80,13 @@ interface CreateJobResponse {
 
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_BASE_URL, prepareHeaders: (headers) => {
-    const token = localStorage.getItem('accessToken'); // or from Redux
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_BASE_URL,     prepareHeaders: (headers) => {
+    const token = Cookies.get('accessToken');
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
     return headers;
-  }, credentials: 'include' }), // Use relative base URL for proxy or absolute if needed
+  },credentials: 'include' }), // Use relative base URL for proxy or absolute if needed
   endpoints: (builder) => ({
     getJobs: builder.query<JobDetail[], void>({
       query: () => '/jobs/',

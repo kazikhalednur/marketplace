@@ -9,6 +9,7 @@ import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle } from 'l
 import * as React from 'react';
 import { useState } from 'react';
 import type { JobDetail } from './JobList';
+import { useAuth } from '@/hooks/useAuth';
 
 interface JobDetailModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
   const [applyLoading, setApplyLoading] = React.useState(false);
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   // Accessibility: Focus trap and Escape key
   React.useEffect(() => {
@@ -218,35 +220,37 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                 </button>
               </div>
             </div>
-            <Button
-              className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
-              onClick={async () => {
-                setApplyLoading(true);
-                try {
-                  // Simulate async apply action
-                  await new Promise((r) => setTimeout(r, 1200));
-                  showToast({
-                    type: 'success',
-                    message: 'Application submitted successfully!'
-                  });
-                } catch (err) {
-                  showToast({
-                    type: 'error',
-                    message: 'Failed to apply for this job. Please try again.'
-                  });
-                  console.error(err);
-                } finally {
-                  setApplyLoading(false);
-                }
-              }}
-              disabled={applyLoading}
-              aria-busy={applyLoading}
-            >
-              {applyLoading ? (
-                <span className="animate-spin mr-2 w-4 h-4 border-2 border-t-transparent border-primary rounded-full" />
-              ) : null}
-              Apply for this Job
-            </Button>
+            {isAuthenticated && user.role === 'freelancer' && (
+              <Button
+                className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
+                onClick={async () => {
+                  setApplyLoading(true);
+                  try {
+                    // Simulate async apply action
+                    await new Promise((r) => setTimeout(r, 1200));
+                    showToast({
+                      type: 'success',
+                      message: 'Application submitted successfully!'
+                    });
+                  } catch (err) {
+                    showToast({
+                      type: 'error',
+                      message: 'Failed to apply for this job. Please try again.'
+                    });
+                    console.error(err);
+                  } finally {
+                    setApplyLoading(false);
+                  }
+                }}
+                disabled={applyLoading}
+                aria-busy={applyLoading}
+              >
+                {applyLoading ? (
+                  <span className="animate-spin mr-2 w-4 h-4 border-2 border-t-transparent border-primary rounded-full" />
+                ) : null}
+                Apply for this Job
+              </Button>
+            )}
           </div>
         </div>
       </Card>

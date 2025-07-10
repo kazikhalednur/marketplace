@@ -1,31 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
-import { Mail, Eye, EyeOff, Lock } from "lucide-react";
 import Icon from "@/components/ui/Icon";
-import { useLoginMutation, LoginPayload } from '@/features/api/apiSlice';
-import { getErrorMessage } from '@/utils/error';
+import { Input } from "@/components/ui/input";
 import { useToast } from '@/components/ui/toast-provider';
+import { LoginPayload, useLoginMutation } from '@/features/api/apiSlice';
+import { Loader, useAuth } from '@/hooks/useAuth';
+import { getErrorMessage } from '@/utils/error';
+import Cookies from 'js-cookie';
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
   const form = useForm({
@@ -40,31 +41,35 @@ export default function LoginPage() {
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
+  const { isAuthenticated, showLoader } = useAuth();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        router.replace('/dashboard');
-      }
+    if (isAuthenticated) {
+      router.replace('/dashboard');
     }
-  }, [router]);
+  }, [isAuthenticated, router]);
+
+  if (showLoader || isAuthenticated) return <Loader />;
 
   const onSubmit = async (data: LoginPayload) => {
     try {
       const res = await login(data).unwrap();
       if (res?.success && res?.data?.access && res?.data?.refresh) {
         showToast({ type: 'success', message: 'Login successful!' });
-        localStorage.setItem('accessToken', res.data.access);
-        localStorage.setItem('refreshToken', res.data.refresh);
+        // Save tokens as cookies (not HttpOnly, accessible to JS)
+        Cookies.set('accessToken', res.data.access, { path: '/', expires: 7 });
+        Cookies.set('refreshToken', res.data.refresh, { path: '/', expires: 7 });
         window.location.href = '/dashboard';
       } else {
         const errorDetail = res?.error?.detail;
         showToast({ type: 'error', message: errorDetail || res?.message || 'Invalid email or password.' });
       }
-    } catch (err: any) {
-      // Try to extract error?.detail from the error response if possible
-      const errorDetail = err?.data?.error?.detail || err?.error?.detail;
+    } catch (err: unknown) {
+      let errorDetail = '';
+      if (typeof err === 'object' && err !== null) {
+        // @ts-expect-error: dynamic error shape
+        errorDetail = err?.data?.error?.detail || err?.error?.detail;
+      }
       showToast({ type: 'error', message: errorDetail || getErrorMessage(err, 'Invalid email or password.') });
     }
   };

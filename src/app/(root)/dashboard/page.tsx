@@ -1,31 +1,22 @@
 "use client";
 
-import { Card } from '@/components/ui/card';
-import JobList, { JobDetail } from './_views/JobList';
-import JobDetailModal from './_views/JobDetailModal';
-import { useState, useEffect } from 'react';
-import DashboardFilters from './_views/DashboardFilters';
-import { useAppSelector } from '@/hooks/useTypedSelector';
-import { useRouter } from 'next/navigation';
-import { useGetJobsQuery } from '@/features/api/jobsApi';
 import { Button } from '@/components/ui/button';
-import JobCreateModal from './_views/JobCreateModal';
+import { Card } from '@/components/ui/card';
+import { useGetJobsQuery } from '@/features/api/jobsApi';
+import { useAppSelector } from '@/hooks/useTypedSelector';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import DashboardFilters from './_views/DashboardFilters';
+import JobCreateModal from './_views/JobCreateModal';
+import JobDetailModal from './_views/JobDetailModal';
+import JobList, { JobDetail } from './_views/JobList';
 
 export default function DashboardPage() {
-  const router = useRouter();
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.replace('/login?next=/dashboard');
-      }
-    }
-  }, [router]);
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
+  const user = useAppSelector((state) => state.user);
 
   // Fetch jobs from API
   const { data: jobs = [], isLoading, isError } = useGetJobsQuery();
@@ -60,13 +51,16 @@ export default function DashboardPage() {
         </Card>
         {/* Create Job Button */}
         <div className="flex flex-col sm:flex-row sm:justify-end mb-6">
-          <Button
-            className="w-full sm:w-auto px-8 py-3 text-base font-semibold shadow-md flex items-center gap-2"
-            onClick={() => setCreateModalOpen(true)}
-          >
-            <Plus className="w-6 h-6" />
-            Create Job
-          </Button>
+          {/* Example: Only show for a specific email, or add your own logic */}
+          {user.role === 'client' && (
+            <Button
+              className="w-full sm:w-auto px-8 py-3 text-base font-semibold shadow-md flex items-center gap-2"
+              onClick={() => setCreateModalOpen(true)}
+            >
+              <Plus className="w-6 h-6" />
+              Create Job
+            </Button>
+          )}
         </div>
         {/* Job List */}
         <section className="space-y-4 min-h-[200px]">

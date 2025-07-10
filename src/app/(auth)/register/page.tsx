@@ -6,19 +6,19 @@ import { useState, useEffect } from "react";
 import EmployerForm from "./EmployerForm";
 import StudentForm from "./StudentForm";
 import { useRouter } from 'next/navigation';
+import { useAuth, Loader } from '@/hooks/useAuth';
 
 export default function RegisterPage() {
   const router = useRouter();
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        router.replace('/dashboard');
-      }
-    }
-  }, [router]);
-
+  const { isAuthenticated, showLoader } = useAuth();
   const [role, setRole] = useState<"student" | "employer" | null>(null);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
+  if (showLoader || isAuthenticated) return <Loader />;
 
   if (role === "student") return <StudentForm onBack={() => setRole(null)} />;
   if (role === "employer") return <EmployerForm onBack={() => setRole(null)} />;

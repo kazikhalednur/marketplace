@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import Cookies from 'js-cookie';
 
 // Types
 export interface SignupResponse {
@@ -34,16 +35,38 @@ export interface LoginResponse {
   data?: {
     access?: string;
     refresh?: string;
+    role?: string;
   };
   error?: {
     detail?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
+}
+
+export interface UserInfo {
+  first_name: string;
+  last_name: string;
+  email: string;
+  username: string;
+  phone: string;
+  role: string;
+  email_verified: boolean;
+  is_google_login: boolean;
 }
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+    credentials: 'include',
+    prepareHeaders: (headers) => {
+      const token = Cookies.get('accessToken');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
     studentSignup: builder.mutation<SignupResponse, StudentSignupPayload>({
       query: (body) => ({
@@ -66,7 +89,11 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    getMe: builder.query<UserInfo, void>({
+      query: () => 'accounts/info/',
+      transformResponse: (response: { data: UserInfo }) => response.data,
+    }),
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation } = apiSlice; 
+export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery } = apiSlice; 
