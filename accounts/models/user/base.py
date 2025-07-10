@@ -33,6 +33,9 @@ class User(AbstractUser):
     )
     is_google_login = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
+    is_resent_email = models.BooleanField(
+        default=False, help_text="Email verification resent"
+    )
     role = models.CharField(
         max_length=20,
         choices=UserRole.choices,

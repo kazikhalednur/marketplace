@@ -42,6 +42,8 @@ class EmailVerifyView(APIView):
             )
 
         if user.check_email_verification_timeout(token):
+            user.is_resent_email = False
+            user.save(update_fields=["is_resent_email"])
             return Response(
                 message="This link has expired. Please request a new verification link.",  # noqa: E501
                 data={"is_success": False, "is_expired": True, "is_invalid": False},
