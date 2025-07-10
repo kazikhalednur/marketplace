@@ -11,6 +11,7 @@ class SigninGoogleSerializer(JWTTokenObtainPairSerializer):
     code = serializers.CharField(max_length=500, write_only=True)
     refresh = serializers.CharField(max_length=500, read_only=True)
     access = serializers.CharField(max_length=500, read_only=True)
+    role = serializers.CharField(max_length=50, read_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,5 +32,6 @@ class SigninGoogleSerializer(JWTTokenObtainPairSerializer):
 
         attrs["refresh"] = str(refresh)
         attrs["access"] = str(refresh.access_token)
+        attrs["role"] = user.first().role
 
         return attrs

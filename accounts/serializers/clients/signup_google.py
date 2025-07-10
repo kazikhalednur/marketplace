@@ -8,7 +8,7 @@ from ...helpers import (
 from ...models import Client, User
 
 
-class SignupGoogleSerializer(serializers.Serializer):
+class ClientSignupGoogleSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=500, write_only=True)
     student_id = serializers.CharField(max_length=20, write_only=True)
 

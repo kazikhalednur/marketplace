@@ -16,6 +16,7 @@ from ..serializers import SigninGoogleSerializer
                 "message": drf_serializers.CharField(default="Login Successfully"),
                 "access": drf_serializers.CharField(),
                 "refresh": drf_serializers.CharField(),
+                "role": drf_serializers.CharField(),
             },
         ),
     },

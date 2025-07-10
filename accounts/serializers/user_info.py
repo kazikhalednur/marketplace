@@ -12,4 +12,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "username",
+            "phone",
+            "role",
+            "is_email_verified",
+            "is_google_login",
         ]

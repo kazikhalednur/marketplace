@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.generics import CreateAPIView
 
-from ...serializers.clients import SignupGoogleSerializer
+from ...serializers.clients import ClientSignupGoogleSerializer
 
 
 @extend_schema(tags=["client"])
@@ -12,4 +12,4 @@ class SignupGoogleView(CreateAPIView):
 
     authentication_classes = []
     permission_classes = []
-    serializer_class = SignupGoogleSerializer
+    serializer_class = ClientSignupGoogleSerializer

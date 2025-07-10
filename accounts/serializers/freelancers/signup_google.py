@@ -5,12 +5,11 @@ from ...helpers import (
     google_user_details,
     match_email_domain,
 )
-from ...models import Freelancer, User
+from ...models import Freelancer
 
 
 class SignupGoogleSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=500, write_only=True)
-    student_id = serializers.CharField(max_length=20, write_only=True)
 
     def save(self, **kwargs):
         code = self.validated_data["code"]
@@ -31,7 +30,6 @@ class SignupGoogleSerializer(serializers.Serializer):
             username=username,
             email_verified=google_data["email_verified"],
             password=get_random_string(32),
-            role=User.UserRole.FREELANCER,
         )
 
         return user
