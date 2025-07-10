@@ -41,7 +41,8 @@ class SignupVerifyView(APIView):
             )
 
         user.is_active = True
-        user.save(update_fields=["is_active"])
+        user.email_verified = True
+        user.save(update_fields=["is_active", "email_verified"])
 
         return Response(message="Email verified successfully. You can now login.")
 
