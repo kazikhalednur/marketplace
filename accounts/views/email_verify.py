@@ -34,7 +34,20 @@ class EmailVerifyView(APIView):
         Verify the email address.
         """
         user: User = self.get_user(uidb64)
-        if user is None or not user.check_email_verification_token(token):
+        if user is None:
+            return Response(
+                status_code=400,
+                message="Invalid link",
+                data={"is_success": False, "is_expired": False, "is_invalid": True},
+            )
+
+        if user.email_verified:
+            return Response(
+                message="Email is already verified. You can now login.",
+                data={"is_success": True, "is_expired": False, "is_invalid": False},
+            )
+
+        if not user.check_email_verification_token(token):
             return Response(
                 status_code=400,
                 message="Invalid link",
