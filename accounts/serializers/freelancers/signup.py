@@ -33,6 +33,11 @@ class SignupSerializer(serializers.ModelSerializer):
                 {"email": "Try with your varsity mail address"}
             )
 
+        if FreelancerProfile.objects.filter(student_id=attrs["student_id"]).exists():
+            raise serializers.ValidationError(
+                {"student_id": "This student ID is already registered"}
+            )
+
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError({"password": "Password doesn't matched"})
         attrs.pop("confirm_password")
