@@ -38,7 +38,14 @@ class EmailResendView(APIView):
         if user is None or not user.check_email_verification_token(token):
             return Response(status_code=400, message="Invalid link")
 
-        if user.check_email_verification_timeout(token) and not user.is_resent_email:
+        if user.email_verified:
+            return Response(message="Email is already verified. You can now login.")
+
+        if (
+            user.check_email_verification_timeout(token)
+            and not user.is_resent_email
+            and not user.email_verified
+        ):
             send_signup_verification_email(user)
             user.is_resent_email = True
             user.save(update_fields=["is_resent_email"])
