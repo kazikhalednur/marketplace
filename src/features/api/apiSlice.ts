@@ -93,7 +93,28 @@ export const apiSlice = createApi({
       query: () => 'accounts/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
     }),
+    verifyEmail: builder.query<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+        data: { is_success: boolean; is_expired: boolean; is_invalid: boolean };
+      },
+      { uid: string; token: string }
+    >({
+      query: ({ uid, token }) => `accounts/verify/email/${uid}/${token}/`,
+    }),
+    resendVerificationEmail: builder.query<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+      },
+      { uid: string; token: string }
+    >({
+      query: ({ uid, token }) => `accounts/resend/email/${uid}/${token}/`,
+    }),
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery } = apiSlice; 
+export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery } = apiSlice; 
