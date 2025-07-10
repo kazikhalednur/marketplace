@@ -20,12 +20,13 @@ class SigninSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError(
                 {"detail": "User with this email does not exist."}
             )
+
+        if not user.check_password(password):
+            raise serializers.ValidationError({"detail": "Invalid credential."})
+
         if not user.email_verified:
             raise serializers.ValidationError(
                 {"detail": "Email is not verified. Please verify your email."}
             )
-
-        if not user.check_password(password):
-            raise serializers.ValidationError({"detail": "Invalid password."})
 
         return super().validate(attrs)
