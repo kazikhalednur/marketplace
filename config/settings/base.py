@@ -155,12 +155,12 @@ CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 # Allow credentials like cookies or Authorization headers
 CORS_ALLOW_CREDENTIALS = True
 
-# Optional: expose specific headers to frontend (if needed)
-CORS_EXPOSE_HEADERS = [
-    "Content-Type",
-    "Authorization",
-    "X-CSRFToken",
-]
+# # Optional: expose specific headers to frontend (if needed)
+# CORS_EXPOSE_HEADERS = [
+#     "Content-Type",
+#     "Authorization",
+#     "X-CSRFToken",
+# ]
 
 OTP_TIMEOUT = 300
 EMAIL_VERIFIY_TIMEOUT = 300
