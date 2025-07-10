@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from utils.helpers import Response
 
-from ..models import Freelancer
+from ..models import User
 
 
 @extend_schema(
@@ -33,7 +33,7 @@ class SignupVerifyView(APIView):
         """
         Verify the email address of a freelancer.
         """
-        user: Freelancer = self.get_user(uidb64)
+        user: User = self.get_user(uidb64)
         if user is None or not user.check_email_verification_token(token):
             return Response(
                 status_code=400,
@@ -49,13 +49,13 @@ class SignupVerifyView(APIView):
         try:
             # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
-            pk = Freelancer._meta.pk.to_python(uid)
-            user = Freelancer._default_manager.get(pk=pk)
+            pk = User._meta.pk.to_python(uid)
+            user = User._default_manager.get(pk=pk)
         except (
             TypeError,
             ValueError,
             OverflowError,
-            Freelancer.DoesNotExist,
+            User.DoesNotExist,
             ValidationError,
         ):
             user = None
