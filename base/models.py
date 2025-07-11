@@ -19,11 +19,7 @@ class Settings(models.Model):
 
     @classmethod
     def get_data(cls):
-        """Get the application settings data."""
-        try:
-            return cls.objects.first()
-        except cls.DoesNotExist:
-            return cls.objects.create()
+        return cls.objects.first()
 
     @classmethod
     def OTP_TIMEOUT(cls):
