@@ -3,16 +3,18 @@ from rest_framework import serializers
 from ...models import Category, Job, Skill
 
 
-class DropdownCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["id", "name", "slug"]
-
-
 class DropdownSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = ["id", "name", "slug"]
+
+
+class DropdownCategorySerializer(serializers.ModelSerializer):
+    skills = DropdownSkillSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "slug", "skills"]
 
 
 class DropdownStatusSerializer(serializers.Serializer):
@@ -43,7 +45,6 @@ class DropdownSerializer(serializers.Serializer):
             "categories": DropdownCategorySerializer(
                 Category.objects.all(), many=True
             ).data,
-            "skills": DropdownSkillSerializer(Skill.objects.all(), many=True).data,
             "status": DropdownStatusSerializer().to_representation(None),
             "experience_levels": DropdownExperienceLevelSerializer().to_representation(
                 None
