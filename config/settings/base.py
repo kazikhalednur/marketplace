@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # local apps
+    "base.apps.BaseConfig",
     "accounts.apps.AccountsConfig",
     "jobs.apps.JobsConfig",
     "biding.apps.BidingConfig",
@@ -162,11 +163,6 @@ CORS_ALLOW_CREDENTIALS = True
 #     "Authorization",
 #     "X-CSRFToken",
 # ]
-
-OTP_TIMEOUT = 300
-EMAIL_VERIFIY_TIMEOUT = 120
-
-FRONTEND_URL = config("FRONTEND_URL", cast=str)
 
 
 from .rest_framework import *

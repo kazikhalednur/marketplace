@@ -6,6 +6,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from base.models import settings as base_settings
+
 from .models import OTP, User
 
 
@@ -14,7 +16,7 @@ def send_reset_mail(user):
     subject = "Reset Password"
     from_mail = f"DIU CPC Workhub <{settings.DEFAULT_FROM_EMAIL}>"
     to_mail = user.email
-    frontend_url = settings.FRONTEND_URL
+    frontend_url = base_settings.FRONTEND_URL
     frontend_parsed_url = urlparse(frontend_url)
     frontend_domain = frontend_parsed_url.hostname
 

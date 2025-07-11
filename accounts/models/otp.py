@@ -1,9 +1,10 @@
 from uuid import uuid4
 
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+
+from base.models import settings as base_settings
 
 from .user import User
 
@@ -27,4 +28,4 @@ class OTP(models.Model):
         super().save(*args, **kwargs)
 
     def is_expired(self):
-        return (timezone.now() - self.created_at).seconds > settings.OTP_TIMEOUT
+        return (timezone.now() - self.created_at).seconds > base_settings.OTP_TIMEOUT

@@ -1,7 +1,8 @@
-from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.crypto import constant_time_compare
 from django.utils.http import base36_to_int
+
+from base.models import settings as base_settings
 
 
 class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
@@ -43,7 +44,7 @@ class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
 
             return (
                 self._num_seconds(self._now()) - ts
-            ) > settings.EMAIL_VERIFIY_TIMEOUT
+            ) > base_settings.EMAIL_VERIFIY_TIMEOUT
 
         return False
 
