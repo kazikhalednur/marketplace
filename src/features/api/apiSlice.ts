@@ -114,7 +114,49 @@ export const apiSlice = createApi({
     >({
       query: ({ uid, token }) => `accounts/resend/email/${uid}/${token}/`,
     }),
+    sendPasswordResetMail: builder.mutation<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+      },
+      { email: string }
+    >({
+      query: (body) => ({
+        url: 'accounts/password-reset-mail/',
+        method: 'POST',
+        body,
+      }),
+    }),
+    verifyOtp: builder.mutation<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+      },
+      { email: string; code: string }
+    >({
+      query: (body) => ({
+        url: 'accounts/otp-verify/',
+        method: 'POST',
+        body,
+      }),
+    }),
+    resetPassword: builder.mutation<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+      },
+      { email: string; code: string; new_password: string; confirm_password: string }
+    >({
+      query: (body) => ({
+        url: '/accounts/password-reset/',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery } = apiSlice; 
+export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation } = apiSlice; 

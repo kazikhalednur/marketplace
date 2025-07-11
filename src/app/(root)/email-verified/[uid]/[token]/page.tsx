@@ -153,9 +153,9 @@ export default function EmailVerifiedPage({ params }: { params: Promise<{ uid: s
             <p className="text-green-600 font-medium mt-2">{resendData?.message || 'A new verification link has been sent to your email.'}</p>
           )
         ) : (
-          <Button asChild className="w-full mt-2" disabled={scenario === 'loading'}>
-            <Link href="/dashboard">Go to Dashboard</Link>
-          </Button>
+        <Button asChild className="w-full mt-2" disabled={scenario === 'loading'}>
+          <Link href="/dashboard">Go to Dashboard</Link>
+        </Button>
         )}
         {((resendError && resendErrorData) || resendData?.success === false) && scenario === 'expired' && !resendSuccess && (
           <p className="text-red-600 font-medium mt-2">

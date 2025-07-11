@@ -153,6 +153,9 @@ export default function LoginPage() {
                     {fieldState.error && (
                       <FormMessage>{fieldState.error.message}</FormMessage>
                     )}
+                    <div className="flex justify-end mt-1">
+                      <a href="/reset-password" className="text-xs text-primary hover:underline font-medium">Forgot password?</a>
+                    </div>
                   </FormItem>
                 )}
               />
@@ -181,6 +184,11 @@ export default function LoginPage() {
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
+          <div className="flex items-center w-full mb-1 mt-2">
+            <hr className="flex-1 border-t border-border" />
+            <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
+            <hr className="flex-1 border-t border-border" />
+          </div>
           <Button
             variant="outline"
             className="w-full flex items-center justify-center gap-2 mt-2"

@@ -28,7 +28,7 @@ export function Toast({ type = 'info', message, onClose, duration = 3500 }: Toas
 
   return (
     <div
-      className="fixed top-6 right-6 z-[9999] w-full max-w-xs sm:max-w-sm bg-white dark:bg-neutral-900 shadow-xl rounded-lg flex items-center px-4 py-3 gap-3 border border-border/60 animate-in fade-in slide-in-from-top-6"
+      className="fixed top-6 right-6 z-[9999] w-80 max-w-full bg-white dark:bg-neutral-900 shadow-xl rounded-lg flex items-center px-4 py-3 gap-3 border border-border/60 animate-in fade-in slide-in-from-top-6"
       role="alert"
       aria-live="assertive"
       style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)' }}
@@ -36,7 +36,7 @@ export function Toast({ type = 'info', message, onClose, duration = 3500 }: Toas
       <span className="flex-shrink-0">
         {ICONS[type]}
       </span>
-      <span className="flex-1 text-sm text-foreground truncate" title={message}>{message}</span>
+      <span className="flex-1 text-sm text-foreground" title={message}>{message}</span>
       {onClose && (
         <button
           onClick={onClose}
