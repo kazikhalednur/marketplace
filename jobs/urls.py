@@ -13,7 +13,7 @@ urlpatterns = [
         name="client_job_list",
     ),
     path(
-        "my-jobs/<int:pk>/",
+        "my-jobs/<uuid:id>/",
         client_views.JobDetailView.as_view(),
         name="client_job_detail",
     ),
@@ -23,5 +23,5 @@ urlpatterns = [
         name="category_skill_list",
     ),
     path("", views.JobListView.as_view(), name="job_list"),
-    path("<int:pk>/", views.JobDetailView.as_view(), name="job_detail"),
+    path("<uuid:id>/", views.JobDetailView.as_view(), name="job_detail"),
 ]
