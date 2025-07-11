@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Menu, Bell, UserCircle2, LogOut, Settings, HelpCircle, User as UserIcon } from "lucide-react";
@@ -17,6 +17,26 @@ export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!profileDropdownOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(e.target as Node) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(e.target as Node)
+      ) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [profileDropdownOpen]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 4);
@@ -29,6 +49,17 @@ export default function Navbar() {
   const roleDashboard = user?.role === "employer" ? "/dashboard/employer" :
                         user?.role === "admin" ? "/dashboard/admin" :
                         "/dashboard";
+
+  // Helper to get user initials
+  function getUserInitials() {
+    if (user?.name && user.name.trim().length > 0) {
+      return user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    if (user?.first_name || user?.last_name) {
+      return `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase();
+    }
+    return null;
+  }
 
   return (
     <header className={cn(
@@ -62,9 +93,15 @@ export default function Navbar() {
                 {/* Example unread dot */}
                 <span className="absolute top-0 right-0 block w-2 h-2 rounded-full bg-red-500" />
               </Button>
-              <div className="relative group">
+              <div className="relative">
                 <button
+                  ref={profileButtonRef}
                   className="p-0.5 rounded-full border-2 border-transparent hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition bg-background"
+                  onClick={() => setProfileDropdownOpen((v) => !v)}
+                  aria-haspopup="true"
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="Open profile menu"
+                  type="button"
                 >
                   {user?.avatar ? (
                     <Image
@@ -75,44 +112,61 @@ export default function Navbar() {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <Icon icon={UserCircle2} size={32} className="text-muted-foreground" />
+                    getUserInitials() ? (
+                      <span
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-lg font-extrabold text-white ring-2 ring-primary/30 shadow-md select-none"
+                      >
+                        {getUserInitials()}
+                      </span>
+                    ) : (
+                      <Icon icon={UserCircle2} size={24} className="text-muted-foreground" />
+                    )
                   )}
                 </button>
                 {/* Improved Dropdown */}
-                <div className="absolute right-0 mt-2 w-72 bg-popover border border-border shadow-xl rounded-2xl py-2 px-0 z-50 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 opacity-0 translate-y-2">
-                  <div className="flex flex-col items-center gap-2 py-5 border-b border-border">
-                    {user?.avatar ? (
-                      <Image
-                        src={user.avatar || ""}
-                        alt={user.name || ""}
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/30 shadow"
-                      />
-                    ) : (
-                      <span className="w-16 h-16 rounded-full flex items-center justify-center bg-muted text-3xl font-bold text-primary ring-2 ring-primary/30 shadow">
-                        {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || <Icon icon={UserCircle2} size={40} />}
-                      </span>
-                    )}
-                    <span className="font-bold text-lg">{user?.name}</span>
-                    <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
-                  </div>
-                  <Link href={roleDashboard} className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
-                    <Icon icon={UserIcon} size={18} /> Profile
-                  </Link>
-                  <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
-                    <Icon icon={Settings} size={18} /> Settings
-                  </button>
-                  <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
-                    <Icon icon={HelpCircle} size={18} /> Help
-                  </button>
-                  <button
-                    className="flex items-center gap-3 w-full px-4 py-2 mt-2 hover:bg-red-100 hover:border-l-4 hover:border-red-500 rounded-lg transition text-base font-semibold text-red-600"
-                    onClick={logout}
+                {profileDropdownOpen && (
+                  <div
+                    ref={profileDropdownRef}
+                    className="absolute right-0 mt-2 w-72 bg-popover border border-border shadow-xl rounded-2xl py-2 px-0 z-50 transition-all duration-200 opacity-100 translate-y-0"
                   >
-                    <Icon icon={LogOut} size={18} className="-scale-x-100" /> Logout
-                  </button>
-                </div>
+                    <div className="flex flex-col items-center gap-2 py-5 border-b border-border">
+                      {user?.avatar ? (
+                        <Image
+                          src={user.avatar || ""}
+                          alt={user.name || ""}
+                          width={64}
+                          height={64}
+                          className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/30 shadow"
+                        />
+                      ) : (
+                        getUserInitials() ? (
+                          <span className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-3xl font-extrabold text-white ring-2 ring-primary/30 shadow-md select-none">
+                            {getUserInitials()}
+                          </span>
+                        ) : (
+                          <Icon icon={UserCircle2} size={40} className="text-muted-foreground" />
+                        )
+                      )}
+                      <span className="font-bold text-lg">{user?.name}</span>
+                      <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
+                    </div>
+                    <Link href={roleDashboard} className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                      <Icon icon={UserIcon} size={18} /> Profile
+                    </Link>
+                    <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                      <Icon icon={Settings} size={18} /> Settings
+                    </button>
+                    <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                      <Icon icon={HelpCircle} size={18} /> Help
+                    </button>
+                    <button
+                      className="flex items-center gap-3 w-full px-4 py-2 mt-2 hover:bg-red-100 hover:border-l-4 hover:border-red-500 rounded-lg transition text-base font-semibold text-red-600"
+                      onClick={logout}
+                    >
+                      <Icon icon={LogOut} size={18} className="-scale-x-100" /> Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -140,3 +194,4 @@ export default function Navbar() {
     </header>
   );
 }
+ 

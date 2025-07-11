@@ -262,19 +262,19 @@ export default function JobCreateModal({ open, onClose, onJobPosted }: { open: b
                   </div>
                   {/* Tags full width below */}
                   <div>
-                    <FormField
-                      control={form.control}
+                  <FormField
+                    control={form.control}
                       name="tags"
-                      render={({ field }) => (
-                        <FormItem>
+                    render={({ field }) => (
+                      <FormItem>
                           <FormLabel>Tags</FormLabel>
-                          <FormControl>
+                        <FormControl>
                             <TagsInput {...field} placeholder="e.g. React, Next.js, API" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   </div>
                 </div>
                 {/* Budget & Terms Section */}
