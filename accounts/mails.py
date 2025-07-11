@@ -14,10 +14,13 @@ def send_reset_mail(user):
     subject = "Reset Password"
     from_mail = f"DIU CPC Workhub <{settings.DEFAULT_FROM_EMAIL}>"
     to_mail = user.email
+    frontend_url = settings.FRONTEND_URL
+    frontend_parsed_url = urlparse(frontend_url)
+    frontend_domain = frontend_parsed_url.hostname
 
     text_content = render_to_string(
         "accounts/emails/password_reset.txt",
-        context={"code": code},
+        context={"frontend_domain": frontend_domain, "code": code},
     )
 
     # html_content = render_to_string(
