@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from base.models import settings as base_settings
+from base.models import Settings as base_settings
 
 from .models import OTP, User
 

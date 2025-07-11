@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from base.models import settings as base_settings
+from base.models import Settings as base_settings
 
 from .user import User
 

@@ -2,7 +2,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.crypto import constant_time_compare
 from django.utils.http import base36_to_int
 
-from base.models import settings as base_settings
+from base.models import Settings as base_settings
 
 
 class EmailVerifyTokenGenerator(PasswordResetTokenGenerator):
