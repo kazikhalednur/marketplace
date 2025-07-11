@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 
 interface SelectFieldOption {
   value: string | number;
@@ -13,18 +13,21 @@ interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement>
 
 export const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
   ({ options, placeholder, ...props }, ref) => (
-    <select
-      ref={ref}
-      className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-      {...props}
-    >
-      {placeholder && <option value="">{placeholder}</option>}
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        ref={ref}
+        className="block w-full rounded-md border border-input bg-background px-3 pr-10 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition"
+        {...props}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+    </div>
   )
 );
 SelectField.displayName = "SelectField";
@@ -57,10 +60,10 @@ export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFiel
     const unselectedOptions = options.filter(opt => !value.includes(String(opt.value)));
 
     return (
-      <div ref={ref} className={`relative ${className}`}>
+      <div ref={ref} className={`relative ${className}`} tabIndex={0} onBlur={() => setIsOpen(false)}>
         {/* Selected items display */}
         <div 
-          className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary cursor-pointer"
+          className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 pr-10 py-2 text-sm shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary cursor-pointer flex flex-wrap gap-1 items-center transition"
           onClick={() => setIsOpen(!isOpen)}
         >
           {selectedOptions.length > 0 ? (
@@ -73,10 +76,7 @@ export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFiel
                   {option.label}
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemove(String(option.value));
-                    }}
+                    onClick={e => { e.stopPropagation(); handleRemove(String(option.value)); }}
                     className="hover:bg-primary/20 rounded-full p-0.5"
                   >
                     <X className="w-3 h-3" />
@@ -87,16 +87,17 @@ export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFiel
           ) : (
             <span className="text-muted-foreground">{placeholder || "Select options..."}</span>
           )}
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         </div>
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-background border border-input rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-background border border-input rounded-md shadow-lg max-h-60 overflow-y-auto animate-in fade-in">
             {unselectedOptions.length > 0 ? (
               unselectedOptions.map((option) => (
                 <div
                   key={option.value}
-                  className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                  className="px-3 py-2 hover:bg-primary/10 cursor-pointer text-sm rounded transition-colors"
                   onClick={() => handleSelect(String(option.value))}
                 >
                   {option.label}

@@ -61,7 +61,7 @@ interface CreateJobRequest {
   tags: string[];
   category: number;
   skills: number[];
-  currency: number;
+  currency?: number;
   is_fixed: boolean;
   duration: string;
   min_budget: string;

@@ -5,6 +5,7 @@ import { getCurrencySymbol } from '@/utils/getCurrencySymbol';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
 import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle } from 'lucide-react';
+import React from 'react';
 
 export interface JobCreator {
   full_name: string;
@@ -86,28 +87,34 @@ function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) =
         {/* Right: Meta Info */}
         <div className="md:w-64 w-full md:border-l border-border/40 bg-muted/40 flex flex-col justify-between p-6 gap-4 md:gap-2">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-green-700 font-semibold text-lg">
+            {/* Budget Row */}
+            <div className="flex items-center gap-2 text-green-700 font-semibold text-lg mb-1">
               <span className="text-lg font-extrabold align-middle text-green-700">{getCurrencySymbol(job.currency)}</span>
               <span>{job.min_budget ?? 0}</span>
               {job.max_budget && job.max_budget !== job.min_budget && (
                 <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">{getCurrencySymbol(job.currency)}</span>{job.max_budget}</span>
               )}
             </div>
-            {job.duration && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground"><Clock className="w-4 h-4 text-primary" /> {job.duration}</div>
-            )}
-            <div className="flex items-center gap-2">
+            {/* Fixed/Flexible and Duration Row */}
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               {job.is_fixed !== undefined && (
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}>
                   {job.is_fixed ? <CheckCircle className="w-3 h-3 text-primary" /> : <XCircle className="w-3 h-3 text-muted-foreground" />} {job.is_fixed ? 'Fixed' : 'Flexible'}
                 </span>
               )}
-              {job.created_by?.is_payment_verified && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-200">
-                  <CheckCircle className="w-3 h-3" /> Payment verified
+              {job.duration && (
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="w-4 h-4 text-primary" /> {job.duration}
                 </span>
               )}
             </div>
+            {/* Payment verified badge */}
+            {job.created_by?.is_payment_verified && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-200">
+                <CheckCircle className="w-3 h-3" /> Payment verified
+              </span>
+            )}
+            {/* Experience and Proposals */}
             <div className="flex items-center gap-2">
               {getExperienceBadge(job.experience_level)}
               {job.min_proposal_count !== undefined && job.max_proposal_count !== undefined && (

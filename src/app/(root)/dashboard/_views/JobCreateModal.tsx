@@ -30,7 +30,6 @@ interface JobFormValues {
   tags: string[];
   category: string;
   skills: string[];
-  currency: string;
   is_fixed: boolean;
   duration: string;
   min_budget: string;
@@ -41,7 +40,28 @@ interface JobFormValues {
   status: string;
 }
 
-export default function JobCreateModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+// Types for dropdowns
+interface DropdownCategory {
+  id: number;
+  name: string;
+  slug: string;
+  skills?: DropdownSkill[];
+}
+interface DropdownSkill {
+  id: number;
+  name: string;
+  slug: string;
+}
+interface DropdownExperienceLevel {
+  label: string;
+  value: string;
+}
+interface DropdownStatus {
+  label: string;
+  value: string;
+}
+
+export default function JobCreateModal({ open, onClose, onJobPosted }: { open: boolean; onClose: () => void; onJobPosted?: () => void }) {
   const { showToast } = useToast();
   const form = useForm<JobFormValues>({
     defaultValues: {
@@ -50,7 +70,6 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
       tags: [],
       category: "",
       skills: [],
-      currency: "USD",
       is_fixed: false,
       duration: "",
       min_budget: "",
@@ -63,22 +82,35 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
   });
   const [createJob, { isLoading }] = useCreateJobMutation();
   const { data: dropdowns, isLoading: dropdownsLoading } = useGetDropdownsQuery();
-  const CATEGORY_OPTIONS = dropdowns?.categories?.map(c => ({ value: c.id, label: c.name })) || [];
-  const SKILL_OPTIONS = dropdowns?.skills?.map(s => ({ value: s.id, label: s.name })) || [];
-  const EXPERIENCE_LEVEL_OPTIONS = dropdowns?.experience_levels?.map(e => ({ value: e.value, label: e.label })) || [];
-  const STATUS_OPTIONS = dropdowns?.status?.map(s => ({ value: s.value, label: s.label })) || [];
-  const CURRENCY_OPTIONS = dropdowns?.currencies?.map(c => ({ value: c.id, label: c.name })) || [];
+  // Removed jobsData and refetch; handled in parent page
+  const CATEGORY_OPTIONS = (dropdowns?.categories as DropdownCategory[] | undefined)?.map((c) => ({ value: c.id, label: c.name, skills: c.skills })) || [];
+  const EXPERIENCE_LEVEL_OPTIONS = (dropdowns?.experience_levels as DropdownExperienceLevel[] | undefined)?.map((e) => ({ value: e.value, label: e.label })) || [];
+  const STATUS_OPTIONS = (dropdowns?.status as DropdownStatus[] | undefined)?.map((s) => ({ value: s.value, label: s.label })) || [];
+
+  // Get selected category object
+  const selectedCategory = CATEGORY_OPTIONS.find((cat) => String(cat.value) === String(form.watch('category')));
+  const SKILL_OPTIONS = selectedCategory?.skills?.map((s: DropdownSkill) => ({ value: s.id, label: s.name })) || [];
 
   const onSubmit = async (data: JobFormValues) => {
+    // Validation
+    if (!data.is_fixed && Number(data.min_budget) >= Number(data.max_budget)) {
+      showToast({ type: 'error', message: 'Min budget must be less than max budget.' });
+      return;
+    }
+    if (Number(data.min_proposal_count) >= Number(data.max_proposal_count)) {
+      showToast({ type: 'error', message: 'Min proposal must be less than max proposal.' });
+      return;
+    }
+
     try {
       const payload = {
-        ...data,
+        title: data.title,
+        description: data.description,
         category: Number(data.category), // send as id
-        currency: Number(data.currency), // send as id
         tags: data.tags,
         skills: data.skills.map(Number), // send as array of ids
         min_budget: data.min_budget,
-        max_budget: data.max_budget,
+        max_budget: data.is_fixed ? data.min_budget : data.max_budget,
         is_fixed: data.is_fixed,
         duration: data.duration,
         experience_level: data.experience_level, // already value
@@ -89,7 +121,24 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
       const res = await createJob(payload).unwrap();
       if (!res.success) throw new Error('Failed to post job');
       showToast({ type: 'success', message: 'Job posted successfully' });
-      // Optionally reset form or close modal here
+      form.reset({
+        title: "",
+        description: "",
+        tags: [],
+        category: "",
+        skills: [],
+        is_fixed: false,
+        duration: "",
+        min_budget: "",
+        max_budget: "",
+        experience_level: "",
+        min_proposal_count: 1,
+        max_proposal_count: "",
+        status: "draft",
+      });
+      onClose();
+      if (onJobPosted) onJobPosted();
+      // refetch(); // This line was removed as per the edit hint
     } catch (err) {
       console.log(err);
       showToast({ type: 'error', message: 'Failed to post job' });
@@ -167,16 +216,22 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
                       </FormItem>
                     )}
                   />
+                  {/* Category & Skills on the same line */}
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
                       <FormField
                         control={form.control}
-                        name="tags"
+                        name="category"
+                        rules={{ required: "Category is required" }}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Skills/Tags</FormLabel>
+                            <FormLabel>Category</FormLabel>
                             <FormControl>
-                              <TagsInput {...field} placeholder="e.g. React, Next.js, API" />
+                              <SelectField
+                                {...field}
+                                options={CATEGORY_OPTIONS}
+                                placeholder="Select category"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -187,15 +242,16 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
                       <FormField
                         control={form.control}
                         name="skills"
+                        rules={{ required: "At least one skill is required" }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Skills</FormLabel>
                             <FormControl>
                               <MultiSelectField
-                                options={SKILL_OPTIONS}
+                                options={selectedCategory ? SKILL_OPTIONS : []}
                                 value={field.value}
                                 onChange={field.onChange}
-                                placeholder="Select skills..."
+                                placeholder={selectedCategory ? "Select skills..." : "Select a category first"}
                               />
                             </FormControl>
                             <FormMessage />
@@ -204,24 +260,22 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
                       />
                     </div>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    rules={{ required: "Category is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <FormControl>
-                          <SelectField
-                            {...field}
-                            options={CATEGORY_OPTIONS}
-                            placeholder="Select category"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Tags full width below */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tags</FormLabel>
+                          <FormControl>
+                            <TagsInput {...field} placeholder="e.g. React, Next.js, API" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
                 {/* Budget & Terms Section */}
                 <div className="bg-muted/40 rounded-xl p-6 border border-border/10 shadow-sm flex flex-col gap-6">
@@ -229,24 +283,6 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
                     <DollarSign className="w-5 h-5 text-green-600" /> Budget & Terms
                   </div>
                   <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1">
-                      <FormField
-                        control={form.control}
-                        name="currency"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Currency</FormLabel>
-                            <FormControl>
-                              <SelectField
-                                {...field}
-                                options={CURRENCY_OPTIONS}
-                                placeholder="Select currency"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                     <div className="flex-1">
                       <FormField
                         control={form.control}
@@ -288,7 +324,7 @@ export default function JobCreateModal({ open, onClose }: { open: boolean; onClo
                           <FormItem>
                             <FormLabel>Max Budget</FormLabel>
                             <FormControl>
-                              <Input type="number" min={0} placeholder="Maximum budget" {...field} />
+                              <Input type="number" min={0} placeholder="Maximum budget" {...field} disabled={form.watch('is_fixed')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
