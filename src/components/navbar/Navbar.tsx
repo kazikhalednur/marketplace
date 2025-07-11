@@ -46,10 +46,6 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname.startsWith(path);
 
-  const roleDashboard = user?.role === "employer" ? "/dashboard/employer" :
-                        user?.role === "admin" ? "/dashboard/admin" :
-                        "/dashboard";
-
   // Helper to get user initials
   function getUserInitials() {
     if (user?.name && user.name.trim().length > 0) {
@@ -72,8 +68,10 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/dashboard" className={cn("hover:text-primary", isActive("/") && "text-primary font-medium")}>Dashboard</Link>
-          <Link href="/jobs" className={cn("hover:text-primary", isActive("/jobs") && "text-primary font-medium")}>My Jobs</Link>
+          <Link href="/dashboard" className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
+          {user?.role === "client" && (
+            <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>
+          )}
           {/* {isAuthenticated && (
             <>
               <Link href="/messages" className={cn("hover:text-primary", isActive("/messages") && "text-primary font-medium")}>Messages</Link>
@@ -150,7 +148,7 @@ export default function Navbar() {
                       <span className="font-bold text-lg">{user?.name}</span>
                       <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
                     </div>
-                    <Link href={roleDashboard} className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                    <Link href="/profile" className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
                       <Icon icon={UserIcon} size={18} /> Profile
                     </Link>
                     <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">

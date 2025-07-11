@@ -59,6 +59,15 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
             </Link>
             {isAuthenticated && (
               <>
+                {user?.role === "client" && (
+                  <Link
+                    href="/my-jobs"
+                    className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                    onClick={() => setOpen(false)}
+                  >
+                    <Briefcase className="w-5 h-5" /> My Jobs
+                  </Link>
+                )}
                 <Link
                   href="/messages"
                   className="flex items-center gap-3 text-base font-medium hover:text-primary"

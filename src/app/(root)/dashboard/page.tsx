@@ -1,32 +1,24 @@
 "use client";
 
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useGetJobsQuery } from '@/features/api/jobsApi';
-import { useAuth } from '@/hooks/useAuth';
 import { useAppSelector } from '@/hooks/useTypedSelector';
-import { useAppDispatch } from '@/hooks/useTypedDispatch';
-import { clearFilters } from '@/features/jobs/jobsFilterSlice';
-import { Plus } from 'lucide-react';
+
 import { useState } from 'react';
 import DashboardFilters from './_views/DashboardFilters';
 import DashboardFiltersSkeleton from './_views/DashboardFiltersSkeleton';
-import JobCreateModal from './_views/JobCreateModal';
+
 import JobDetailModal from './_views/JobDetailModal';
 import JobList, { JobDetail } from './_views/JobList';
 import JobListSkeleton from './_views/JobListSkeleton';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
-  const dispatch = useAppDispatch();
-
 
   // Fetch jobs from API
-  const { data: jobs = [], isLoading, isError, refetch } = useGetJobsQuery();
+  const { data: jobs = [], isLoading, isError } = useGetJobsQuery();
 
   // Filter jobs based on searchText and selectedTags
   const filteredJobs = jobs.filter((job) => {
@@ -56,18 +48,7 @@ export default function DashboardPage() {
         <Card className="p-6 mb-8">
           {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters />}
         </Card>
-        {/* Create Job Button */}
-        <div className="flex flex-col sm:flex-row sm:justify-end mb-6">
-          {user.role === 'client' && (
-            <Button
-              className="w-full sm:w-auto px-8 py-3 text-base font-semibold shadow-md flex items-center gap-2"
-              onClick={() => setCreateModalOpen(true)}
-            >
-              <Plus className="w-6 h-6" />
-              Create Job
-            </Button>
-          )}
-        </div>
+
         {/* Job List */}
         <section className="space-y-4 min-h-[200px]">
           {isLoading ? (
@@ -90,9 +71,6 @@ export default function DashboardPage() {
           )}
         </section>
         <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
-        {user.role === 'client' && (
-          <JobCreateModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} onJobPosted={() => { setCreateModalOpen(false); dispatch(clearFilters()); refetch(); }} />
-        )}
       </div>
     </main>
   );

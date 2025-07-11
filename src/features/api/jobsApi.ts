@@ -72,6 +72,10 @@ interface CreateJobRequest {
   status: string;
 }
 
+interface UpdateJobRequest extends CreateJobRequest {
+  id: string;
+}
+
 interface CreateJobResponse {
   success: boolean;
   message?: string;
@@ -129,7 +133,51 @@ export const jobsApi = createApi({
         credentials: 'include',
       }),
     }),
+    updateJob: builder.mutation<CreateJobResponse, UpdateJobRequest>({
+      query: ({ id, ...body }) => ({
+        url: `/jobs/my-jobs/${id}/`,
+        method: 'PATCH',
+        body,
+        credentials: 'include',
+      }),
+    }),
+    deleteJob: builder.mutation<CreateJobResponse, { id: string }>({
+      query: ({ id }) => ({
+        url: `/jobs/my-jobs/${id}/`,
+        method: 'DELETE',
+        credentials: 'include',
+      }),
+    }),
+    getMyJobs: builder.query<JobDetail[], void>({
+      query: () => '/jobs/my-jobs/',
+      transformResponse: (response: { data: JobApi[] }) => {
+        if (response && Array.isArray(response.data)) {
+          return response.data.map((job: JobApi) => ({
+            id: job.id,
+            title: job.title,
+            description: job.description,
+            tags: job.tags,
+            category: job.category,
+            skills: job.skills,
+            currency: job.currency,
+            is_fixed: job.is_fixed,
+            min_budget: job.min_budget,
+            max_budget: job.max_budget,
+            min_hourly_rate: job.min_hourly_rate,
+            max_hourly_rate: job.max_hourly_rate,
+            duration: job.duration,
+            experience_level: job.experience_level,
+            min_proposal_count: job.min_proposal_count,
+            max_proposal_count: job.max_proposal_count,
+            status: job.status,
+            created_by: job.created_by,
+            created_at: job.created_at,
+          }));
+        }
+        return [];
+      },
+    }),
   }),
 });
 
-export const { useGetJobsQuery, useCreateJobMutation, useGetDropdownsQuery } = jobsApi; 
+export const { useGetJobsQuery, useCreateJobMutation, useUpdateJobMutation, useDeleteJobMutation, useGetDropdownsQuery, useGetMyJobsQuery } = jobsApi; 

@@ -1,9 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { getExperienceBadge } from '@/utils/experienceBadge';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
-import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle } from 'lucide-react';
+import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle, Edit, Trash2 } from 'lucide-react';
 
 export interface JobCreator {
   full_name: string;
@@ -34,9 +35,18 @@ export interface JobDetail {
 export interface JobListProps {
   jobs: JobDetail[];
   onJobClick: (job: JobDetail) => void;
+  showEditButton?: boolean;
+  onEditJob?: (job: JobDetail) => void;
+  onDeleteJob?: (job: JobDetail) => void;
 }
 
-function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) => void }) {
+function JobCard({ job, onClick, showEditButton, onEditJob, onDeleteJob }: { 
+  job: JobDetail; 
+  onClick: (job: JobDetail) => void;
+  showEditButton?: boolean;
+  onEditJob?: (job: JobDetail) => void;
+  onDeleteJob?: (job: JobDetail) => void;
+}) {
   // const key = job.status?.toLowerCase() || '';
   // const bg = getStatusBadge(key, true); // true for bg color
   // console.log("job", job);
@@ -54,6 +64,38 @@ function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) =
               {job.title}
             </a>
             {getStatusBadge(job.status)}
+            {showEditButton && (onEditJob || onDeleteJob) && (
+              <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                {onEditJob && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditJob(job);
+                    }}
+                    title="Edit job"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                )}
+                {onDeleteJob && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteJob(job);
+                    }}
+                    title="Delete job"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           <div className="text-xs text-muted-foreground mb-1">
             by <span className="font-semibold text-foreground">{job.created_by?.full_name || 'Unknown'}</span>
@@ -75,8 +117,8 @@ function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) =
                 <Layers className="w-3 h-3" /> {typeof job.category === 'string' ? job.category : job.category.name}
               </Badge>
             )}
-            {job.skills && job.skills.length > 0 && job.skills.map((skill) => (
-              <Badge key={skill.slug} variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1 border-green-200 bg-green-50 text-green-700">
+            {job.skills && job.skills.length > 0 && job.skills.map((skill, skillIndex) => (
+              <Badge key={`${skill.slug || skill.name}-${skillIndex}`} variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1 border-green-200 bg-green-50 text-green-700">
                 <TrendingUp className="w-3 h-3" /> {skill.name}
               </Badge>
             ))}
@@ -130,11 +172,18 @@ function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) =
   );
 }
 
-export default function JobList({ jobs, onJobClick }: JobListProps) {
+export default function JobList({ jobs, onJobClick, showEditButton, onEditJob, onDeleteJob }: JobListProps) {
   return (
     <div className="space-y-4">
-      {jobs.map((job) => (
-        <JobCard key={job.id} job={job} onClick={onJobClick} />
+      {jobs.map((job, idx) => (
+        <JobCard 
+          key={job.id || `${job.title}-${idx}` } 
+          job={job} 
+          onClick={onJobClick}
+          showEditButton={showEditButton}
+          onEditJob={onEditJob}
+          onDeleteJob={onDeleteJob}
+        />
       ))}
     </div>
   );
