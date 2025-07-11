@@ -66,4 +66,4 @@ class PasswordResetMailView(APIView):
                     message="Password reset mail already sent. Please check inbox",
                 )
 
-        return drf_Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        return drf_Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
