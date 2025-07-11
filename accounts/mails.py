@@ -49,7 +49,7 @@ def send_signup_verification_email(user: User):
     to_mail = user.email
 
     token = user.generate_email_verification_token()
-    frontend_url = settings.FRONTEND_URL
+    frontend_url = base_settings.FRONTEND_URL
     frontend_parsed_url = urlparse(frontend_url)
     frontend_domain = frontend_parsed_url.hostname
     uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
