@@ -24,12 +24,14 @@ export function useAuth() {
   });
 
   useEffect(() => {
+    // Only update if data exists and is different from user, and user is not empty
     if (data && !isEqual(data, user)) {
       dispatch(setUser(data));
     } else if (isError) {
       dispatch(clearUser());
     }
-  }, [data, isError, dispatch, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, isError, dispatch]);
 
   // Helper: is authenticated
   const isAuthenticated = !!user && !!user.email;

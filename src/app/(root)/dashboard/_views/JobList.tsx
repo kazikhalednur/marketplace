@@ -1,11 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { getExperienceBadge } from '@/utils/experienceBadge';
-import { getCurrencySymbol } from '@/utils/getCurrencySymbol';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
 import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle } from 'lucide-react';
-import React from 'react';
 
 export interface JobCreator {
   full_name: string;
@@ -89,10 +87,14 @@ function JobCard({ job, onClick }: { job: JobDetail; onClick: (job: JobDetail) =
           <div className="flex flex-col gap-3">
             {/* Budget Row */}
             <div className="flex items-center gap-2 text-green-700 font-semibold text-lg mb-1">
-              <span className="text-lg font-extrabold align-middle text-green-700">{getCurrencySymbol(job.currency)}</span>
+              <span className="text-lg font-extrabold align-middle text-green-700">
+                {/* {getCurrencySymbol(job.currency)} */}৳
+                </span>
               <span>{job.min_budget ?? 0}</span>
               {job.max_budget && job.max_budget !== job.min_budget && (
-                <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">{getCurrencySymbol(job.currency)}</span>{job.max_budget}</span>
+                <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">
+                  {/* {getCurrencySymbol(job.currency)} */}৳
+                </span>{job.max_budget}</span>
               )}
             </div>
             {/* Fixed/Flexible and Duration Row */}

@@ -1,0 +1,142 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Menu, Bell, UserCircle2, LogOut, Settings, HelpCircle, User as UserIcon } from "lucide-react";
+import Icon from "@/components/ui/Icon";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import MobileSidebar from "@/components/navbar/MobileSidebar";
+
+export default function Navbar() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isActive = (path: string) => pathname.startsWith(path);
+
+  const roleDashboard = user?.role === "employer" ? "/dashboard/employer" :
+                        user?.role === "admin" ? "/dashboard/admin" :
+                        "/dashboard";
+
+  return (
+    <header className={cn(
+      "sticky top-0 z-50 w-full transition-all",
+      scrolled ? "shadow-sm border-b bg-background/90 backdrop-blur" : "bg-background/70"
+    )}>
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="text-xl font-bold text-primary">UniMarket</Link>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/dashboard" className={cn("hover:text-primary", isActive("/") && "text-primary font-medium")}>Dashboard</Link>
+          <Link href="/jobs" className={cn("hover:text-primary", isActive("/jobs") && "text-primary font-medium")}>My Jobs</Link>
+          {/* {isAuthenticated && (
+            <>
+              <Link href="/messages" className={cn("hover:text-primary", isActive("/messages") && "text-primary font-medium")}>Messages</Link>
+              <Link href={roleDashboard} className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
+            </>
+          )} */}
+        </nav>
+        {/* Actions (Desktop only) */}
+        <div className="hidden md:flex items-center gap-4">
+          <span className="scale-125">
+            <ThemeToggle />
+          </span>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" className="p-1.5 relative">
+                <Icon icon={Bell} size={32} />
+                {/* Example unread dot */}
+                <span className="absolute top-0 right-0 block w-2 h-2 rounded-full bg-red-500" />
+              </Button>
+              <div className="relative group">
+                <button
+                  className="p-0.5 rounded-full border-2 border-transparent hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition bg-background"
+                >
+                  {user?.avatar ? (
+                    <Image
+                      src={user.avatar || ""}
+                      alt={user.name || ""}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Icon icon={UserCircle2} size={32} className="text-muted-foreground" />
+                  )}
+                </button>
+                {/* Improved Dropdown */}
+                <div className="absolute right-0 mt-2 w-72 bg-popover border border-border shadow-xl rounded-2xl py-2 px-0 z-50 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 opacity-0 translate-y-2">
+                  <div className="flex flex-col items-center gap-2 py-5 border-b border-border">
+                    {user?.avatar ? (
+                      <Image
+                        src={user.avatar || ""}
+                        alt={user.name || ""}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/30 shadow"
+                      />
+                    ) : (
+                      <span className="w-16 h-16 rounded-full flex items-center justify-center bg-muted text-3xl font-bold text-primary ring-2 ring-primary/30 shadow">
+                        {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || <Icon icon={UserCircle2} size={40} />}
+                      </span>
+                    )}
+                    <span className="font-bold text-lg">{user?.name}</span>
+                    <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
+                  </div>
+                  <Link href={roleDashboard} className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                    <Icon icon={UserIcon} size={18} /> Profile
+                  </Link>
+                  <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                    <Icon icon={Settings} size={18} /> Settings
+                  </button>
+                  <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                    <Icon icon={HelpCircle} size={18} /> Help
+                  </button>
+                  <button
+                    className="flex items-center gap-3 w-full px-4 py-2 mt-2 hover:bg-red-100 hover:border-l-4 hover:border-red-500 rounded-lg transition text-base font-semibold text-red-600"
+                    onClick={logout}
+                  >
+                    <Icon icon={LogOut} size={18} className="-scale-x-100" /> Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button variant="ghost" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Register</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+        {/* Hamburger (Mobile only) */}
+        <button
+          className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
+      {/* Mobile Sidebar */}
+      <MobileSidebar open={mobileSidebarOpen} setOpen={setMobileSidebarOpen} />
+    </header>
+  );
+}

@@ -1,15 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast-provider';
+import { useAuth } from '@/hooks/useAuth';
 import { getExperienceBadge } from '@/utils/experienceBadge';
-import { getCurrencySymbol } from '@/utils/getCurrencySymbol';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
 import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import type { JobDetail } from './JobList';
-import { useAuth } from '@/hooks/useAuth';
 
 interface JobDetailModalProps {
   open: boolean;
@@ -137,10 +136,14 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Budget:</span>
-                  <span className="text-lg font-extrabold align-middle text-green-700">{getCurrencySymbol(job.currency)}</span>
+                  <span className="text-lg font-extrabold align-middle text-green-700">
+                    {/* {getCurrencySymbol(job.currency)} */}৳
+                  </span>
                   <span className="text-lg font-bold">{job.min_budget}</span>
                   {job.max_budget && job.max_budget !== job.min_budget && (
-                    <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">{getCurrencySymbol(job.currency)}</span>{job.max_budget}</span>
+                    <span className="text-sm flex items-center text-green-700">- <span className="text-sm font-extrabold align-middle text-green-700 mx-1">
+                      {/* {getCurrencySymbol(job.currency)} */}৳
+                    </span>{job.max_budget}</span>
                   )}
                 </div>
                 {job.duration && (
@@ -152,7 +155,7 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                 )}
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-base">Type:</span>
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}> 
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm font-semibold border ${job.is_fixed ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-muted-foreground/20'}`}>
                     {job.is_fixed ? <CheckCircle className="w-4 h-4 text-primary" /> : <XCircle className="w-4 h-4 text-muted-foreground" />} {job.is_fixed ? 'Fixed' : 'Flexible'}
                   </span>
                 </div>

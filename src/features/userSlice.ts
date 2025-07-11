@@ -9,6 +9,8 @@ interface UserState {
   role?: string | null;
   email_verified?: boolean | null;
   is_google_login?: boolean | null;
+  avatar?: string | null;
+  name?: string | null;
 }
 
 const initialState: UserState = {
@@ -20,6 +22,8 @@ const initialState: UserState = {
   role: null,
   email_verified: null,
   is_google_login: null,
+  avatar: null,
+  name: null,
 };
 
 const userSlice = createSlice({
@@ -38,6 +42,8 @@ const userSlice = createSlice({
       state.role = null;
       state.email_verified = null;
       state.is_google_login = null;
+      state.avatar = null;
+      state.name = null;
     },
   },
 });
