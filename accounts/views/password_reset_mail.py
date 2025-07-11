@@ -3,6 +3,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from rest_framework.views import Response as drf_Response
 
 from utils.helpers import Response
 
@@ -57,7 +58,7 @@ class PasswordResetMailView(APIView):
                 OTP.objects.create(user=user)
                 send_reset_mail(user)
                 return Response(
-                    message="Password reset mail was sent",
+                    message="Password reset mail was resent",
                     status_code=status.HTTP_202_ACCEPTED,
                 )
             else:
@@ -65,4 +66,4 @@ class PasswordResetMailView(APIView):
                     message="Password reset mail already sent. Please check inbox",
                 )
 
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
+        return drf_Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
