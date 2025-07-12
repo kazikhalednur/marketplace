@@ -71,16 +71,16 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
     >
       <Card
         ref={modalRef}
-        className="relative w-full max-w-3xl md:max-w-4xl p-0 rounded-2xl shadow-2xl bg-background animate-in fade-in zoom-in-95 focus:outline-none"
+        className="relative w-full max-w-3xl md:max-w-4xl p-0 rounded-2xl shadow-2xl bg-background animate-in fade-in zoom-in-95 focus:outline-none py-4"
       >
-        <button
-          onClick={onClose}
-          className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10"
-          aria-label="Close"
-        >
+                  <button
+            onClick={onClose}
+            className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
+            aria-label="Close"
+          >
           <X className="w-6 h-6" />
         </button>
-        <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-6 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent pb-6">
+        <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-6 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
           {/* Left/Main Info */}
           <div className="flex-1 flex flex-col gap-6">
             {/* Job Overview */}
@@ -217,22 +217,22 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                   className="bg-muted text-muted-foreground rounded px-3 py-2 text-xs w-full font-mono border border-border/20 focus:ring-2 focus:ring-primary/30 transition-all overflow-x-auto whitespace-nowrap"
                   style={{ cursor: 'text' }}
                 />
-                <button
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md font-medium text-xs transition-all duration-200 border ${
-                    copied 
-                      ? 'bg-green-100 text-green-700 border-green-200 cursor-not-allowed' 
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                  }`}
-                  onClick={() => {
-                    if (!copied) {
-                      const jobLink = typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : '';
-                      navigator.clipboard.writeText(jobLink);
-                      setCopied(true);
-                    }
-                  }}
-                  type="button"
-                  disabled={copied}
-                >
+                                  <button
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md font-medium text-xs transition-all duration-200 border ${
+                      copied 
+                        ? 'bg-green-100 text-green-700 border-green-200 cursor-not-allowed' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 cursor-pointer'
+                    }`}
+                    onClick={() => {
+                      if (!copied) {
+                        const jobLink = typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : '';
+                        navigator.clipboard.writeText(jobLink);
+                        setCopied(true);
+                      }
+                    }}
+                    type="button"
+                    disabled={copied}
+                  >
                   {copied ? (
                     <>
                       <Check className="w-4 h-4" />
@@ -241,7 +241,6 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      Copy link
                     </>
                   )}
                 </button>

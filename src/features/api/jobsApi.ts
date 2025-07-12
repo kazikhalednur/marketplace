@@ -1,5 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { JobDetail } from '@/app/(root)/dashboard/_views/JobList';
+import { normalizeTag } from '@/utils/tags';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
 
 // Define types for API response and job
@@ -112,8 +113,45 @@ export const jobsApi = createApi({
     credentials: 'include' 
   }),
   endpoints: (builder) => ({
-    getJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { page?: number; pageSize?: number }>({
-      query: ({ page = 1, pageSize = 10 }) => `/jobs/?page=${page}&page_size=${pageSize}`,
+    getJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { 
+      page?: number; 
+      pageSize?: number;
+      status?: string;
+      search?: string;
+      tags?: string[];
+      min_budget?: string;
+      max_budget?: string;
+      skills?: string[];
+      category?: string;
+    }>({
+      query: ({ 
+        page = 1, 
+        pageSize = 10, 
+        status, 
+        search, 
+        tags, 
+        min_budget, 
+        max_budget, 
+        skills, 
+        category 
+      }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', pageSize.toString());
+        
+        if (status) params.append('status', status);
+        if (search) params.append('search', search);
+        if (tags && tags.length > 0) {
+          const normalizedTags = tags.map(normalizeTag);
+          params.append('tags', normalizedTags.join(','));
+        }
+        if (min_budget) params.append('min_budget', min_budget);
+        if (max_budget) params.append('max_budget', max_budget);
+        if (skills && skills.length > 0) params.append('skills', skills.join(','));
+        if (category) params.append('category', category);
+        
+        return `/jobs/?${params.toString()}`;
+      },
       transformResponse: (response: PaginatedJobsApiResponse) => {
         if (response?.data && Array.isArray(response.data.results)) {
           const jobs = response.data.results.map((job: JobApi) => ({
@@ -179,8 +217,45 @@ export const jobsApi = createApi({
         credentials: 'include',
       }),
     }),
-    getMyJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { page?: number; pageSize?: number }>({
-      query: ({ page = 1, pageSize = 10 }) => `/jobs/my-jobs/?page=${page}&page_size=${pageSize}`,
+    getMyJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { 
+      page?: number; 
+      pageSize?: number;
+      status?: string;
+      search?: string;
+      tags?: string[];
+      min_budget?: string;
+      max_budget?: string;
+      skills?: string[];
+      category?: string;
+    }>({
+      query: ({ 
+        page = 1, 
+        pageSize = 10, 
+        status, 
+        search, 
+        tags, 
+        min_budget, 
+        max_budget, 
+        skills, 
+        category 
+      }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', pageSize.toString());
+        
+        if (status) params.append('status', status);
+        if (search) params.append('search', search);
+        if (tags && tags.length > 0) {
+          const normalizedTags = tags.map(normalizeTag);
+          params.append('tags', normalizedTags.join(','));
+        }
+        if (min_budget) params.append('min_budget', min_budget);
+        if (max_budget) params.append('max_budget', max_budget);
+        if (skills && skills.length > 0) params.append('skills', skills.join(','));
+        if (category) params.append('category', category);
+        
+        return `/jobs/my-jobs/?${params.toString()}`;
+      },
       transformResponse: (response: PaginatedJobsApiResponse) => {
         if (response?.data && Array.isArray(response.data.results)) {
           const jobs = response.data.results.map((job: JobApi) => ({

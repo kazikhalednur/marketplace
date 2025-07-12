@@ -29,13 +29,28 @@ export default function MyJobsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-  const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
+  const { 
+    status, 
+    search, 
+    tags, 
+    min_budget, 
+    max_budget, 
+    skills, 
+    category 
+  } = useAppSelector((state) => state.jobsFilter);
   const dispatch = useAppDispatch();
 
-  // Fetch only my jobs from API with pagination
+  // Fetch only my jobs from API with pagination and filters
   const { data: myJobsData, isLoading, isError, refetch } = useGetMyJobsQuery({ 
     page: currentPage, 
-    pageSize 
+    pageSize,
+    status,
+    search,
+    tags,
+    min_budget,
+    max_budget,
+    skills,
+    category
   });
   const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation();
 
@@ -99,16 +114,8 @@ export default function MyJobsPage() {
     );
   }
 
-  // Filter jobs based on searchText and selectedTags
-  const filteredJobs = myJobs.filter((job) => {
-    const matchesSearch =
-      !searchText ||
-      job.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchText.toLowerCase());
-    const matchesTags =
-      selectedTags.length === 0 || selectedTags.every((tag) => job.tags.includes(tag));
-    return matchesSearch && matchesTags;
-  });
+  // Jobs are already filtered by the API, so we use them directly
+  const filteredJobs = myJobs;
 
   const handleJobClick = (job: JobDetail) => {
     setSelectedJob(job);
@@ -165,12 +172,19 @@ export default function MyJobsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleFiltersChange = () => {
+    // Reset to first page when filters change
+    setCurrentPage(1);
+    // Refetch jobs with new filters
+    refetch();
+  };
+
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">My Jobs</h1>
         <Card className="p-6 mb-8">
-          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters />}
+          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters onFiltersChange={handleFiltersChange} />}
         </Card>
         {/* Create Job Button */}
         <div className="flex flex-col sm:flex-row sm:justify-end mb-6">

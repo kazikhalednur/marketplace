@@ -346,11 +346,11 @@ export default function StudentProfile({ user, onSwitch }: { user: User; onSwitc
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <label className="font-semibold text-sm">Education</label>
-                  <button type="button" onClick={addEducation} className="rounded-full p-1.5 hover:bg-accent transition" aria-label="Add education"><Plus className="w-5 h-5" /></button>
+                  <button type="button" onClick={addEducation} className="rounded-full p-1.5 hover:bg-accent transition cursor-pointer" aria-label="Add education"><Plus className="w-5 h-5" /></button>
                 </div>
                 {form.education.map((edu: Education, idx: number) => (
                   <div key={idx} className="border border-border rounded-lg p-4 mb-2 flex flex-col gap-2 bg-muted/40 relative">
-                    <button type="button" onClick={() => removeEducation(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border" aria-label="Remove education"><Trash2 className="w-5 h-5" /></button>
+                    <button type="button" onClick={() => removeEducation(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border cursor-pointer" aria-label="Remove education"><Trash2 className="w-5 h-5" /></button>
                     <div className="flex flex-col gap-2">
                       <input name="school" value={edu.school} onChange={e => handleEducationChange(idx, "school", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Institution Name" required />
                       <input name="degree" value={edu.degree} onChange={e => handleEducationChange(idx, "degree", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Degree" />
@@ -366,11 +366,11 @@ export default function StudentProfile({ user, onSwitch }: { user: User; onSwitc
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <label className="font-semibold text-sm">Job Experience</label>
-                  <button type="button" onClick={addExperience} className="rounded-full p-1.5 hover:bg-accent transition" aria-label="Add experience"><Plus className="w-5 h-5" /></button>
+                  <button type="button" onClick={addExperience} className="rounded-full p-1.5 hover:bg-accent transition cursor-pointer" aria-label="Add experience"><Plus className="w-5 h-5" /></button>
                 </div>
                 {form.experience.map((exp: Experience, idx: number) => (
                   <div key={idx} className="border border-border rounded-lg p-4 mb-2 flex flex-col gap-2 bg-muted/40 relative">
-                    <button type="button" onClick={() => removeExperience(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border" aria-label="Remove experience"><Trash2 className="w-5 h-5" /></button>
+                    <button type="button" onClick={() => removeExperience(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border cursor-pointer" aria-label="Remove experience"><Trash2 className="w-5 h-5" /></button>
                     <div className="flex flex-col gap-2">
                       <input name="company" value={exp.company} onChange={e => handleExperienceChange(idx, "company", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Company/Project Name" required />
                       <input name="title" value={exp.title} onChange={e => handleExperienceChange(idx, "title", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Title/Position" />

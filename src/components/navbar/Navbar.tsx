@@ -93,7 +93,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     ref={profileButtonRef}
-                    className="p-0.5 rounded-full border-2 border-transparent hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition bg-background"
+                    className="p-0.5 rounded-full border-2 border-transparent hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition bg-background cursor-pointer"
                     onClick={() => setProfileDropdownOpen((v) => !v)}
                     aria-haspopup="true"
                     aria-expanded={profileDropdownOpen}
@@ -150,14 +150,14 @@ export default function Navbar() {
                       <Link href="/profile" className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
                         <Icon icon={UserIcon} size={18} /> Profile
                       </Link>
-                      <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                      <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold cursor-pointer">
                         <Icon icon={Settings} size={18} /> Settings
                       </button>
-                      <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold">
+                      <button className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold cursor-pointer">
                         <Icon icon={HelpCircle} size={18} /> Help
                       </button>
                       <button
-                        className="flex items-center gap-3 w-full px-4 py-2 mt-2 hover:bg-red-100 hover:border-l-4 hover:border-red-500 rounded-lg transition text-base font-semibold text-red-600"
+                        className="flex items-center gap-3 w-full px-4 py-2 mt-2 hover:bg-red-100 hover:border-l-4 hover:border-red-500 rounded-lg transition text-base font-semibold text-red-600 cursor-pointer"
                         onClick={logout}
                       >
                         <Icon icon={LogOut} size={18} className="-scale-x-100" /> Logout
@@ -185,7 +185,7 @@ export default function Navbar() {
         </div>
         {/* Hamburger (Mobile only) */}
         <button
-          className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+          className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
           onClick={() => setMobileSidebarOpen(true)}
           aria-label="Open menu"
         >

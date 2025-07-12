@@ -5,13 +5,19 @@ import { useAppDispatch } from '@/hooks/useTypedDispatch';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 import { TAGS } from '@/lib/constants';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
+import FilterModal from './FilterModal';
 
-export default function DashboardFilters() {
+interface DashboardFiltersProps {
+  onFiltersChange?: () => void;
+}
+
+export default function DashboardFilters({ onFiltersChange }: DashboardFiltersProps) {
   const dispatch = useAppDispatch();
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
   const [localSearch, setLocalSearch] = useState(searchText);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   // Use a ref to store the timeout id with correct type
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -21,8 +27,14 @@ export default function DashboardFilters() {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => {
       dispatch(setSearchText(value));
-    }, 350);
-  }, [dispatch]);
+      onFiltersChange?.(); // Trigger API call with debounced search
+    }, 500); // Increased debounce time for better UX
+  }, [dispatch, onFiltersChange]);
+
+  const handleFilterApply = useCallback(() => {
+    // Trigger refetch when filters are applied
+    onFiltersChange?.();
+  }, [onFiltersChange]);
 
   return (
     <motion.div
@@ -32,15 +44,25 @@ export default function DashboardFilters() {
       className="w-full"
     >
       {/* Search Input */}
-      <div className="relative mb-4">
-        <Input
-          type="text"
-          placeholder="Search jobs..."
-          className="pl-10 pr-4 py-2 rounded-lg shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
-          value={localSearch}
-          onChange={handleSearchChange}
-        />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            placeholder="Search jobs..."
+            className="pl-10 pr-4 py-2 rounded-lg shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
+            value={localSearch}
+            onChange={handleSearchChange}
+          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+          onClick={() => setFilterModalOpen(true)}
+        >
+          <SlidersHorizontal className="w-5 h-5" />
+        </Button>
       </div>
       {/* Tag Filter */}
       <motion.div
@@ -55,12 +77,22 @@ export default function DashboardFilters() {
             variant={selectedTags.includes(tag) ? 'default' : 'outline'}
             size="sm"
             className={`rounded-full px-4 whitespace-nowrap transition-colors ${selectedTags.includes(tag) ? 'bg-primary text-primary-foreground' : ''}`}
-            onClick={() => dispatch(toggleTag(tag))}
+            onClick={() => {
+              dispatch(toggleTag(tag));
+              onFiltersChange?.(); // Instant API call for tag changes
+            }}
           >
             {tag}
           </Button>
         ))}
       </motion.div>
+      
+      {/* Filter Modal */}
+      <FilterModal
+        open={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        onApply={handleFilterApply}
+      />
     </motion.div>
   );
 }

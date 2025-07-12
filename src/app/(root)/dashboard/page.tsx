@@ -20,14 +20,29 @@ function DashboardContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-  const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
+  const { 
+    status, 
+    search, 
+    tags, 
+    min_budget, 
+    max_budget, 
+    skills, 
+    category 
+  } = useAppSelector((state) => state.jobsFilter);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Fetch jobs from API with pagination
-  const { data: jobsData, isLoading, isError } = useGetJobsQuery({ 
+  // Fetch jobs from API with pagination and filters
+  const { data: jobsData, isLoading, isError, refetch } = useGetJobsQuery({ 
     page: currentPage, 
-    pageSize 
+    pageSize,
+    status,
+    search,
+    tags,
+    min_budget,
+    max_budget,
+    skills,
+    category
   });
 
   const jobs = jobsData?.jobs || [];
@@ -36,16 +51,8 @@ function DashboardContent() {
   const hasPrevious = jobsData?.previous !== null;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  // Filter jobs based on searchText and selectedTags
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      !searchText ||
-      job.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchText.toLowerCase());
-    const matchesTags =
-      selectedTags.length === 0 || selectedTags.every((tag) => job.tags.includes(tag));
-    return matchesSearch && matchesTags;
-  });
+  // Jobs are already filtered by the API, so we use them directly
+  const filteredJobs = jobs;
 
   // Handle URL parameters for job details
   useEffect(() => {
@@ -61,7 +68,7 @@ function DashboardContent() {
       setModalOpen(false);
       setSelectedJob(null);
     }
-  }, [searchParams, jobs]);
+  }, [searchParams, jobs, modalOpen]);
 
   const handleJobClick = (job: JobDetail) => {
     setSelectedJob(job);
@@ -90,12 +97,19 @@ function DashboardContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleFiltersChange = () => {
+    // Reset to first page when filters change
+    setCurrentPage(1);
+    // Refetch jobs with new filters
+    refetch();
+  };
+
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">Job Dashboard</h1>
         <Card className="p-6 mb-8">
-          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters />}
+          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters onFiltersChange={handleFiltersChange} />}
         </Card>
 
         {/* Job List */}
