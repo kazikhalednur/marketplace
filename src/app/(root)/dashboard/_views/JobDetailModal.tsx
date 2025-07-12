@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getExperienceBadge } from '@/utils/experienceBadge';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
-import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle, Copy, Check } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import type { JobDetail } from './JobList';
@@ -22,6 +22,13 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
   const { isAuthenticated, user } = useAuth();
+
+  // Reset copied state when modal opens/closes
+  React.useEffect(() => {
+    if (!open) {
+      setCopied(false);
+    }
+  }, [open]);
 
   // Accessibility: Focus trap and Escape key
   React.useEffect(() => {
@@ -73,9 +80,9 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
         >
           <X className="w-6 h-6" />
         </button>
-        <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-0 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
+        <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-6 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent pb-6">
           {/* Left/Main Info */}
-          <div className="flex-1 p-6 md:p-0 flex flex-col gap-6">
+          <div className="flex-1 flex flex-col gap-6">
             {/* Job Overview */}
             <div className="flex flex-col gap-2 border-b pb-4">
               <div className="flex items-center gap-3 flex-wrap">
@@ -113,9 +120,9 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                     <Layers className="w-3 h-3" /> {typeof job.category === 'string' ? job.category : job.category.name}
                   </span>
                 )}
-                {job.skills && job.skills.length > 0 && job.skills.map((skill) => (
+                {job.skills && job.skills.length > 0 && job.skills.map((skill, skillIndex) => (
                   <span
-                    key={skill.slug}
+                    key={`${skill.slug || skill.name}-${skillIndex}`}
                     className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full border border-green-200 hover:bg-green-200/60 transition-colors"
                     title={`Skill: ${skill.name}`}
                   >
@@ -130,7 +137,7 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
             </div>
           </div>
           {/* Right/Meta & Apply */}
-          <div className="md:w-96 w-full flex flex-col gap-6 p-8 border-t md:border-t-0 md:border-l border-border/20 bg-white">
+          <div className="md:w-96 w-full flex flex-col gap-6 p-6 border-t md:border-t-0 md:border-l border-border/20 bg-white">
             <div>
               <div className="font-semibold text-lg text-primary mb-2 tracking-wide">Budget & Terms</div>
               <div className="flex flex-col gap-2">
@@ -200,26 +207,43 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                 </div>
               )}
             </div>
-            <div className="mt-6">
+            <div className="mt-6 mb-4">
               <div className="font-semibold mb-1 text-sm">Job link</div>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
-                  value={typeof window !== 'undefined' ? window.location.href : ''}
+                  value={typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : ''}
                   readOnly
-                  className="bg-muted text-muted-foreground rounded px-3 py-2 text-xs w-full font-mono border border-border/20 focus:ring-2 focus:ring-primary/30 transition-all"
-                  style={{ cursor: 'not-allowed' }}
+                  className="bg-muted text-muted-foreground rounded px-3 py-2 text-xs w-full font-mono border border-border/20 focus:ring-2 focus:ring-primary/30 transition-all overflow-x-auto whitespace-nowrap"
+                  style={{ cursor: 'text' }}
                 />
                 <button
-                  className={`text-green-600 font-medium text-xs px-2 py-1 rounded hover:bg-green-50 focus:bg-green-100 transition-all border border-green-100 ${copied ? 'bg-green-100' : ''}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md font-medium text-xs transition-all duration-200 border ${
+                    copied 
+                      ? 'bg-green-100 text-green-700 border-green-200 cursor-not-allowed' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}
                   onClick={() => {
-                    navigator.clipboard.writeText(typeof window !== 'undefined' ? window.location.href : '');
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 1200);
+                    if (!copied) {
+                      const jobLink = typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : '';
+                      navigator.clipboard.writeText(jobLink);
+                      setCopied(true);
+                    }
                   }}
                   type="button"
+                  disabled={copied}
                 >
-                  {copied ? 'Copied!' : 'Copy link'}
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copy link
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -252,8 +276,8 @@ export default function JobDetailModal({ open, onClose, job }: JobDetailModalPro
                   <span className="animate-spin mr-2 w-4 h-4 border-2 border-t-transparent border-primary rounded-full" />
                 ) : null}
                 Apply for this Job
-              </Button>
-            )}
+                              </Button>
+              )}
           </div>
         </div>
       </Card>

@@ -19,8 +19,10 @@ import {
 import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
 import { StudentSignupPayload, useStudentSignupMutation } from '@/features/api/apiSlice';
+import { useGetAcceptedDomainsQuery } from '@/features/api/jobsApi';
 import { getErrorMessage } from '@/utils/error';
 import { checkStrength, generatePassword } from '@/utils/password';
+import { validateEmail } from '@/utils/emailValidation';
 import { ArrowLeft, Eye, EyeOff, IdCard, Lock, Mail, Phone, RefreshCw, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -48,6 +50,10 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [remember, setRemember] = useState(false);
   const [studentSignup, { isLoading }] = useStudentSignupMutation();
+  
+  // Fetch accepted domains for email validation
+  const { data: domainsData } = useGetAcceptedDomainsQuery();
+  const acceptedDomains = domainsData?.data?.domains || [];
 
   // Password strength checker and generator are now imported
 
@@ -225,10 +231,10 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 name="email"
                 rules={{
                   required: "Email is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@diu\.edu\.bd$/,
-                    message: "Email must be a valid @diu.edu.bd address",
-                  },
+                  validate: (value) => {
+                    const validation = validateEmail(value, acceptedDomains);
+                    return validation.isValid || validation.error;
+                  }
                 }}
                 render={({ field, fieldState }) => (
                   <FormItem>
@@ -237,7 +243,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                       <div className="relative">
                         <Input
                           type="email"
-                          placeholder="example@diu.edu.bd"
+                          placeholder="example@university.edu"
                           autoComplete="email"
                           {...field}
                           className="pl-10"

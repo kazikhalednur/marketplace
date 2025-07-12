@@ -1,14 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast-provider";
 import { useDeleteJobMutation, useGetMyJobsQuery } from "@/features/api/jobsApi";
 import { clearFilters } from "@/features/jobs/jobsFilterSlice";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { useAppSelector } from "@/hooks/useTypedSelector";
-import { AlertTriangle, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import DashboardFilters from "../dashboard/_views/DashboardFilters";
 import DashboardFiltersSkeleton from "../dashboard/_views/DashboardFiltersSkeleton";
 import JobCreateModal from "../dashboard/_views/JobCreateModal";
@@ -27,12 +27,23 @@ export default function MyJobsPage() {
   const [jobToEdit, setJobToEdit] = useState<JobDetail | null>(null);
   const [jobToDelete, setJobToDelete] = useState<JobDetail | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
   const dispatch = useAppDispatch();
 
-  // Fetch only my jobs from API
-  const { data: myJobs = [], isLoading, isError, refetch } = useGetMyJobsQuery();
+  // Fetch only my jobs from API with pagination
+  const { data: myJobsData, isLoading, isError, refetch } = useGetMyJobsQuery({ 
+    page: currentPage, 
+    pageSize 
+  });
   const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation();
+
+  const myJobs = myJobsData?.jobs || [];
+  const totalCount = myJobsData?.count || 0;
+  const hasNext = myJobsData?.next !== null;
+  const hasPrevious = myJobsData?.previous !== null;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   // Add mounted state to prevent hydration issues
   const [mounted, setMounted] = useState(false);
@@ -87,8 +98,6 @@ export default function MyJobsPage() {
       </main>
     );
   }
-
-  // Filter jobs based on searchText and selectedTags
 
   // Filter jobs based on searchText and selectedTags
   const filteredJobs = myJobs.filter((job) => {
@@ -150,6 +159,12 @@ export default function MyJobsPage() {
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-5xl mx-auto">
@@ -185,13 +200,74 @@ export default function MyJobsPage() {
               <div className="text-sm text-muted-foreground">You haven&apos;t posted any jobs yet. Click &apos;Create Job&apos; to get started.</div>
             </Card>
           ) : (
-            <JobList 
-              jobs={filteredJobs} 
-              onJobClick={handleJobClick}
-              showEditButton={true}
-              onEditJob={handleEditJob}
-              onDeleteJob={handleDeleteJob}
-            />
+            <>
+              <JobList 
+                jobs={filteredJobs} 
+                onJobClick={handleJobClick}
+                showEditButton={true}
+                onEditJob={handleEditJob}
+                onDeleteJob={handleDeleteJob}
+              />
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-8">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} jobs
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={!hasPrevious}
+                      className="flex items-center gap-1"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Previous
+                    </Button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = currentPage - 2 + i;
+                        }
+                        
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={currentPage === pageNum ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(pageNum)}
+                            className="w-8 h-8 p-0"
+                          >
+                            {pageNum}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={!hasNext}
+                      className="flex items-center gap-1"
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </section>
         <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
@@ -200,44 +276,32 @@ export default function MyJobsPage() {
           <JobEditModal 
             open={editModalOpen} 
             onClose={handleCloseEditModal} 
-            job={jobToEdit}
+            job={jobToEdit} 
             onJobUpdated={handleJobUpdated}
           />
         )}
-        
-        {/* Delete Confirmation Modal */}
-        {deleteModalOpen && jobToDelete && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in">
-            <Card className="relative w-full max-w-md mx-4 p-0 rounded-2xl border border-border/30 shadow-xl bg-gradient-to-br from-background to-muted/60 animate-in fade-in zoom-in-95">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
-                </div>
-                <CardTitle className="text-xl font-bold text-foreground">Delete Job</CardTitle>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Are you sure you want to delete &quot;{jobToDelete.title}&quot;? This action cannot be undone.
-                </p>
-              </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={handleCloseDeleteModal}
-                    disabled={isDeleting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={handleConfirmDelete}
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? 'Deleting...' : 'Delete Job'}
-                  </Button>
-                </div>
-              </CardContent>
+        {jobToDelete && (
+          <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ${deleteModalOpen ? 'animate-in fade-in' : 'hidden'}`}>
+            <Card className="w-full max-w-md p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
+                <h3 className="text-lg font-semibold">Delete Job</h3>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Are you sure you want to delete &quot;{jobToDelete.title}&quot;? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={handleCloseDeleteModal}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </div>
             </Card>
           </div>
         )}

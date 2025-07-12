@@ -26,10 +26,9 @@ interface JobApi {
   tags: string[];
   category: JobApiCategory;
   skills: JobApiSkill[];
-  currency: string;
-  is_fixed: boolean;
   min_budget: string;
   max_budget: string;
+  is_fixed: boolean;
   min_hourly_rate: string | null;
   max_hourly_rate: string | null;
   duration: string;
@@ -41,8 +40,16 @@ interface JobApi {
   created_at: string;
 }
 
-interface JobsApiResponse {
-  data: JobApi[];
+interface PaginatedJobsApiResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: JobApi[];
+  };
 }
 
 interface JobsDropdownsResponse {
@@ -82,28 +89,41 @@ interface CreateJobResponse {
   data?: unknown;
 }
 
+interface AcceptedDomainResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data?: {
+    domains?: string[];
+  };
+}
+
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_BASE_URL,     prepareHeaders: (headers) => {
-    const token = Cookies.get('accessToken');
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    return headers;
-  },credentials: 'include' }), // Use relative base URL for proxy or absolute if needed
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || '',
+    prepareHeaders: (headers) => {
+      const token = Cookies.get('accessToken');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+    credentials: 'include' 
+  }),
   endpoints: (builder) => ({
-    getJobs: builder.query<JobDetail[], void>({
-      query: () => '/jobs/',
-      transformResponse: (response: JobsApiResponse) => {
-        if (response && Array.isArray(response.data)) {
-          return response.data.map((job: JobApi) => ({
+    getJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { page?: number; pageSize?: number }>({
+      query: ({ page = 1, pageSize = 10 }) => `/jobs/?page=${page}&page_size=${pageSize}`,
+      transformResponse: (response: PaginatedJobsApiResponse) => {
+        if (response?.data && Array.isArray(response.data.results)) {
+          const jobs = response.data.results.map((job: JobApi) => ({
             id: job.id,
             title: job.title,
             description: job.description,
             tags: job.tags,
             category: job.category,
             skills: job.skills,
-            currency: job.currency,
+            currency: undefined, // Not provided in API response
             is_fixed: job.is_fixed,
             min_budget: job.min_budget,
             max_budget: job.max_budget,
@@ -117,8 +137,19 @@ export const jobsApi = createApi({
             created_by: job.created_by,
             created_at: job.created_at,
           }));
+          return {
+            jobs,
+            count: response.data.count,
+            next: response.data.next,
+            previous: response.data.previous,
+          };
         }
-        return [];
+        return {
+          jobs: [],
+          count: 0,
+          next: null,
+          previous: null,
+        };
       }
     }),
     getDropdowns: builder.query<JobsDropdownsResponse['data'], void>({
@@ -148,18 +179,18 @@ export const jobsApi = createApi({
         credentials: 'include',
       }),
     }),
-    getMyJobs: builder.query<JobDetail[], void>({
-      query: () => '/jobs/my-jobs/',
-      transformResponse: (response: { data: JobApi[] }) => {
-        if (response && Array.isArray(response.data)) {
-          return response.data.map((job: JobApi) => ({
+    getMyJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { page?: number; pageSize?: number }>({
+      query: ({ page = 1, pageSize = 10 }) => `/jobs/my-jobs/?page=${page}&page_size=${pageSize}`,
+      transformResponse: (response: PaginatedJobsApiResponse) => {
+        if (response?.data && Array.isArray(response.data.results)) {
+          const jobs = response.data.results.map((job: JobApi) => ({
             id: job.id,
             title: job.title,
             description: job.description,
             tags: job.tags,
             category: job.category,
             skills: job.skills,
-            currency: job.currency,
+            currency: undefined, // Not provided in API response
             is_fixed: job.is_fixed,
             min_budget: job.min_budget,
             max_budget: job.max_budget,
@@ -173,11 +204,33 @@ export const jobsApi = createApi({
             created_by: job.created_by,
             created_at: job.created_at,
           }));
+          return {
+            jobs,
+            count: response.data.count,
+            next: response.data.next,
+            previous: response.data.previous,
+          };
         }
-        return [];
+        return {
+          jobs: [],
+          count: 0,
+          next: null,
+          previous: null,
+        };
       },
+    }),
+    getAcceptedDomains: builder.query<AcceptedDomainResponse, void>({
+      query: () => '/accounts/accepted-domain/',
     }),
   }),
 });
 
-export const { useGetJobsQuery, useCreateJobMutation, useUpdateJobMutation, useDeleteJobMutation, useGetDropdownsQuery, useGetMyJobsQuery } = jobsApi; 
+export const { 
+  useGetJobsQuery, 
+  useCreateJobMutation, 
+  useUpdateJobMutation, 
+  useDeleteJobMutation, 
+  useGetDropdownsQuery, 
+  useGetMyJobsQuery,
+  useGetAcceptedDomainsQuery
+} = jobsApi; 
