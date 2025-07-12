@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "whitenoise",
     "simple_history",
+    "django_filters",
 ]
 
 MIDDLEWARE = [

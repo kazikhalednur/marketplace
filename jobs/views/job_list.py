@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 
+from ..filters import JobFilter
 from ..models import Job
 from ..serializers import JobSerializer
 
@@ -16,3 +18,5 @@ class JobListView(ListAPIView):
     queryset = Job.objects.published()
     serializer_class = JobSerializer
     pagination_class = JobPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = JobFilter
