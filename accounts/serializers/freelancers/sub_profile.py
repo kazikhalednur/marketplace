@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from jobs.models import Skill
-
 from ...models import Education, Experience, FreelancerSubProfile, Project
+
+# from jobs.models import Skill
 
 
 class FreelancerSubProfileProjectSerializer(serializers.ModelSerializer):
@@ -47,9 +47,9 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
     projects = FreelancerSubProfileProjectSerializer(many=True, required=False)
     experiences = FreelancerSubProfileExperienceSerializer(many=True, required=False)
     educations = FreelancerSubProfileEducationSerializer(many=True, required=False)
-    skills = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Skill.objects.all(), required=False
-    )
+    # skills = serializers.PrimaryKeyRelatedField(
+    #     many=True, queryset=Skill.objects.all(), required=False
+    # )
 
     class Meta:
         model = FreelancerSubProfile
@@ -62,7 +62,7 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
             "linkedin",
             "github",
             "portfolio",
-            "skills",
+            # "skills",
             "projects",
             "experiences",
             "educations",
@@ -72,7 +72,7 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         projects_data = validated_data.pop("projects", [])
         experiences_data = validated_data.pop("experiences", [])
         educations_data = validated_data.pop("educations", [])
-        skills_ids = validated_data.pop("skills", [])
+        # skills_ids = validated_data.pop("skills", [])
 
         sub_profile = FreelancerSubProfile.objects.create(**validated_data)
 
@@ -85,8 +85,8 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         for education_data in educations_data:
             Education.objects.create(sub_profile=sub_profile, **education_data)
 
-        if skills_ids:
-            sub_profile.skills.set(skills_ids)
+        # if skills_ids:
+        #     sub_profile.skills.set(skills_ids)
 
         return sub_profile
 
@@ -96,8 +96,8 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         educations_data = validated_data.pop("educations", [])
 
         # Update skills
-        skills_ids = validated_data.pop("skills", [])
-        instance.skills.set(skills_ids)
+        # skills_ids = validated_data.pop("skills", [])
+        # instance.skills.set(skills_ids)
 
         # Update base sub-profile fields
         for attr, value in validated_data.items():
