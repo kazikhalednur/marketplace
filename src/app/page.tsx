@@ -45,7 +45,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)] relative">
       {/* Sticky Navbar */}
-      <nav className="sticky top-0 z-30 w-full bg-[var(--card)]/90 backdrop-blur border-b border-[var(--border)] flex items-center justify-between px-6 py-3 shadow-sm">
+{/*      <nav className="sticky top-0 z-30 w-full bg-[var(--card)]/90 backdrop-blur border-b border-[var(--border)] flex items-center justify-between px-6 py-3 shadow-sm">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]">
           <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">UniMarket</span>
         </Link>
@@ -58,7 +58,7 @@ export default function LandingPage() {
           </Button>
           <ThemeToggle />
         </div>
-      </nav>
+      </nav> */}
 
       {/* Subtle Background */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[var(--background)] via-[var(--muted)] to-[var(--background)]" />
