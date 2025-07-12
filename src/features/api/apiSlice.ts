@@ -26,6 +26,7 @@ export interface StudentSignupPayload extends EmployerSignupPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+  remember?: boolean;
 }
 
 export interface LoginResponse {

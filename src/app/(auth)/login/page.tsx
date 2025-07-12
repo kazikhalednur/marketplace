@@ -37,6 +37,25 @@ export default function LoginPage() {
     },
     mode: "onBlur",
   });
+  
+  // Check if user had remember me enabled and restore saved credentials
+  useEffect(() => {
+    const rememberMe = Cookies.get('rememberMe');
+    const savedEmail = Cookies.get('savedEmail');
+    const savedPassword = Cookies.get('savedPassword');
+    
+    if (rememberMe === 'true') {
+      form.setValue('remember', true);
+      
+      // Auto-fill saved credentials if they exist
+      if (savedEmail) {
+        form.setValue('email', savedEmail);
+      }
+      if (savedPassword) {
+        form.setValue('password', savedPassword);
+      }
+    }
+  }, [form]);
   const router = useRouter();
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
@@ -56,9 +75,27 @@ export default function LoginPage() {
       const res = await login(data).unwrap();
       if (res?.success && res?.data?.access && res?.data?.refresh) {
         showToast({ type: 'success', message: 'Login successful!' });
+        
+        // Set cookie expiration based on remember me
+        const expires = data.remember ? 30 : 7; // 30 days if remember me, 7 days otherwise
+        
         // Save tokens as cookies (not HttpOnly, accessible to JS)
-        Cookies.set('accessToken', res.data.access, { path: '/', expires: 7 });
-        Cookies.set('refreshToken', res.data.refresh, { path: '/', expires: 7 });
+        Cookies.set('accessToken', res.data.access, { path: '/', expires });
+        Cookies.set('refreshToken', res.data.refresh, { path: '/', expires });
+        
+        // Save remember me preference and credentials if remember me is checked
+        Cookies.set('rememberMe', data.remember ? 'true' : 'false', { path: '/', expires });
+        
+        if (data.remember) {
+          // Save email and password for auto-fill
+          Cookies.set('savedEmail', data.email, { path: '/', expires });
+          Cookies.set('savedPassword', data.password, { path: '/', expires });
+        } else {
+          // Clear saved credentials if remember me is unchecked
+          Cookies.remove('savedEmail', { path: '/' });
+          Cookies.remove('savedPassword', { path: '/' });
+        }
+        
         window.location.href = '/dashboard';
       } else {
         const errorDetail = res?.error?.detail;
@@ -164,16 +201,27 @@ export default function LoginPage() {
                 name="remember"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center gap-2 mt-2">
-                    <input
-                      id="remember"
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={e => field.onChange(e.target.checked)}
-                      className="accent-primary w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary"
-                    />
-                    <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
-                      Remember me
-                    </label>
+                    <div className="flex items-center">
+                      <input
+                        id="remember"
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={e => {
+                          const isChecked = e.target.checked;
+                          field.onChange(isChecked);
+                          
+                          // Clear saved credentials if unchecked
+                          if (!isChecked) {
+                            Cookies.remove('savedEmail', { path: '/' });
+                            Cookies.remove('savedPassword', { path: '/' });
+                          }
+                        }}
+                        className="w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background accent-primary cursor-pointer"
+                      />
+                      <label htmlFor="remember" className="ml-2 text-sm text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors">
+                        Remember me
+                      </label>
+                    </div>
                   </FormItem>
                 )}
               />

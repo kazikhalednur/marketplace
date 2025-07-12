@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { useAppSelector } from "@/hooks/useTypedSelector";
 import { AlertTriangle, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardFilters from "../dashboard/_views/DashboardFilters";
 import DashboardFiltersSkeleton from "../dashboard/_views/DashboardFiltersSkeleton";
 import JobCreateModal from "../dashboard/_views/JobCreateModal";
@@ -34,7 +34,27 @@ export default function MyJobsPage() {
   const { data: myJobs = [], isLoading, isError, refetch } = useGetMyJobsQuery();
   const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation();
 
-  // Show loader while checking authentication
+  // Add mounted state to prevent hydration issues
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Show loader while checking authentication (only on client side)
+  if (!mounted) {
+    return (
+      <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="text-sm text-muted-foreground mt-4">Loading...</div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (showLoader) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
