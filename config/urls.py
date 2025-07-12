@@ -28,6 +28,7 @@ urlpatterns = [
     # local apps
     path("accounts/", include("accounts.urls")),
     path("jobs/", include("jobs.urls")),
+    path("images/", include("images.urls")),
 ]
 
 if settings.SERVER_TYPE == "local":

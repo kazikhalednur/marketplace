@@ -4,7 +4,6 @@ from .password_reset import PasswordResetSerializer
 from .password_reset_mail import PasswordResetMailSerializer
 from .signin import SigninSerializer
 from .signin_google import SigninGoogleSerializer
-from .user_info import UserInfoSerializer
 
 __all__ = [
     "OTPVerifySerializer",
@@ -13,5 +12,4 @@ __all__ = [
     "PasswordResetMailSerializer",
     "SigninSerializer",
     "SigninGoogleSerializer",
-    "UserInfoSerializer",
 ]

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "jobs.apps.JobsConfig",
     "biding.apps.BidingConfig",
+    "images.apps.ImagesConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",

@@ -46,7 +46,6 @@ urlpatterns = [
         views.EmailResendView.as_view(),
         name="resend_email",
     ),
-    path("info/", views.UserInfoView.as_view(), name="info"),
     # Freelancer specific URLs
     path("signup/", freelancers_views.SignupView.as_view(), name="signup"),
     path(
@@ -59,6 +58,7 @@ urlpatterns = [
         freelancers_views.AcceptedDomainView.as_view(),
         name="accepted_domain",
     ),
+    path("info/", freelancers_views.UserInfoView.as_view(), name="info"),
     # Client specific URLs
     path("clients/signup/", clients_views.SignupView.as_view(), name="clients_signup"),
     path(

@@ -8,8 +8,12 @@ from .models import (
     Auditor,
     Client,
     ClientProfile,
+    Education,
+    Experience,
     Freelancer,
     FreelancerProfile,
+    FreelancerSubProfile,
+    Project,
     User,
 )
 
@@ -135,3 +139,7 @@ class AuditorAdmin(FreelancerAdmin):
 admin.site.register(OTP)
 admin.site.register(ClientProfile)
 admin.site.register(FreelancerProfile)
+admin.site.register(FreelancerSubProfile)
+admin.site.register(Education)
+admin.site.register(Experience)
+admin.site.register(Project)

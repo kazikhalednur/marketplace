@@ -1,6 +1,13 @@
 from .accepted_domains import AcceptedDomain
 from .otp import OTP
-from .profile import ClientProfile, FreelancerProfile
+from .profile import (
+    ClientProfile,
+    Education,
+    Experience,
+    FreelancerProfile,
+    FreelancerSubProfile,
+    Project,
+)
 from .user import Arbitrator, Auditor, Client, Freelancer, User
 
 __all__ = [
@@ -13,4 +20,8 @@ __all__ = [
     "FreelancerProfile",
     "Arbitrator",
     "Auditor",
+    "FreelancerSubProfile",
+    "Project",
+    "Education",
+    "Experience",
 ]
