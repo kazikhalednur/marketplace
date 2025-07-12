@@ -13,6 +13,20 @@ class JSONRenderer(DRFJSONRenderer):
         accepted_media_type=None,
         renderer_context=None,
     ):
+        if data is None:
+            return super().render(
+                {
+                    "status_code": renderer_context["response"].status_code,
+                    "message": (
+                        "Deleted successfully"
+                        if renderer_context["response"].status_code == 204
+                        else "No content"
+                    ),
+                },
+                accepted_media_type,
+                renderer_context,
+            )
+
         response_data = {
             "success": renderer_context["response"].status_code < 400,
             "status_code": (
