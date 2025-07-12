@@ -7,6 +7,8 @@ import { useAppSelector } from './useTypedSelector';
 import { setUser, clearUser } from '../features/userSlice';
 import React from 'react';
 import isEqual from 'lodash.isequal';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export function Loader() {
   return (
@@ -18,6 +20,7 @@ export function Loader() {
 
 export function useAuth() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { data, isLoading, isError, refetch } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -42,8 +45,12 @@ export function useAuth() {
   // Helper: logout (clear user info)
   const logout = useCallback(() => {
     dispatch(clearUser());
-    // Optionally: remove cookies, redirect, etc.
-  }, [dispatch]);
+    // Clear cookies
+    Cookies.remove('accessToken', { path: '/' });
+    Cookies.remove('refreshToken', { path: '/' });
+    // Redirect to home page
+    router.push('/');
+  }, [dispatch, router]);
 
   // Helper: refresh user info
   const refresh = useCallback(() => {
