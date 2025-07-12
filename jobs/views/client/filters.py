@@ -28,7 +28,7 @@ class ClientJobFilter(django_filters.FilterSet):
     skills = django_filters.CharFilter(
         field_name="skills__name", lookup_expr="icontains"
     )
-    tags = django_filters.CharFilter(field_name="tags__name", lookup_expr="icontains")
+    tags = django_filters.CharFilter(field_name="tags", lookup_expr="icontains")
 
     class Meta:
         model = Job
