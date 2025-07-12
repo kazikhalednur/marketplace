@@ -7,7 +7,7 @@ from accounts.permissions import IsClient
 
 from ...models import Job
 from ...serializers.client import ClientJobSerializer
-from .filters import JobFilter
+from .filters import ClientJobFilter
 
 
 class JobPagination(PageNumberPagination):
@@ -22,7 +22,7 @@ class JobListView(ListAPIView):
     serializer_class = ClientJobSerializer
     pagination_class = JobPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_class = JobFilter
+    filterset_class = ClientJobFilter
 
     def get_queryset(self):
         return Job.objects.filter(created_by=self.request.user)

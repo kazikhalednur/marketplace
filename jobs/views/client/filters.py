@@ -3,7 +3,7 @@ import django_filters
 from ...models import Job
 
 
-class JobFilter(django_filters.FilterSet):
+class ClientJobFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(
         field_name="status",
         choices=Job.JobStatus.choices,
