@@ -267,7 +267,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full bg-[var(--card)] border-t border-[var(--border)] py-6 px-6 mt-0 text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-2">
+      {/* <footer className="w-full bg-[var(--card)] border-t border-[var(--border)] py-6 px-6 mt-0 text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="font-semibold">&copy; {new Date().getFullYear()} UniMarket. All rights reserved.</span>
         </div>
@@ -276,7 +276,7 @@ export default function LandingPage() {
           <a href="#" className="hover:underline">Privacy Policy</a>
           <a href="#" className="hover:underline">Terms</a>
         </div>
-      </footer>
+      </footer> */}
     </main>
   );
 }
