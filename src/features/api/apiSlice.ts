@@ -94,6 +94,7 @@ export interface UserInfo {
   email_verified: boolean;
   is_google_login: boolean;
   student_id: string;
+  avatar?: string;
   freelancer_sub_profiles: FreelancerSubProfile[];
 }
 

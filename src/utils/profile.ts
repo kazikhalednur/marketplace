@@ -25,12 +25,14 @@ interface FreelancerFormData {
   avatar?: string;
   skills?: string[];
   education?: Array<{
+    id?: number | null;
     school?: string;
     degree?: string;
     start?: string;
     end?: string | null;
   }>;
   experience?: Array<{
+    id?: number | null;
     title?: string;
     company?: string;
     start?: string;
@@ -40,6 +42,7 @@ interface FreelancerFormData {
     type?: string;
   }>;
   projects?: Array<{
+    id?: number | null;
     name?: string;
     link?: string;
     description?: string;
@@ -94,7 +97,7 @@ export function transformStudentData(user: UserState) {
   const subProfile = user.freelancer_sub_profiles?.[0];
   
   return {
-    avatar: undefined, // No avatar in API response yet
+    avatar: user.avatar || undefined, // Use actual avatar from API response
     name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Student User',
     role: 'Freelancer',
     location: '', // Not provided in API
@@ -106,12 +109,14 @@ export function transformStudentData(user: UserState) {
     about: subProfile?.bio || '', // No dummy data
     skills: [], // No dummy data
     education: subProfile?.educations?.map((edu: FreelancerEducation) => ({
+      id: edu.id || null,
       school: edu.institution_name,
       degree: edu.degree,
       start: edu.start_date,
       end: edu.end_date,
     })) || [], // No dummy data
     experience: subProfile?.experiences?.map((exp: FreelancerExperience) => ({
+      id: exp.id || null,
       title: exp.job_title,
       company: exp.company_name,
       start: exp.start_date,
@@ -119,6 +124,7 @@ export function transformStudentData(user: UserState) {
       description: exp.description,
     })) || [], // No dummy data
     projects: subProfile?.projects?.map((proj: FreelancerProject) => ({
+      id: proj.id || null,
       name: proj.title,
       link: proj.link,
       description: proj.description,
@@ -174,13 +180,13 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
       portfolio: form.website || subProfile?.portfolio || '',
       skills: [], // Skills are handled separately, using IDs
       projects: form.projects?.map((project) => ({
-        id: null, // New project - no ID
+        id: project.id || null, // Use existing ID or null for new projects
         title: project.name || '',
         link: project.link || '',
         description: project.description || '',
       })) || [],
       experiences: form.experience?.map((exp) => ({
-        id: null, // New experience - no ID
+        id: exp.id || null, // Use existing ID or null for new experiences
         job_title: exp.title || '',
         company_name: exp.company || '',
         start_date: formatDateToFull(exp.start || ''),
@@ -189,7 +195,7 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
         description: exp.description || '',
       })) || [],
       educations: form.education?.map((edu) => ({
-        id: null, // New education - no ID
+        id: edu.id || null, // Use existing ID or null for new educations
         institution_name: edu.school || '',
         degree: edu.degree || '',
         start_date: formatDateToFull(edu.start || ''),

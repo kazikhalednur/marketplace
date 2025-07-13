@@ -7,9 +7,12 @@ import { Edit, Mail, MapPin, Globe, Linkedin, Twitter, Github, CheckCircle2, Plu
 import { TagsInput } from "@/components/ui/tags-input";
 import { useUpdateProfileMutation, useUploadImageMutation } from "@/features/api/apiSlice";
 import { useAppSelector } from "@/hooks/useTypedSelector";
+import { useAppDispatch } from "@/hooks/useTypedDispatch";
+import { setUser } from "@/features/userSlice";
 import { transformFreelancerFormToPayload } from "@/utils/profile";
 
 interface Experience {
+  id?: number | null;
   title: string;
   company: string;
   start: string;
@@ -20,6 +23,7 @@ interface Experience {
 }
 
 interface Education {
+  id?: number | null;
   school: string;
   degree: string;
   start: string;
@@ -49,8 +53,10 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   const [editMode, setEditMode] = useState(false);
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [uploadImage] = useUploadImageMutation();
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [originalForm, setOriginalForm] = useState<typeof form | null>(null);
   const userState = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
   // Helper to get user initials
   function getUserInitials() {
@@ -66,8 +72,36 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   // Helper to determine if avatar is real
   function hasRealAvatar() {
     if (!user?.avatar) return false;
+    const avatarUrl = user.avatar.trim();
+    if (!avatarUrl) return false;
+    
+    // Check if it's a placeholder
     const placeholderList = ["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"];
-    return !placeholderList.includes(user.avatar.trim());
+    const isPlaceholder = placeholderList.some(placeholder => 
+      avatarUrl.toLowerCase().includes(placeholder.toLowerCase())
+    );
+    
+    return !isPlaceholder;
+  }
+
+  // Helper to get the full avatar URL
+  function getAvatarUrl() {
+    if (!user?.avatar) return "";
+    const avatarUrl = user.avatar.trim();
+    if (!avatarUrl) return "";
+    
+    // If it's already a full URL, return as is
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+      return avatarUrl;
+    }
+    
+    // If it's a relative URL, prefix with base URL
+    if (avatarUrl.startsWith('/')) {
+      return `${process.env.NEXT_PUBLIC_BASE_URL}${avatarUrl}`;
+    }
+    
+    // If it doesn't start with /, add it
+    return `${process.env.NEXT_PUBLIC_BASE_URL}/${avatarUrl}`;
   }
 
   // Helper to calculate duration between two dates
@@ -239,33 +273,17 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedImage(file);
       setAvatarPreview(URL.createObjectURL(file));
-      // Automatically upload the image when selected
-      handleImageUpload(file);
-    }
-  }
-
-  async function handleImageUpload(file: File) {
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const response = await uploadImage(formData).unwrap();
-      
-      if (response.success) {
-        // Update the form with the new image URL
-        setForm(prev => ({ ...prev, avatar: response.data.image }));
-        // Update the avatar preview with the new URL
-        setAvatarPreview(response.data.image);
-      }
-    } catch (error) {
-      console.error('Failed to upload image:', error);
     }
   }
 
   // Helper: check if form has changes
   const hasChanges = useCallback(() => {
     if (!originalForm) return false;
+    
+    // Check if there's a selected image (new image to upload)
+    if (selectedImage) return true;
     
     // Deep comparison of form objects
     const formKeys = Object.keys(form) as (keyof typeof form)[];
@@ -283,17 +301,43 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
       }
     }
     return false;
-  }, [form, originalForm]);
+  }, [form, originalForm, selectedImage]);
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const payload = transformFreelancerFormToPayload(form, userState);
+      const updatedForm = { ...form };
+      
+      // If there's a selected image, upload it first
+      if (selectedImage) {
+        try {
+          const formData = new FormData();
+          formData.append('image', selectedImage);
+
+          const response = await uploadImage(formData).unwrap();
+          
+          if (response.success) {
+            updatedForm.avatar = response.data.image;
+            setAvatarPreview(response.data.image);
+            setSelectedImage(null);
+          }
+        } catch (error) {
+          console.error('Failed to upload image:', error);
+          return; // Don't proceed with profile update if image upload fails
+        }
+      }
+      
+      const payload = transformFreelancerFormToPayload(updatedForm, userState);
       console.log('Profile update payload:', payload);
-      console.log('Form data:', form);
+      console.log('Form data:', updatedForm);
       console.log('User state:', userState);
       
       const result = await updateProfile(payload).unwrap();
       console.log('Profile update result:', result);
+      
+      // Update Redux state with the new avatar URL if it was uploaded
+      if (updatedForm.avatar && updatedForm.avatar !== userState.avatar) {
+        dispatch(setUser({ ...userState, avatar: updatedForm.avatar }));
+      }
       
       setEditMode(false);
       // Refetch user data to update the profile
@@ -309,17 +353,24 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
     <main className="relative min-h-screen bg-gradient-to-b from-muted/60 to-background/80 pb-20">
       <div className="absolute inset-0 pointer-events-none select-none opacity-10 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-accent/20 via-transparent to-transparent" />
       <div className="max-w-3xl mx-auto px-4 pt-12">
-        <section className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border border-border/60 rounded-3xl shadow-lg p-8 flex flex-col md:flex-row items-center md:items-start gap-8 mb-10 mt-4 backdrop-blur-sm">
+                <section className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border border-border/60 rounded-3xl shadow-lg p-8 flex flex-col md:flex-row items-center md:items-start gap-8 mb-10 mt-4 backdrop-blur-sm">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-accent/60 to-primary/40 blur-md opacity-40" />
             {hasRealAvatar() ? (
               <Image
-                src={user.avatar || ""}
+                src={getAvatarUrl()}
                 alt={user.name || ""}
                 width={120}
                 height={120}
                 className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg relative z-10"
+                onError={(e) => {
+                  console.error('Image failed to load:', getAvatarUrl());
+                  console.error('Error event:', e);
+                }}
+                onLoad={() => {
+                  console.log('Image loaded successfully:', getAvatarUrl());
+                }}
               />
             ) : getUserInitials() ? (
               <span className="w-32 h-32 flex items-center justify-center rounded-full bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-5xl font-extrabold text-white ring-4 ring-primary/30 shadow-lg select-none relative z-10 border-4 border-background">
