@@ -18,13 +18,8 @@ class FreelancerProfile(models.Model):
         help_text="Your student ID, e.g., 2019-12345-1",
     )
     is_available = models.BooleanField(default=True)
-    avatar = models.OneToOneField(
-        "images.Image",
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="freelancer_profile",
-        verbose_name="Profile Image",
+    avatar = models.URLField(
+        max_length=255, blank=True, null=True, verbose_name="Avatar URL"
     )
     available_connects = models.PositiveIntegerField(default=30)
     history = HistoricalRecords()

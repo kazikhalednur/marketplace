@@ -25,14 +25,9 @@ class ClientProfile(models.Model):
     )
     twitter = models.URLField(blank=True, null=True, verbose_name="Twitter Profile")
     linkedin = models.URLField(blank=True, null=True, verbose_name="LinkedIn Profile")
-    about = models.TextField(blank=True, null=True)
-    image = models.OneToOneField(
-        "images.Image",
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="client_profile",
-        verbose_name="Profile Image",
+    bio = models.TextField(blank=True, null=True)
+    avatar = models.URLField(
+        max_length=255, blank=True, null=True, verbose_name="Avatar URL"
     )
     history = HistoricalRecords()
 

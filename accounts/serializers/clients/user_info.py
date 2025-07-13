@@ -20,8 +20,8 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     about = serializers.CharField(
         source="client_profile.about", allow_null=True, required=False
     )
-    image = serializers.ImageField(
-        source="client_profile.image", allow_null=True, required=False
+    avatar = serializers.ImageField(
+        source="client_profile.avatar", allow_null=True, required=False
     )
 
     class Meta:
@@ -39,7 +39,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
             "twitter",
             "linkedin",
             "about",
-            "image",
+            "avatar",
         ]
 
     def update(self, instance, validated_data):

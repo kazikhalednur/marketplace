@@ -17,6 +17,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
         source="freelancer_profile.freelancer_sub_profiles",
         many=True,
     )
+    avatar = serializers.URLField(
+        source="freelancer_profile.avatar", allow_null=True, required=False
+    )
 
     class Meta:
         model = User
@@ -31,6 +34,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "is_google_login",
             "student_id",
             "is_available",
+            "avatar",
             "freelancer_sub_profiles",
         ]
 

@@ -28,6 +28,21 @@ class FreelancerSubProfileExperienceSerializer(serializers.ModelSerializer):
             "description",
         ]
 
+    # def validate(self, attrs):
+    #     if attrs.get("is_present") and attrs.get("end_date"):
+    #         raise serializers.ValidationError(
+    #             {"is_present": "Cannot have an end date if currently employed."}
+    #         )
+    #     if not attrs.get("is_present") and not attrs.get("end_date"):
+    #         raise serializers.ValidationError(
+    #             {"end_date": "End date is required if not currently employed."}
+    #         )
+    #     if attrs.get("start_date") and attrs.get("end_date") and attrs["start_date"] > attrs["end_date"]: # noqa: E501
+    #         raise serializers.ValidationError(
+    #             {"end_date": "End date must be after start date."}
+    #         )
+    #     return super().validate(attrs)
+
 
 class FreelancerSubProfileEducationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
