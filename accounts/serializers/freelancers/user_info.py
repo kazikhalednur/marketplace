@@ -12,6 +12,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     student_id = serializers.CharField(
         source="freelancer_profile.student_id", read_only=True
     )
+    is_available = serializers.BooleanField(source="freelancer_profile.is_available")
     freelancer_sub_profiles = FreelancerSubProfileSerializer(
         source="freelancer_profile.freelancer_sub_profiles",
         many=True,
@@ -29,6 +30,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "email_verified",
             "is_google_login",
             "student_id",
+            "is_available",
             "freelancer_sub_profiles",
         ]
 
