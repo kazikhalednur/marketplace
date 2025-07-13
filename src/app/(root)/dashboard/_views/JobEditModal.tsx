@@ -72,7 +72,7 @@ interface JobEditModalProps {
 
 export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEditModalProps) {
   const { showToast } = useToast();
-  const [updateJob] = useUpdateJobMutation();
+  const [updateJob, { isLoading: isUpdating }] = useUpdateJobMutation();
   const { data: dropdowns, isLoading: dropdownsLoading } = useGetDropdownsQuery();
   
   const form = useForm<JobFormValues>({
@@ -190,10 +190,20 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
       <Card
         className="relative w-full max-w-2xl md:max-w-3xl py-0 rounded-2xl border border-border/30 shadow-xl bg-gradient-to-br from-background to-muted/60 animate-in fade-in zoom-in-95 focus:outline-none max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent"
       >
+        {/* Loading overlay */}
+        {isUpdating && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-50">
+            <div className="flex flex-col items-center gap-3">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary"></div>
+              <p className="text-foreground font-medium">Updating job...</p>
+            </div>
+          </div>
+        )}
         <button
           onClick={onClose}
           className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 w-12 h-12 flex items-center justify-center text-3xl"
           aria-label="Close"
+          disabled={isUpdating}
         >
          <span className="text-4xl leading-none">×</span>
         </button>
@@ -472,7 +482,8 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
               </div>
               <Button
                 type="submit"
-                className="w-full py-3 text-base font-semibold shadow-lg bg-gradient-to-tr from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 transition-all focus:outline-none focus:ring-2 focus:ring-primary/60 focus:ring-offset-2"
+                className="w-full py-3 text-base font-semibold shadow-lg bg-gradient-to-tr from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 transition-all focus:outline-none focus:ring-2 focus:ring-primary/60 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isUpdating}
               >
                 Update Job
               </Button>

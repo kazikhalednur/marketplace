@@ -1,60 +1,61 @@
 "use client";
-import { useState } from "react";
+import { useAuth, Loader } from "@/hooks/useAuth";
 import ClientProfile from "./_views/ClientProfile";
 import StudentProfile from "./_views/StudentProfile";
-
-const mockClient = {
-  avatar: "/avatar-placeholder.png",
-  name: "Jane Doe",
-  role: "Client / Employer",
-  location: "San Francisco, CA",
-  email: "jane.doe@email.com",
-  website: "https://janedoe.dev",
-  linkedin: "https://linkedin.com/in/janedoe",
-  twitter: "https://twitter.com/janedoe",
-  github: "https://github.com/janedoe",
-  about: "Business owner looking for talented students to join exciting projects. Passionate about innovation and collaboration.",
-  skills: ["Project Management", "Hiring", "Leadership", "Product Design"],
-  projects: [
-    { name: "Marketplace Redesign", link: "#", description: "Led the redesign of the UniMarket platform for better UX." },
-    { name: "Job Board", link: "#", description: "Built a scalable job board for students and employers." },
-  ],
-};
-
-const mockStudent = {
-  avatar: "/avatar-placeholder.png",
-  name: "John Smith",
-  role: "Student / Developer",
-  location: "Boston, MA",
-  email: "john.smith@email.com",
-  website: "https://johnsmith.dev",
-  linkedin: "https://linkedin.com/in/johnsmith",
-  twitter: "https://twitter.com/johnsmith",
-  github: "https://github.com/johnsmith",
-  about: "CS student passionate about web development, open source, and learning new technologies. Seeking internships and freelance gigs.",
-  skills: ["React", "TypeScript", "Next.js", "UI/UX", "Tailwind CSS"],
-  education: [
-    { school: "MIT", degree: "BSc Computer Science", start: "2021-09", end: "Present" },
-    { school: "Boston High School", degree: "High School Diploma", start: "2017-09", end: "2021-06" },
-    { school: "Online Academy", degree: "Certificate in Web Development", start: "2020-01", end: "2020-08" },
-  ],
-  experience: [
-    { title: "Frontend Intern", company: "TechSoft", start: "2024-01", end: "Present", description: "Worked on a real-world SaaS dashboard with React and TypeScript." },
-    { title: "Freelance Developer", company: "Various Clients", start: "2023-06", end: "2024-01", description: "Built responsive websites and web applications for small businesses and startups." },
-    { title: "Research Assistant", company: "MIT Computer Science", start: "2023-01", end: "2023-12", description: "Assisted in research on machine learning algorithms and data visualization techniques." },
-    { title: "Teaching Assistant", company: "MIT", start: "2022-09", end: "2023-05", description: "Led programming tutorials and helped students with Python, Java, and web development projects." },
-  ],
-  projects: [
-    { name: "Student Portfolio", link: "#", description: "Personal website and project showcase." },
-    { name: "Open Source PRs", link: "#", description: "Contributed to several open source React libraries." },
-  ],
-};
+import { transformClientData, transformStudentData } from "@/utils/profile";
 
 export default function ProfilePage() {
-  const [role, setRole] = useState<"client" | "student">("client");
-  return role === "client" ? (
-    <ClientProfile user={mockClient} onSwitch={() => setRole("student")} />
-  ) : (
-    <StudentProfile user={mockStudent} onSwitch={() => setRole("client")} />
+  const { user, isAuthenticated, showLoader, refresh } = useAuth();
+
+  // Show loader while checking authentication
+  if (showLoader) {
+    return <Loader />;
+  }
+
+  // Show access denied only after authentication check is complete and user is not authenticated
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col items-center justify-center py-16">
+            <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mb-4">
+              <rect width="64" height="64" rx="16" fill="#f3f4f6" />
+              <path d="M12 32l8 8 16-16" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div className="text-xl font-semibold text-red-600 mb-2">Access Denied</div>
+            <div className="text-sm text-muted-foreground text-center">
+              Please log in to view your profile.
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Show appropriate profile based on user role
+  if (user.role === "client") {
+    const clientData = transformClientData(user);
+    return <ClientProfile user={clientData} onProfileUpdate={refresh} />;
+  } else if (user.role === "freelancer") {
+    const studentData = transformStudentData(user);
+    return <StudentProfile user={studentData} onProfileUpdate={refresh} />;
+  }
+
+  // Fallback for unknown roles
+  return (
+    <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col items-center justify-center py-16">
+          <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mb-4">
+            <rect width="64" height="64" rx="16" fill="#f3f4f6" />
+            <path d="M12 32l8 8 16-16" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div className="text-xl font-semibold text-red-600 mb-2">Invalid Role</div>
+          <div className="text-sm text-muted-foreground text-center">
+            Your account has an invalid role. Please contact support.
+          </div>
+        </div>
+      </div>
+    </main>
   );
 } 

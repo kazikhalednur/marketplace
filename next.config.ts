@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     domains: [
       'images.unsplash.com',
       'randomuser.me',
+      '203.190.14.56',
     ],
   },
 };

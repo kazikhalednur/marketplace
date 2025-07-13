@@ -44,6 +44,46 @@ export interface LoginResponse {
   };
 }
 
+export interface FreelancerProject {
+  id: number | null;
+  title: string;
+  link: string;
+  description: string;
+}
+
+export interface FreelancerExperience {
+  id: number | null;
+  job_title: string;
+  company_name: string;
+  start_date: string;
+  end_date: string | null;
+  is_present: boolean;
+  description: string;
+}
+
+export interface FreelancerEducation {
+  id: number | null;
+  institution_name: string;
+  degree: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface FreelancerSubProfile {
+  id: number | null;
+  hours_per_week: number;
+  is_more_available: boolean;
+  hour_rate: string;
+  bio: string;
+  linkedin: string;
+  github: string;
+  portfolio: string;
+  skills: number[];
+  projects: FreelancerProject[];
+  experiences: FreelancerExperience[];
+  educations: FreelancerEducation[];
+}
+
 export interface UserInfo {
   first_name: string;
   last_name: string;
@@ -53,6 +93,47 @@ export interface UserInfo {
   role: string;
   email_verified: boolean;
   is_google_login: boolean;
+  student_id: string;
+  freelancer_sub_profiles: FreelancerSubProfile[];
+}
+
+// Profile update types
+export interface ProfileUpdateResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+}
+
+// Image upload types
+export interface ImageUploadResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    id: string;
+    image: string;
+  };
+}
+
+export interface ClientProfileUpdatePayload {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone?: string;
+  company_name?: string;
+  twitter?: string;
+  linkedin?: string;
+  about?: string;
+  avatar?: string | null;
+}
+
+export interface FreelancerProfileUpdatePayload {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone?: string;
+  avatar?: string | null;
+  freelancer_sub_profiles?: FreelancerSubProfile[];
 }
 
 export const apiSlice = createApi({
@@ -92,6 +173,10 @@ export const apiSlice = createApi({
     }),
     getMe: builder.query<UserInfo, void>({
       query: () => 'accounts/info/',
+      transformResponse: (response: { data: UserInfo }) => response.data,
+    }),
+    getClientMe: builder.query<UserInfo, void>({
+      query: () => 'accounts/clients/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
     }),
     verifyEmail: builder.query<
@@ -157,7 +242,28 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    updateProfile: builder.mutation<ProfileUpdateResponse, FreelancerProfileUpdatePayload>({
+      query: (body) => ({
+        url: 'accounts/info/',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    updateClientProfile: builder.mutation<ProfileUpdateResponse, ClientProfileUpdatePayload>({
+      query: (body) => ({
+        url: 'accounts/clients/info/',
+        method: 'PATCH',
+        body,
+      }),
+    }),
+    uploadImage: builder.mutation<ImageUploadResponse, FormData>({
+      query: (body) => ({
+        url: 'images/upload/',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation } = apiSlice; 
+export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useGetClientMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation, useUpdateProfileMutation, useUpdateClientProfileMutation, useUploadImageMutation } = apiSlice; 

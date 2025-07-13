@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState } from 'react';
-import { useGetMeQuery } from '../features/api/apiSlice';
+import { useGetMeQuery, useGetClientMeQuery } from '../features/api/apiSlice';
 import { useAppDispatch } from './useTypedDispatch';
 import { useAppSelector } from './useTypedSelector';
 import { setUser, clearUser } from '../features/userSlice';
@@ -23,30 +23,75 @@ export function useAuth() {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   
-  // Check if we have a token to determine if we should make the API call
-  // Use useState to avoid hydration mismatch
   const [hasToken, setHasToken] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   
   useEffect(() => {
-    setHasToken(!!Cookies.get('accessToken'));
+    const token = Cookies.get('accessToken');
+    setHasToken(!!token);
     setMounted(true);
+    
+    // Extract role from token if available
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const role = payload.role || payload.user_role || null;
+        console.log('useAuth: Extracted role from token:', role);
+        setUserRole(role);
+      } catch {
+        console.log('useAuth: Could not extract role from token');
+        setUserRole(null);
+      }
+    }
   }, []);
   
-  const { data, isLoading, isError, refetch } = useGetMeQuery(undefined, {
+  // Determine which query to use based on user role
+  const currentRole = user.role || userRole;
+  const isClient = currentRole === 'client';
+  
+  console.log('useAuth: Role detection - currentRole:', currentRole, 'isClient:', isClient);
+  
+  // Use only the appropriate query based on role
+  const { data: freelancerData, isLoading: freelancerLoading, refetch: refetchFreelancer } = useGetMeQuery(undefined, {
     refetchOnMountOrArgChange: true,
-    skip: !hasToken, // Skip the query if there's no token
+    skip: !hasToken || isClient, // Skip if user is client
   });
 
+  const { data: clientData, isLoading: clientLoading, refetch: refetchClient } = useGetClientMeQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    skip: !hasToken || !isClient, // Skip if user is NOT client (i.e., freelancer)
+  });
+
+  // Use the appropriate data based on which query was called
+  const data = isClient ? clientData : freelancerData;
+  const isLoading = isClient ? clientLoading : freelancerLoading;
+  const isError = false; // Since we're not using error states, set to false
+  
+  // Refetch function that uses the appropriate endpoint
+  const refetch = useCallback(() => {
+    console.log('useAuth: Refetching with role:', currentRole);
+    if (isClient) {
+      console.log('useAuth: Using client endpoint for refetch');
+      refetchClient();
+    } else {
+      console.log('useAuth: Using freelancer endpoint for refetch');
+      refetchFreelancer();
+    }
+  }, [isClient, refetchClient, refetchFreelancer, currentRole]);
+
   useEffect(() => {
-    // Only update if data exists and is different from user, and user is not empty
+    // Only update if data exists and is different from user
     if (data && !isEqual(data, user)) {
+      console.log('useAuth: Setting user data from API:', data);
       dispatch(setUser(data));
     } else if (isError) {
+      console.log('useAuth: API error, clearing user');
       dispatch(clearUser());
     }
     // Only clear user if we're sure there's no token (after initial mount)
     else if (!hasToken && mounted) {
+      console.log('useAuth: No token, clearing user');
       dispatch(clearUser());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +119,7 @@ export function useAuth() {
   }, [refetch]);
 
   // Loader: show while checking authentication for the first time
-  const showLoader = isLoading && !user.email && mounted;
+  const showLoader = !mounted || (hasToken && isLoading);
 
   // Helper: check if remember me is enabled
   const isRememberMeEnabled = useCallback(() => {
