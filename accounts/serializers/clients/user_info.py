@@ -20,7 +20,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     about = serializers.CharField(
         source="client_profile.about", allow_null=True, required=False
     )
-    avatar = serializers.ImageField(
+    avatar = serializers.URLField(
         source="client_profile.avatar", allow_null=True, required=False
     )
     is_payment_verified = serializers.BooleanField(
