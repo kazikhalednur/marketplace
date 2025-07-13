@@ -41,22 +41,24 @@ class UserInfoSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         freelancer_data = validated_data.get("freelancer_profile", {})
 
-        # Update client profile fields
-        freelancer_profile = instance.freelancer_profile  # assumes OneToOneField
+        # Update freelancer_profile fields except freelancer_sub_profiles
+        freelancer_profile = instance.freelancer_profile
         for attr, value in freelancer_data.items():
+            if attr == "freelancer_sub_profiles":
+                continue
             setattr(freelancer_profile, attr, value)
         freelancer_profile.save()
 
-        # Nested freelancer_sub_profiles update
-        sub_profiles_data = freelancer_data.get("freelancer_sub_profiles", [])
-
-        # Update the user instance with the provided data
+        # Update the user instance fields
         for attr, value in validated_data.items():
+            if attr == "freelancer_profile":
+                continue
             setattr(instance, attr, value)
         instance.save()
 
+        # Handle freelancer_sub_profiles update
+        sub_profiles_data = freelancer_data.get("freelancer_sub_profiles", [])
         if sub_profiles_data:
-            freelancer_profile = instance.freelancer_profile
             existing_profiles = {
                 sub.id: sub for sub in freelancer_profile.freelancer_sub_profiles.all()
             }
