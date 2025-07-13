@@ -3,4 +3,8 @@ profile = "black"
 
 [tool.black]
 line-length = 88
-exclude = ".*/(migrations)/.*"
+exclude = '''
+/(
+    migrations
+)/
+'''
