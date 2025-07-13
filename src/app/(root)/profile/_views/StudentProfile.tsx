@@ -28,6 +28,7 @@ interface Education {
   degree: string;
   start: string;
   end: string | null;
+  is_present?: boolean;
 }
 
 interface User {
@@ -57,6 +58,12 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   const [originalForm, setOriginalForm] = useState<typeof form | null>(null);
   const userState = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  
+  // Error state for form validation
+  const [errors, setErrors] = useState<{
+    education?: { [key: number]: { end?: string } };
+    experience?: { [key: number]: { end?: string } };
+  }>({});
 
   // Helper to get user initials
   function getUserInitials() {
@@ -222,17 +229,35 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   function handleSkillsChange(skills: string[]) {
     setForm({ ...form, skills });
   }
-  function handleEducationChange(idx: number, field: string, value: string) {
+  function handleEducationChange(idx: number, field: string, value: string | boolean) {
     const updated = [...form.education];
     const currentEdu = updated[idx];
     
+    // Clear error when user starts typing
+    if (field === "end" || field === "start" || field === "is_present") {
+      setErrors(prev => ({
+        ...prev,
+        education: {
+          ...prev.education,
+          [idx]: { ...prev.education?.[idx], end: undefined }
+        }
+      }));
+    }
+    
     // If changing end date, validate it's not before start date
-    if (field === "end" && value && currentEdu.start) {
+    if (field === "end" && typeof value === "string" && value && currentEdu.start) {
       const startDate = new Date(currentEdu.start);
       const endDate = new Date(value);
       
       if (endDate < startDate) {
-        // Don't update if end date is before start date
+        // Set error message for invalid end date
+        setErrors(prev => ({
+          ...prev,
+          education: {
+            ...prev.education,
+            [idx]: { ...prev.education?.[idx], end: "End date cannot be earlier than start date" }
+          }
+        }));
         return;
       }
     }
@@ -241,7 +266,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
     setForm({ ...form, education: updated });
   }
   function addEducation() {
-    setForm({ ...form, education: [...form.education, { school: "", degree: "", start: "", end: "" }] });
+    setForm({ ...form, education: [...form.education, { school: "", degree: "", start: "", end: "", is_present: false }] });
   }
   function removeEducation(idx: number) {
     setForm({ ...form, education: form.education.filter((_: Education, i: number) => i !== idx) });
@@ -250,13 +275,31 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
     const updated = [...form.experience];
     const currentExp = updated[idx];
     
+    // Clear error when user starts typing
+    if (field === "end" || field === "start" || field === "is_present") {
+      setErrors(prev => ({
+        ...prev,
+        experience: {
+          ...prev.experience,
+          [idx]: { ...prev.experience?.[idx], end: undefined }
+        }
+      }));
+    }
+    
     // If changing end date, validate it's not before start date
     if (field === "end" && typeof value === "string" && value && currentExp.start) {
       const startDate = new Date(currentExp.start);
       const endDate = new Date(value);
       
       if (endDate < startDate) {
-        // Don't update if end date is before start date
+        // Set error message for invalid end date
+        setErrors(prev => ({
+          ...prev,
+          experience: {
+            ...prev.experience,
+            [idx]: { ...prev.experience?.[idx], end: "End date cannot be earlier than start date" }
+          }
+        }));
         return;
       }
     }
@@ -304,6 +347,44 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   }, [form, originalForm, selectedImage]);
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Validate all education dates
+    const educationErrors: { [key: number]: { end?: string } } = {};
+    for (let i = 0; i < form.education.length; i++) {
+      const edu = form.education[i];
+      if (edu.start && edu.end && !edu.is_present) {
+        const startDate = new Date(edu.start);
+        const endDate = new Date(edu.end);
+        
+        if (endDate < startDate) {
+          educationErrors[i] = { end: "End date cannot be earlier than start date" };
+        }
+      }
+    }
+    
+    // Validate all experience dates
+    const experienceErrors: { [key: number]: { end?: string } } = {};
+    for (let i = 0; i < form.experience.length; i++) {
+      const exp = form.experience[i];
+      if (exp.start && exp.end && !exp.is_present) {
+        const startDate = new Date(exp.start);
+        const endDate = new Date(exp.end);
+        
+        if (endDate < startDate) {
+          experienceErrors[i] = { end: "End date cannot be earlier than start date" };
+        }
+      }
+    }
+    
+    // If there are validation errors, set them and return
+    if (Object.keys(educationErrors).length > 0 || Object.keys(experienceErrors).length > 0) {
+      setErrors({
+        education: educationErrors,
+        experience: experienceErrors
+      });
+      return;
+    }
+    
     try {
       const updatedForm = { ...form };
       
@@ -585,7 +666,16 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
                       <input name="degree" value={edu.degree} onChange={e => handleEducationChange(idx, "degree", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Degree" />
                       <div className="flex gap-2">
                         <input type="date" name="start" value={edu.start || ""} onChange={e => handleEducationChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
-                        <input type="date" name="end" value={edu.end || ""} onChange={e => handleEducationChange(idx, "end", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="End Date" />
+                        <div className="flex-1">
+                          <input type="date" name="end" value={edu.is_present ? "" : (edu.end || "")} onChange={e => handleEducationChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.education?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={edu.is_present} />
+                          {errors.education?.[idx]?.end && (
+                            <p className="text-red-500 text-xs mt-1">{errors.education[idx].end}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id={`present-edu-${idx}`} checked={edu.is_present || false} onChange={e => handleEducationChange(idx, "is_present", e.target.checked)} className="rounded border-border" />
+                        <label htmlFor={`present-edu-${idx}`} className="text-sm text-muted-foreground">Currently studying</label>
                       </div>
                     </div>
                   </div>
@@ -605,7 +695,12 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
                       <input name="title" value={exp.title} onChange={e => handleExperienceChange(idx, "title", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Title/Position" />
                       <div className="flex gap-2">
                         <input type="date" name="start" value={exp.start || ""} onChange={e => handleExperienceChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
-                        <input type="date" name="end" value={exp.is_present ? "" : (exp.end || "")} onChange={e => handleExperienceChange(idx, "end", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="End Date" disabled={exp.is_present} />
+                        <div className="flex-1">
+                          <input type="date" name="end" value={exp.is_present ? "" : (exp.end || "")} onChange={e => handleExperienceChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.experience?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={exp.is_present} />
+                          {errors.experience?.[idx]?.end && (
+                            <p className="text-red-500 text-xs mt-1">{errors.experience[idx].end}</p>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <input type="checkbox" id={`present-${idx}`} checked={exp.is_present || false} onChange={e => handleExperienceChange(idx, "is_present", e.target.checked)} className="rounded border-border" />

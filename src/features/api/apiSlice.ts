@@ -66,7 +66,7 @@ export interface FreelancerEducation {
   institution_name: string;
   degree: string;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
 }
 
 export interface FreelancerSubProfile {

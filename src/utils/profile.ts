@@ -30,6 +30,7 @@ interface FreelancerFormData {
     degree?: string;
     start?: string;
     end?: string | null;
+    is_present?: boolean;
   }>;
   experience?: Array<{
     id?: number | null;
@@ -114,6 +115,7 @@ export function transformStudentData(user: UserState) {
       degree: edu.degree,
       start: edu.start_date,
       end: edu.end_date,
+      is_present: false, // Default to false, will be updated based on end_date being null
     })) || [], // No dummy data
     experience: subProfile?.experiences?.map((exp: FreelancerExperience) => ({
       id: exp.id || null,
@@ -199,7 +201,7 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
         institution_name: edu.school || '',
         degree: edu.degree || '',
         start_date: formatDateToFull(edu.start || ''),
-        end_date: formatDateToFull(edu.end || ''),
+        end_date: edu.is_present ? null : formatDateToFull(edu.end || ''),
       })) || [],
     }];
   }
