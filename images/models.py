@@ -2,10 +2,15 @@ from uuid import uuid4
 
 from django.db import models
 
+from accounts.models import User
+
 
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, serialize=False)
     image = models.ImageField(upload_to="images/")
+    uploaded_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="uploaded_images"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

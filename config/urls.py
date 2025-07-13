@@ -31,11 +31,11 @@ urlpatterns = [
     path("images/", include("images.urls")),
 ]
 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 if settings.SERVER_TYPE == "local":
     from debug_toolbar.toolbar import debug_toolbar_urls
 
     if not settings.TESTING:
         urlpatterns += debug_toolbar_urls()
-
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
