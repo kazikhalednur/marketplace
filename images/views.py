@@ -15,6 +15,8 @@ class ImageUploadView(CreateAPIView):
 
 
 class ImageDeleteView(DestroyAPIView):
-    queryset = Image.objects.all()
     serializer_class = ImageSerializer
     lookup_field = "id"
+
+    def get_queryset(self):
+        return Image.objects.filter(uploaded_by=self.request.user)
