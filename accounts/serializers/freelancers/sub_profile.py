@@ -24,6 +24,7 @@ class FreelancerSubProfileExperienceSerializer(serializers.ModelSerializer):
             "company_name",
             "start_date",
             "end_date",
+            "is_present",
             "description",
         ]
 
@@ -60,6 +61,7 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
             "hour_rate",
             "bio",
             "linkedin",
+            "twitter",
             "github",
             "portfolio",
             # "skills",

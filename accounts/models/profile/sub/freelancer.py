@@ -29,6 +29,7 @@ class FreelancerSubProfile(models.Model):
     )
     bio = models.TextField(blank=True, null=True, verbose_name="Bio")
     linkedin = models.URLField(blank=True, null=True, verbose_name="LinkedIn Profile")
+    twitter = models.URLField(blank=True, null=True, verbose_name="Twitter Profile")
     github = models.URLField(blank=True, null=True, verbose_name="GitHub Profile")
     portfolio = models.URLField(blank=True, null=True, verbose_name="Portfolio URL")
     skills = models.ManyToManyField(

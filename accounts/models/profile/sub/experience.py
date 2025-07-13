@@ -15,8 +15,9 @@ class Experience(models.Model):
     company_name = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
-    description = models.TextField()
-    history = HistoricalRecords
+    is_present = models.BooleanField(default=False, verbose_name="Is Present")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "Experience"

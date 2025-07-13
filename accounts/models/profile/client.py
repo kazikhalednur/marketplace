@@ -14,19 +14,25 @@ class ClientProfile(models.Model):
     company_name = models.CharField(
         max_length=255,
         verbose_name="Company Name",
-        help_text="The name of your company or organization.",
         blank=True,
         null=True,
     )
     is_payment_verified = models.BooleanField(
-        default=False,
-        verbose_name="Payment Verified",
-        help_text="Indicates whether the client's payment has been verified.",
+        default=False, verbose_name="Payment Verified"
     )
     is_phone_verified = models.BooleanField(
-        default=False,
-        verbose_name="Phone Verified",
-        help_text="Indicates whether the client's phone number has been verified.",
+        default=False, verbose_name="Phone Verified"
+    )
+    twitter = models.URLField(blank=True, null=True, verbose_name="Twitter Profile")
+    linkedin = models.URLField(blank=True, null=True, verbose_name="LinkedIn Profile")
+    about = models.TextField(blank=True, null=True)
+    images = models.OneToOneField(
+        "images.Image",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="client_profile",
+        verbose_name="Profile Image",
     )
     history = HistoricalRecords()
 

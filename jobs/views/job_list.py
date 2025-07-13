@@ -15,6 +15,7 @@ class JobPagination(PageNumberPagination):
 
 class JobListView(ListAPIView):
     permission_classes = []
+    authentication_classes = []
     queryset = Job.objects.published()
     serializer_class = JobSerializer
     pagination_class = JobPagination
