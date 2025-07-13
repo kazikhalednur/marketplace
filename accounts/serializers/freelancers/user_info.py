@@ -40,12 +40,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Update the user instance with the provided data
-        instance.first_name = validated_data.get("first_name", instance.first_name)
-        instance.last_name = validated_data.get("last_name", instance.last_name)
-        instance.username = validated_data.get("username", instance.username)
-        instance.phone = validated_data.get("phone", instance.phone)
-
-        # Save the updated user instance
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
 
         # Nested freelancer_sub_profiles update
