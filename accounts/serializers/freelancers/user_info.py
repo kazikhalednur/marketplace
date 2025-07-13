@@ -44,8 +44,15 @@ class UserInfoSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # Nested freelancer_sub_profiles update
         freelancer_data = validated_data.get("freelancer_profile", {})
+
+        # Update client profile fields
+        freelancer_profile = instance.freelancer_profile  # assumes OneToOneField
+        for attr, value in freelancer_data.items():
+            setattr(freelancer_profile, attr, value)
+        freelancer_profile.save()
+
+        # Nested freelancer_sub_profiles update
         sub_profiles_data = freelancer_data.get("freelancer_sub_profiles", [])
 
         if sub_profiles_data:
