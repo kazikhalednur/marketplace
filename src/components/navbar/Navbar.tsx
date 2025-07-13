@@ -75,11 +75,6 @@ export default function Navbar() {
     return !placeholderList.includes(user.avatar.trim());
   }
 
-  // Debug: Log user data
-  console.log('Navbar - User data:', user);
-  console.log('Navbar - Avatar:', user?.avatar);
-  console.log('Navbar - Has real avatar:', hasRealAvatar());
-
   return (
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all",
