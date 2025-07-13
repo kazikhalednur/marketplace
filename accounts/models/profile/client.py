@@ -26,7 +26,7 @@ class ClientProfile(models.Model):
     twitter = models.URLField(blank=True, null=True, verbose_name="Twitter Profile")
     linkedin = models.URLField(blank=True, null=True, verbose_name="LinkedIn Profile")
     about = models.TextField(blank=True, null=True)
-    images = models.OneToOneField(
+    image = models.OneToOneField(
         "images.Image",
         blank=True,
         null=True,

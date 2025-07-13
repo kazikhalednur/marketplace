@@ -66,4 +66,5 @@ urlpatterns = [
         clients_views.SignupGoogleView.as_view(),
         name="clients_signup_google",
     ),
+    path("clients/info/", clients_views.UserInfoView.as_view(), name="client_info"),
 ]
