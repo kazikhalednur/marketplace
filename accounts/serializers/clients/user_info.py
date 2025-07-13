@@ -40,6 +40,8 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
             "linkedin",
             "about",
             "avatar",
+            "is_payment_verified",
+            "is_phone_verified",
         ]
 
     def update(self, instance, validated_data):
