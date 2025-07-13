@@ -23,6 +23,12 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(
         source="client_profile.avatar", allow_null=True, required=False
     )
+    is_payment_verified = serializers.BooleanField(
+        source="client_profile.is_payment_verified", read_only=True
+    )
+    is_phone_verified = serializers.BooleanField(
+        source="client_profile.is_phone_verified", read_only=True
+    )
 
     class Meta:
         model = User
