@@ -66,6 +66,7 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
             "projects",
             "experiences",
             "educations",
+            "is_available",
         ]
 
     def create(self, validated_data):

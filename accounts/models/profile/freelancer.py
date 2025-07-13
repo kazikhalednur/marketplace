@@ -17,6 +17,7 @@ class FreelancerProfile(models.Model):
         verbose_name="Student ID",
         help_text="Your student ID, e.g., 2019-12345-1",
     )
+    is_available = models.BooleanField(default=True)
     available_connects = models.PositiveIntegerField(default=30)
     history = HistoricalRecords()
 

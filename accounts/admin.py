@@ -70,8 +70,7 @@ class AcceptedDomainAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-@admin.register(Freelancer)
-class FreelancerAdmin(UserAdmin):
+class UserRoleAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("username", "email", "password")}),
         (
@@ -121,24 +120,46 @@ class FreelancerAdmin(UserAdmin):
     ordering = ("id",)
 
 
+class FreelancerProfileInline(admin.StackedInline):
+    model = FreelancerProfile
+    can_delete = False
+
+
+@admin.register(Freelancer)
+class FreelancerAdmin(UserRoleAdmin):
+    def student_id(self, obj):
+        return (
+            obj.freelancer_profile.student_id
+            if hasattr(obj, "freelancer_profile")
+            else None
+        )
+
+    inlines = (FreelancerProfileInline,)
+    search_fields = UserRoleAdmin.search_fields + ("freelancer_profile__student_id",)
+    list_display = UserRoleAdmin.list_display + ("student_id",)
+
+
+class ClientProfileInline(admin.StackedInline):
+    model = ClientProfile
+    can_delete = False
+
+
 @admin.register(Client)
-class ClientAdmin(FreelancerAdmin):
-    pass
+class ClientAdmin(UserRoleAdmin):
+    inlines = (ClientProfileInline,)
 
 
 @admin.register(Arbitrator)
-class ArbitratorAdmin(FreelancerAdmin):
+class ArbitratorAdmin(UserRoleAdmin):
     pass
 
 
 @admin.register(Auditor)
-class AuditorAdmin(FreelancerAdmin):
+class AuditorAdmin(UserRoleAdmin):
     pass
 
 
 admin.site.register(OTP)
-admin.site.register(ClientProfile)
-admin.site.register(FreelancerProfile)
 admin.site.register(FreelancerSubProfile)
 admin.site.register(Education)
 admin.site.register(Experience)
