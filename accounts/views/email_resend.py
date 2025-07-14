@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils.http import urlsafe_base64_decode
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework.views import APIView
 
@@ -11,6 +11,10 @@ from ..models import User
 
 
 @extend_schema(
+    parameters=[
+        OpenApiParameter(name="uidb64", type=str, location=OpenApiParameter.PATH),
+        OpenApiParameter(name="token", type=str, location=OpenApiParameter.PATH),
+    ],
     responses={
         200: inline_serializer(
             name="EmailResendViewResponse",

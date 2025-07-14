@@ -25,4 +25,4 @@ class JobListView(ListAPIView):
     filterset_class = ClientJobFilter
 
     def get_queryset(self):
-        return Job.objects.filter(created_by=self.request.user)
+        return Job.objects.filter(created_by__id=self.request.user.id)

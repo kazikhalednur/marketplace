@@ -1,31 +1,14 @@
 from rest_framework import serializers
 
-from accounts.models import Client
-
-from ..models import Category, Job, Skill
+from ..models import Category, Job
+from .client import ClientSerializer
+from .skills import SkillSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["name", "slug"]
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = ["name", "slug"]
-
-
-class ClientSerializer(serializers.ModelSerializer):
-    full_name = serializers.CharField(source="get_full_name", read_only=True)
-    is_payment_verified = serializers.BooleanField(
-        source="client_profile.is_payment_verified", read_only=True
-    )
-
-    class Meta:
-        model = Client
-        fields = ["full_name", "is_payment_verified", "date_joined"]
 
 
 class JobSerializer(serializers.ModelSerializer):

@@ -26,6 +26,14 @@ class JobManager(models.Manager):
             .distinct()
         )
 
+    def open(self, **kwargs):
+        return (
+            self.filter(status=Job.JobStatus.OPEN, **kwargs)
+            .select_related("category")
+            .prefetch_related("skills")
+            .distinct()
+        )
+
 
 class Job(models.Model):
     class JobStatus(models.TextChoices):

@@ -1,12 +1,7 @@
 from rest_framework import serializers
 
-from ..models import Category, Skill
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = ["name", "slug"]
+from ..models import Category
+from .skills import SkillSerializer
 
 
 class CategorySkillSerializer(serializers.ModelSerializer):
