@@ -17,8 +17,8 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     linkedin = serializers.URLField(
         source="client_profile.linkedin", allow_null=True, required=False
     )
-    about = serializers.CharField(
-        source="client_profile.about", allow_null=True, required=False
+    bio = serializers.CharField(
+        source="client_profile.bio", allow_null=True, required=False
     )
     avatar = serializers.URLField(
         source="client_profile.avatar", allow_null=True, required=False
@@ -44,7 +44,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
             "company_name",
             "twitter",
             "linkedin",
-            "about",
+            "bio",
             "avatar",
             "is_payment_verified",
             "is_phone_verified",
