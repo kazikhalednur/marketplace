@@ -3,9 +3,14 @@ import { useAuth, Loader } from "@/hooks/useAuth";
 import ClientProfile from "./_views/ClientProfile";
 import StudentProfile from "./_views/StudentProfile";
 import { transformClientData, transformStudentData } from "@/utils/profile";
+import { useGetMeQuery, useGetClientMeQuery } from "@/features/api/apiSlice";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, showLoader, refresh } = useAuth();
+
+  // Always call hooks at the top level
+  const { data: liveUser } = useGetMeQuery();
+  const { data: liveClientUser } = useGetClientMeQuery();
 
   // Show loader while checking authentication
   if (showLoader) {
@@ -34,10 +39,10 @@ export default function ProfilePage() {
 
   // Show appropriate profile based on user role
   if (user.role === "client") {
-    const clientData = transformClientData(user);
+    const clientData = transformClientData(liveClientUser || user);
     return <ClientProfile user={clientData} onProfileUpdate={refresh} />;
   } else if (user.role === "freelancer") {
-    const studentData = transformStudentData(user);
+    const studentData = transformStudentData(liveUser || user);
     return <StudentProfile user={studentData} onProfileUpdate={refresh} />;
   }
 

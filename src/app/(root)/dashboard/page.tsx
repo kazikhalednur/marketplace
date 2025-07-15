@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useGetJobsQuery } from '@/features/api/jobsApi';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DashboardFilters from './_views/DashboardFilters';
@@ -45,7 +45,7 @@ function DashboardContent() {
     category
   });
 
-  const jobs = jobsData?.jobs || [];
+  const jobs = useMemo(() => jobsData?.jobs || [], [jobsData]);
   const totalCount = jobsData?.count || 0;
   const hasNext = jobsData?.next !== null;
   const hasPrevious = jobsData?.previous !== null;

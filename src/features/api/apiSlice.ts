@@ -124,7 +124,7 @@ export interface ClientProfileUpdatePayload {
   company_name?: string;
   twitter?: string;
   linkedin?: string;
-  about?: string;
+  bio?: string;
   avatar?: string | null;
 }
 
@@ -150,6 +150,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Me', 'ClientMe'],
   endpoints: (builder) => ({
     studentSignup: builder.mutation<SignupResponse, StudentSignupPayload>({
       query: (body) => ({
@@ -175,10 +176,12 @@ export const apiSlice = createApi({
     getMe: builder.query<UserInfo, void>({
       query: () => 'accounts/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
+      providesTags: ['Me'],
     }),
     getClientMe: builder.query<UserInfo, void>({
       query: () => 'accounts/clients/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
+      providesTags: ['ClientMe'],
     }),
     verifyEmail: builder.query<
       {
@@ -249,6 +252,7 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body,
       }),
+      invalidatesTags: ['Me'],
     }),
     updateClientProfile: builder.mutation<ProfileUpdateResponse, ClientProfileUpdatePayload>({
       query: (body) => ({
@@ -256,6 +260,7 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body,
       }),
+      invalidatesTags: ['ClientMe'],
     }),
     uploadImage: builder.mutation<ImageUploadResponse, FormData>({
       query: (body) => ({
@@ -267,4 +272,4 @@ export const apiSlice = createApi({
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useGetClientMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation, useUpdateProfileMutation, useUpdateClientProfileMutation, useUploadImageMutation } = apiSlice; 
+export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useGetClientMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation, useUpdateProfileMutation, useUpdateClientProfileMutation, useUploadImageMutation, useLazyGetMeQuery, useLazyGetClientMeQuery } = apiSlice; 

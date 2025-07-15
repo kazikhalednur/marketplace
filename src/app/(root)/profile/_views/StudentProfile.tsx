@@ -1,15 +1,16 @@
 "use client";
-import Image from "next/image";
-import { useState, useEffect, useRef, useCallback } from "react";
+import Avatar from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
-import { Edit, Mail, MapPin, Globe, Linkedin, Twitter, Github, CheckCircle2, Plus, Trash2, Check } from "lucide-react";
 import { TagsInput } from "@/components/ui/tags-input";
-import { useUpdateProfileMutation, useUploadImageMutation } from "@/features/api/apiSlice";
-import { useAppSelector } from "@/hooks/useTypedSelector";
-import { useAppDispatch } from "@/hooks/useTypedDispatch";
+import { useToast } from "@/components/ui/toast-provider";
+import { useUpdateProfileMutation, useUploadImageMutation, useLazyGetMeQuery } from "@/features/api/apiSlice";
 import { setUser } from "@/features/userSlice";
+import { useAppDispatch } from "@/hooks/useTypedDispatch";
+import { useAppSelector } from "@/hooks/useTypedSelector";
 import { transformFreelancerFormToPayload } from "@/utils/profile";
+import { Check, CheckCircle2, Edit, Github, Globe, Linkedin, Mail, MapPin, Plus, Trash2, Twitter } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Experience {
   id?: number | null;
@@ -38,12 +39,14 @@ interface User {
   last_name?: string;
   role?: string;
   about?: string;
+  bio?: string;
   location?: string;
   email?: string;
   website?: string;
   linkedin?: string;
   twitter?: string;
   github?: string;
+  phone?: string;
   skills?: string[];
   education?: Education[];
   experience?: Experience[];
@@ -58,38 +61,21 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   const [originalForm, setOriginalForm] = useState<typeof form | null>(null);
   const userState = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+  const [triggerMe] = useLazyGetMeQuery();
   
   // Error state for form validation
   const [errors, setErrors] = useState<{
     education?: { [key: number]: { end?: string } };
     experience?: { [key: number]: { end?: string } };
   }>({});
+  const { showToast } = useToast();
+  const [fieldErrors, setFieldErrors] = useState<{ first_name?: string; last_name?: string }>({});
 
-  // Helper to get user initials
-  function getUserInitials() {
-    if (user?.name && user.name.trim().length > 0) {
-      return user.name.trim().split(' ').map((n: string) => n[0]).join('').toUpperCase();
-    }
-    if (user?.first_name || user?.last_name) {
-      return `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase();
-    }
-    return null;
-  }
-
-  // Helper to determine if avatar is real
-  function hasRealAvatar() {
-    if (!user?.avatar) return false;
-    const avatarUrl = user.avatar.trim();
-    if (!avatarUrl) return false;
-    
-    // Check if it's a placeholder
-    const placeholderList = ["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"];
-    const isPlaceholder = placeholderList.some(placeholder => 
-      avatarUrl.toLowerCase().includes(placeholder.toLowerCase())
-    );
-    
-    return !isPlaceholder;
-  }
+  // Add refs for error fields
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const educationRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const experienceRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Helper to get the full avatar URL
   function getAvatarUrl() {
@@ -156,7 +142,9 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   // Modal form state
   const [form, setForm] = useState({
     avatar: user.avatar || "",
-    name: user.name || "",
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
+    phone: user.phone || "",
     about: user.about || "",
     location: user.location || "",
     email: user.email || "",
@@ -173,7 +161,9 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   useEffect(() => {
     setForm({
       avatar: user.avatar || "",
-      name: user.name || "",
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      phone: user.phone || "",
       about: user.about || "",
       location: user.location || "",
       email: user.email || "",
@@ -193,7 +183,9 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
     if (editMode && !originalForm) {
       setOriginalForm({
         avatar: user.avatar || "",
-        name: user.name || "",
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        phone: user.phone || "",
         about: user.about || "",
         location: user.location || "",
         email: user.email || "",
@@ -224,7 +216,9 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   }, [editMode]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: undefined })); // Clear error on change
   }
   function handleSkillsChange(skills: string[]) {
     setForm({ ...form, skills });
@@ -274,9 +268,45 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
   function handleExperienceChange(idx: number, field: string, value: string | boolean) {
     const updated = [...form.experience];
     const currentExp = updated[idx];
-    
-    // Clear error when user starts typing
-    if (field === "end" || field === "start" || field === "is_present") {
+    const newExp = { ...currentExp, [field]: value };
+
+    // Only clear error if valid
+    let shouldClearError = false;
+    if ((field === "end" || field === "start" || field === "is_present")) {
+      // If not current position, validate end date
+      if (!newExp.is_present) {
+        if (newExp.start && !newExp.end) {
+          setErrors(prev => ({
+            ...prev,
+            experience: {
+              ...prev.experience,
+              [idx]: { ...prev.experience?.[idx], end: "End date is required" }
+            }
+          }));
+        } else if (newExp.start && newExp.end) {
+          const startDate = new Date(newExp.start);
+          const endDate = new Date(newExp.end);
+          if (endDate < startDate) {
+            setErrors(prev => ({
+              ...prev,
+              experience: {
+                ...prev.experience,
+                [idx]: { ...prev.experience?.[idx], end: "End date cannot be earlier than start date" }
+              }
+            }));
+          } else {
+            shouldClearError = true;
+          }
+        } else if (!newExp.start && newExp.end) {
+          // If end is set but start is not, clear error
+          shouldClearError = true;
+        }
+      } else {
+        // If current position, clear error
+        shouldClearError = true;
+      }
+    }
+    if (shouldClearError) {
       setErrors(prev => ({
         ...prev,
         experience: {
@@ -285,26 +315,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
         }
       }));
     }
-    
-    // If changing end date, validate it's not before start date
-    if (field === "end" && typeof value === "string" && value && currentExp.start) {
-      const startDate = new Date(currentExp.start);
-      const endDate = new Date(value);
-      
-      if (endDate < startDate) {
-        // Set error message for invalid end date
-        setErrors(prev => ({
-          ...prev,
-          experience: {
-            ...prev.experience,
-            [idx]: { ...prev.experience?.[idx], end: "End date cannot be earlier than start date" }
-          }
-        }));
-        return;
-      }
-    }
-    
-    updated[idx] = { ...currentExp, [field]: value };
+    updated[idx] = newExp;
     setForm({ ...form, experience: updated });
   }
   function addExperience() {
@@ -366,12 +377,15 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
     const experienceErrors: { [key: number]: { end?: string } } = {};
     for (let i = 0; i < form.experience.length; i++) {
       const exp = form.experience[i];
-      if (exp.start && exp.end && !exp.is_present) {
-        const startDate = new Date(exp.start);
-        const endDate = new Date(exp.end);
-        
-        if (endDate < startDate) {
-          experienceErrors[i] = { end: "End date cannot be earlier than start date" };
+      if (!exp.is_present) {
+        if (exp.start && !exp.end) {
+          experienceErrors[i] = { end: "End date is required" };
+        } else if (exp.start && exp.end) {
+          const startDate = new Date(exp.start);
+          const endDate = new Date(exp.end);
+          if (endDate < startDate) {
+            experienceErrors[i] = { end: "End date cannot be earlier than start date" };
+          }
         }
       }
     }
@@ -382,6 +396,29 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
         education: educationErrors,
         experience: experienceErrors
       });
+      // Scroll to first education or experience error
+      if (Object.keys(educationErrors).length > 0) {
+        const idx = Number(Object.keys(educationErrors)[0]);
+        educationRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (Object.keys(experienceErrors).length > 0) {
+        const idx = Number(Object.keys(experienceErrors)[0]);
+        experienceRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
+    // Custom validation for first_name and last_name
+    const errors: { first_name?: string; last_name?: string } = {};
+    if (!form.first_name) errors.first_name = 'First name is required';
+    if (!form.last_name) errors.last_name = 'Last name is required';
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      // Scroll to first error field
+      if (errors.first_name) {
+        firstNameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (errors.last_name) {
+        lastNameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
@@ -408,26 +445,20 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
       }
       
       const payload = transformFreelancerFormToPayload(updatedForm, userState);
-      console.log('Profile update payload:', payload);
-      console.log('Form data:', updatedForm);
-      console.log('User state:', userState);
       
-      const result = await updateProfile(payload).unwrap();
-      console.log('Profile update result:', result);
+      await updateProfile(payload).unwrap();
       
-      // Update Redux state with the new avatar URL if it was uploaded
-      if (updatedForm.avatar && updatedForm.avatar !== userState.avatar) {
-        dispatch(setUser({ ...userState, avatar: updatedForm.avatar }));
-      }
+      // Refetch user data to update the profile instantly
+      const freshUser = (await triggerMe()).data;
+      if (freshUser) dispatch(setUser(freshUser));
       
       setEditMode(false);
-      // Refetch user data to update the profile
       if (onProfileUpdate) {
         onProfileUpdate();
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
-      // TODO: Show error toast
+      showToast({ type: 'error', message: 'Failed to update profile' });
     }
   }
   return (
@@ -438,28 +469,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-accent/60 to-primary/40 blur-md opacity-40" />
-            {hasRealAvatar() ? (
-              <Image
-                src={getAvatarUrl()}
-                alt={user.name || ""}
-                width={120}
-                height={120}
-                className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg relative z-10"
-                onError={(e) => {
-                  console.error('Image failed to load:', getAvatarUrl());
-                  console.error('Error event:', e);
-                }}
-                onLoad={() => {
-                  console.log('Image loaded successfully:', getAvatarUrl());
-                }}
-              />
-            ) : getUserInitials() ? (
-              <span className="w-32 h-32 flex items-center justify-center rounded-full bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-5xl font-extrabold text-white ring-4 ring-primary/30 shadow-lg select-none relative z-10 border-4 border-background">
-                {getUserInitials()}
-              </span>
-            ) : (
-              <Icon icon={CheckCircle2} size={64} className="w-32 h-32 rounded-full text-muted-foreground bg-muted ring-4 ring-primary/30 shadow-lg select-none relative z-10 border-4 border-background" />
-            )}
+            <Avatar src={getAvatarUrl()} name={user.name} size={120} />
             <span className="absolute bottom-1 right-1 bg-green-500 rounded-full p-1.5 border-2 border-background z-20">
               <CheckCircle2 className="w-6 h-6 text-white" />
             </span>
@@ -612,35 +622,27 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
               ×
             </button>
             <h2 className="font-bold text-2xl mb-2 text-center pt-8">Edit Profile</h2>
-            <form onSubmit={handleSave} className="flex flex-col gap-6 px-8 pb-8 overflow-y-auto" style={{ flex: 1, minHeight: 0 }}>
+            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-8 pb-8 overflow-y-auto`}>
               {/* Profile Image Upload */}
               <div className="flex flex-col gap-2 items-center">
                 <label className="font-semibold text-sm mb-1">Profile Image</label>
                 <div className="relative w-24 h-24 mb-2">
-                  {avatarPreview && avatarPreview.trim() !== "" && !["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"].includes(avatarPreview.trim()) ? (
-                    <Image
-                      src={avatarPreview}
-                      alt="Profile Preview"
-                      width={96}
-                      height={96}
-                      className="w-24 h-24 rounded-full object-cover border-2 border-primary/40 shadow"
-                    />
-                  ) : (form.name && form.name.trim().length > 0 ? (
-                    <span className="w-24 h-24 flex items-center justify-center rounded-full bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-3xl font-extrabold text-white ring-4 ring-primary/30 shadow select-none border-2 border-primary/40">
-                      {form.name.trim().split(' ').map((n: string) => n[0]).join('').toUpperCase()}
-                    </span>
-                  ) : (
-                    <Icon icon={CheckCircle2} size={48} className="w-24 h-24 rounded-full text-muted-foreground bg-muted ring-4 ring-primary/30 shadow select-none border-2 border-primary/40" />
-                  ))}
+                  <Avatar src={avatarPreview} name={`${form.first_name || ""} ${form.last_name || ""}`.trim() || undefined} size={96} />
                   <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
                   <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
                 </div>
-
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label className="font-semibold text-sm">First Name <span className="text-destructive">*</span></label>
+                    <input name="first_name" ref={firstNameRef} value={form.first_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.first_name ? ' border-red-500' : ''}`} placeholder="First name" />
+                    {fieldErrors.first_name && <span className="text-xs text-red-500">{fieldErrors.first_name}</span>}
+                  </div>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label className="font-semibold text-sm">Last Name <span className="text-destructive">*</span></label>
+                    <input name="last_name" ref={lastNameRef} value={form.last_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.last_name ? ' border-red-500' : ''}`} placeholder="Last name" />
+                    {fieldErrors.last_name && <span className="text-xs text-red-500">{fieldErrors.last_name}</span>}
+                  </div>
               </div>
-              {/* Name */}
-              <div className="flex flex-col gap-2">
-                <label className="font-semibold text-sm">Name</label>
-                <input name="name" value={form.name} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Full name" />
               </div>
               {/* Bio */}
               <div className="flex flex-col gap-2">
@@ -667,7 +669,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
                       <div className="flex gap-2">
                         <input type="date" name="start" value={edu.start || ""} onChange={e => handleEducationChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
                         <div className="flex-1">
-                          <input type="date" name="end" value={edu.is_present ? "" : (edu.end || "")} onChange={e => handleEducationChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.education?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={edu.is_present} />
+                          <input type="date" name="end" ref={el => { educationRefs.current[idx] = el; }} value={edu.is_present ? "" : (edu.end || "")} onChange={e => handleEducationChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.education?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={edu.is_present} />
                           {errors.education?.[idx]?.end && (
                             <p className="text-red-500 text-xs mt-1">{errors.education[idx].end}</p>
                           )}
@@ -696,7 +698,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
                       <div className="flex gap-2">
                         <input type="date" name="start" value={exp.start || ""} onChange={e => handleExperienceChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
                         <div className="flex-1">
-                          <input type="date" name="end" value={exp.is_present ? "" : (exp.end || "")} onChange={e => handleExperienceChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.experience?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={exp.is_present} />
+                          <input type="date" name="end" ref={el => { experienceRefs.current[idx] = el; }} value={exp.is_present ? "" : (exp.end || "")} onChange={e => handleExperienceChange(idx, "end", e.target.value)} className={`input rounded-md border px-3 py-2 bg-background w-full ${errors.experience?.[idx]?.end ? 'border-red-500' : ''}`} placeholder="End Date" disabled={exp.is_present} />
                           {errors.experience?.[idx]?.end && (
                             <p className="text-red-500 text-xs mt-1">{errors.experience[idx].end}</p>
                           )}
@@ -725,7 +727,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
               {/* Email */}
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Email</label>
-                <input name="email" value={form.email} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Email address" type="email" />
+                <input name="email" value={form.email} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Email address" type="email" disabled />
               </div>
               {/* Website */}
               <div className="flex flex-col gap-2">

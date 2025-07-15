@@ -47,9 +47,6 @@ function JobCard({ job, onClick, showEditButton, onEditJob, onDeleteJob }: {
   onEditJob?: (job: JobDetail) => void;
   onDeleteJob?: (job: JobDetail) => void;
 }) {
-  // const key = job.status?.toLowerCase() || '';
-  // const bg = getStatusBadge(key, true); // true for bg color
-  // console.log("job", job);
   return (
     <Card
       className="p-0 overflow-hidden group cursor-pointer border border-border/70 hover:shadow-2xl transition-shadow"

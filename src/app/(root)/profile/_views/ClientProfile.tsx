@@ -1,16 +1,19 @@
 "use client";
+import Avatar from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
-import { useUpdateClientProfileMutation, useUploadImageMutation } from "@/features/api/apiSlice";
+import { useUpdateClientProfileMutation, useUploadImageMutation, useLazyGetClientMeQuery } from "@/features/api/apiSlice";
 import { useGetMyJobsQuery } from "@/features/api/jobsApi";
 import { useAppSelector } from "@/hooks/useTypedSelector";
+import { useAppDispatch } from "@/hooks/useTypedDispatch";
+import { setUser } from "@/features/userSlice";
 import { transformClientFormToPayload } from "@/utils/profile";
 import { getStatusBadge } from "@/utils/statusBadge";
 import { Briefcase, Building2, Calendar, Check, CheckCircle2, ChevronLeft, ChevronRight, DollarSign, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User } from "lucide-react";
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface User {
+  bio?: string;
   avatar?: string;
   name?: string;
   first_name?: string;
@@ -39,6 +42,8 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [originalForm, setOriginalForm] = useState<typeof form | null>(null);
   const userState = useAppSelector((state) => state.user);
+  const [triggerClientMe] = useLazyGetClientMeQuery();
+  const dispatch = useAppDispatch();
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,32 +54,6 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
     page: currentPage,
     pageSize: pageSize,
   });
-
-  // Helper to get user initials
-  function getUserInitials() {
-    if (user?.name && user.name.trim().length > 0) {
-      return user.name.trim().split(' ').map((n: string) => n[0]).join('').toUpperCase();
-    }
-    if (user?.first_name || user?.last_name) {
-      return `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase();
-    }
-    return null;
-  }
-
-  // Helper to determine if avatar is real
-  function hasRealAvatar() {
-    if (!user?.avatar) return false;
-    const avatarUrl = user.avatar.trim();
-    if (!avatarUrl) return false;
-    
-    // Check if it's a placeholder
-    const placeholderList = ["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"];
-    const isPlaceholder = placeholderList.some(placeholder => 
-      avatarUrl.toLowerCase().includes(placeholder.toLowerCase())
-    );
-    
-    return !isPlaceholder;
-  }
 
   // Helper to get display name
   const getDisplayName = useCallback(() => {
@@ -96,13 +75,12 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
     }
   }
 
-
-
   // Modal form state
   const [form, setForm] = useState({
     avatar: user.avatar || "",
-    name: getDisplayName(),
-    about: user.about || "",
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
+    bio: user.bio || "",
     email: user.email || "",
     website: user.website || "",
     linkedin: user.linkedin || "",
@@ -115,8 +93,9 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
   useEffect(() => {
     setForm({
       avatar: user.avatar || "",
-      name: getDisplayName(),
-      about: user.about || "",
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      bio: user.bio || "",
       email: user.email || "",
       website: user.website || "",
       linkedin: user.linkedin || "",
@@ -125,15 +104,16 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
       phone: user.phone || "",
     });
     setAvatarPreview(user.avatar || "");
-  }, [user, getDisplayName]);
+  }, [user]);
 
   // Set original form when edit mode is opened
   useEffect(() => {
     if (editMode && !originalForm) {
       setOriginalForm({
         avatar: user.avatar || "",
-        name: getDisplayName(),
-        about: user.about || "",
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        bio: user.bio || "",
         email: user.email || "",
         website: user.website || "",
         linkedin: user.linkedin || "",
@@ -142,9 +122,11 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
         phone: user.phone || "",
       });
     }
-  }, [editMode, user, originalForm, getDisplayName]);
+  }, [editMode, user, originalForm]);
   const [avatarPreview, setAvatarPreview] = useState<string>(user.avatar || "");
   const modalRef = useRef<HTMLDivElement>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ first_name?: string; last_name?: string }>({});
+  const [shake, setShake] = useState(false);
 
   // Close modal on outside click
   useEffect(() => {
@@ -160,7 +142,9 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
   }, [editMode]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: undefined })); // Clear error on change
   }
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -189,6 +173,16 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    // Custom validation for first_name and last_name
+    const errors: { first_name?: string; last_name?: string } = {};
+    if (!form.first_name) errors.first_name = 'First name is required';
+    if (!form.last_name) errors.last_name = 'Last name is required';
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setShake(true);
+      setTimeout(() => setShake(false), 600);
+      return;
+    }
     try {
       const updatedForm = { ...form };
       
@@ -213,6 +207,9 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
       
       const payload = transformClientFormToPayload(updatedForm, userState);
       await updateProfile(payload).unwrap();
+      // Refetch user data to update the profile instantly
+      const freshUser = (await triggerClientMe()).data;
+      if (freshUser) dispatch(setUser(freshUser));
       setEditMode(false);
       if (onProfileUpdate) {
         onProfileUpdate();
@@ -222,6 +219,13 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
     }
   }
 
+  function getAvatarUrl() {
+    if (user.avatar && user.avatar.trim() !== "") {
+      return user.avatar;
+    }
+    return "/avatar-placeholder.png"; // Fallback to placeholder
+  }
+
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-muted/60 to-background/80 pb-20">
       <div className="absolute inset-0 pointer-events-none select-none opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
@@ -229,22 +233,8 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
         <section className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border border-border/60 rounded-3xl shadow-lg p-8 flex flex-col md:flex-row items-center md:items-start gap-8 mb-10 mt-4 backdrop-blur-sm">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary/60 to-accent/40 blur-md opacity-40" />
-            {hasRealAvatar() ? (
-              <Image
-                src={user.avatar || ""}
-                alt={getDisplayName() || ""}
-                width={120}
-                height={120}
-                className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg relative z-10"
-              />
-            ) : getUserInitials() ? (
-              <span className="w-32 h-32 flex items-center justify-center rounded-full bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-5xl font-extrabold text-white ring-4 ring-primary/30 shadow-lg select-none relative z-10 border-4 border-background">
-                {getUserInitials()}
-              </span>
-            ) : (
-              <Icon icon={CheckCircle2} size={64} className="w-32 h-32 rounded-full text-muted-foreground bg-muted ring-4 ring-primary/30 shadow-lg select-none relative z-10 border-4 border-background" />
-            )}
+            <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-accent/60 to-primary/40 blur-md opacity-40" />
+            <Avatar src={getAvatarUrl()} name={user.name} size={120} />
             <span className="absolute bottom-1 right-1 bg-green-500 rounded-full p-1.5 border-2 border-background z-20">
               <CheckCircle2 className="w-6 h-6 text-white" />
             </span>
@@ -271,10 +261,7 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
               </div>
             )}
             
-            {/* Bio */}
-            {user.about && (
-            <span className="text-base text-muted-foreground font-normal mt-1 mb-2 max-w-xl">{user.about}</span>
-            )}
+            {/* About removed from profile card section */}
             
             {/* Contact Info */}
             <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start text-sm text-muted-foreground mt-2">
@@ -355,9 +342,9 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
         {/* About Section */}
         <section className="mb-8 bg-gradient-to-br from-card/90 to-card/80 border border-border/60 rounded-2xl p-6 shadow-sm backdrop-blur-sm">
           <h2 className="font-bold text-xl mb-3 text-foreground border-l-4 border-primary pl-3">About</h2>
-          {user.about ? (
+          {user.bio ? (
             <p className="text-muted-foreground text-base leading-relaxed">
-              {user.about}
+              {user.bio}
             </p>
           ) : (
             <div className="text-center py-8">
@@ -516,38 +503,30 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
               ×
             </button>
             <h2 className="font-bold text-2xl mb-2 text-center pt-8">Edit Profile</h2>
-            <form onSubmit={handleSave} className="flex flex-col gap-6 px-8 pb-8 overflow-y-auto" style={{ flex: 1, minHeight: 0 }}>
+            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-8 pb-8 overflow-y-auto ${shake ? 'animate-shake' : ''}`} style={{ flex: 1, minHeight: 0 }}>
               {/* Profile Image Upload */}
               <div className="flex flex-col gap-2 items-center">
                 <label className="font-semibold text-sm mb-1">Profile Image</label>
                 <div className="relative w-24 h-24 mb-2">
-                  {avatarPreview && avatarPreview.trim() !== "" && !["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"].some(placeholder => 
-                    avatarPreview.trim().toLowerCase().includes(placeholder.toLowerCase())
-                  ) ? (
-                    <Image
-                      src={avatarPreview}
-                      alt="Profile Preview"
-                      width={48}
-                      height={48}
-                      className="w-24 h-24 rounded-full object-cover border-2 border-primary/40 shadow"
-                    />
-                  ) : (form.name && form.name.trim().length > 0 ? (
-                    <span className="w-24 h-24 flex items-center justify-center rounded-full bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-3xl font-extrabold text-white ring-4 ring-primary/30 shadow select-none border-2 border-primary/40">
-                      {form.name.trim().split(' ').map((n: string) => n[0]).join('').toUpperCase()}
-                    </span>
-                  ) : (
-                    <Icon icon={CheckCircle2} size={48} className="w-24 h-24 rounded-full text-muted-foreground bg-muted ring-4 ring-primary/30 shadow select-none border-2 border-primary/40" />
-                  ))}
+                  <Avatar src={avatarPreview} name={`${form.first_name || ""} ${form.last_name || ""}`.trim() || undefined} size={96} />
                   <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
                   <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label className="font-semibold text-sm">First Name <span className="text-destructive">*</span></label>
+                    <input name="first_name" value={form.first_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.first_name ? ' border-red-500' : ''}`} placeholder="First name" />
+                    {fieldErrors.first_name && <span className="text-xs text-red-500">{fieldErrors.first_name}</span>}
+                  </div>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <label className="font-semibold text-sm">Last Name <span className="text-destructive">*</span></label>
+                    <input name="last_name" value={form.last_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.last_name ? ' border-red-500' : ''}`} placeholder="Last name" />
+                    {fieldErrors.last_name && <span className="text-xs text-red-500">{fieldErrors.last_name}</span>}
+                  </div>
                 </div>
               </div>
 
               {/* Form Fields */}
-              <div className="flex flex-col gap-2">
-                <label className="font-semibold text-sm">Name</label>
-                <input name="name" value={form.name} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Full name" />
-              </div>
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Company Name</label>
                 <input name="company_name" value={form.company_name} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Company name" />
@@ -557,8 +536,8 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
                 <input name="phone" value={form.phone} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Phone number" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="font-semibold text-sm">Bio</label>
-                <textarea name="about" value={form.about} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted min-h-[60px]" placeholder="Short bio/about you" />
+                <label className="font-semibold text-sm">About</label>
+                <textarea name="bio" value={form.bio} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted min-h-[60px]" placeholder="Short bio/about you" />
               </div>
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Email</label>

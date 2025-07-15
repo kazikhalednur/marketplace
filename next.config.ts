@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       'images.unsplash.com',
       'randomuser.me',
       '203.190.14.56',
+      'cpchub.diu.edu.bd',
     ],
   },
 };

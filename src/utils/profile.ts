@@ -3,7 +3,7 @@ import { FreelancerEducation, FreelancerExperience, FreelancerProject, ClientPro
 
 interface ClientFormData {
   name?: string;
-  about?: string;
+  bio?: string;
   email?: string;
   website?: string;
   linkedin?: string;
@@ -78,7 +78,7 @@ export function transformClientData(user: UserState) {
     linkedin: user.linkedin || '',
     twitter: user.twitter || '',
     github: '', // Not provided in API
-    about: user.about || '',
+    bio: user.bio || '',
     skills: [], // No skills for clients
     projects: [], // Jobs will be fetched separately from API
     company_name: user.company_name || '',
@@ -100,6 +100,8 @@ export function transformStudentData(user: UserState) {
   return {
     avatar: user.avatar || undefined, // Use actual avatar from API response
     name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Student User',
+    first_name: user.first_name || '',
+    last_name: user.last_name || '',
     role: 'Freelancer',
     location: '', // Not provided in API
     email: user.email || '',
@@ -148,7 +150,7 @@ export function transformClientFormToPayload(form: ClientFormData, user: UserSta
   if (form.company_name || user.company_name) payload.company_name = form.company_name || user.company_name || '';
   if (form.twitter) payload.twitter = form.twitter;
   if (form.linkedin) payload.linkedin = form.linkedin;
-  if (form.about) payload.about = form.about;
+  if (form.bio) payload.bio = form.bio;
   if (form.avatar || user.avatar) payload.avatar = form.avatar || user.avatar || null;
   
   return payload;

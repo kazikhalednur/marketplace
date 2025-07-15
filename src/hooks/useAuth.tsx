@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useCallback, useState } from 'react';
-import { useGetMeQuery, useGetClientMeQuery } from '../features/api/apiSlice';
+import { useGetMeQuery, useGetClientMeQuery, apiSlice } from '../features/api/apiSlice';
+import { jobsApi } from '../features/api/jobsApi';
 import { useAppDispatch } from './useTypedDispatch';
 import { useAppSelector } from './useTypedSelector';
 import { setUser, clearUser } from '../features/userSlice';
@@ -37,10 +38,8 @@ export function useAuth() {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const role = payload.role || payload.user_role || null;
-        console.log('useAuth: Extracted role from token:', role);
         setUserRole(role);
       } catch {
-        console.log('useAuth: Could not extract role from token');
         setUserRole(null);
       }
     }
@@ -49,8 +48,6 @@ export function useAuth() {
   // Determine which query to use based on user role
   const currentRole = user.role || userRole;
   const isClient = currentRole === 'client';
-  
-  console.log('useAuth: Role detection - currentRole:', currentRole, 'isClient:', isClient);
   
   // Use only the appropriate query based on role
   const { data: freelancerData, isLoading: freelancerLoading, refetch: refetchFreelancer } = useGetMeQuery(undefined, {
@@ -70,35 +67,29 @@ export function useAuth() {
   
   // Refetch function that uses the appropriate endpoint
   const refetch = useCallback(() => {
-    console.log('useAuth: Refetching with role:', currentRole);
     if (isClient) {
-      console.log('useAuth: Using client endpoint for refetch');
       refetchClient();
     } else {
-      console.log('useAuth: Using freelancer endpoint for refetch');
       refetchFreelancer();
     }
-  }, [isClient, refetchClient, refetchFreelancer, currentRole]);
+  }, [isClient, refetchClient, refetchFreelancer]);
 
   useEffect(() => {
     // Only update if data exists and is different from user
     if (data && !isEqual(data, user)) {
-      console.log('useAuth: Setting user data from API:', data);
       dispatch(setUser(data));
     } else if (isError) {
-      console.log('useAuth: API error, clearing user');
       dispatch(clearUser());
     }
     // Only clear user if we're sure there's no token (after initial mount)
     else if (!hasToken && mounted) {
-      console.log('useAuth: No token, clearing user');
       dispatch(clearUser());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, isError, hasToken, dispatch]);
 
   // Helper: is authenticated
-  const isAuthenticated = !!user && !!user.email && mounted;
+  const isAuthenticated = !!user && !!user.email && mounted && !!Cookies.get('accessToken');
 
   // Helper: check user role
   const hasRole = useCallback((role: string) => user.role === role, [user.role]);
@@ -109,6 +100,9 @@ export function useAuth() {
     // Clear cookies
     Cookies.remove('accessToken', { path: '/' });
     Cookies.remove('refreshToken', { path: '/' });
+    // Reset RTK Query caches
+    dispatch(apiSlice.util.resetApiState());
+    dispatch(jobsApi.util.resetApiState());
     // Redirect to login page
     router.push('/login');
   }, [dispatch, router]);

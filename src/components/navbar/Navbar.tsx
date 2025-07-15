@@ -1,16 +1,16 @@
 "use client";
 
+import MobileSidebar from "@/components/navbar/MobileSidebar";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import Avatar from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/Icon";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
+import { Bell, HelpCircle, LogOut, Menu, Settings, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Menu, Bell, UserCircle2, LogOut, Settings, HelpCircle, User as UserIcon } from "lucide-react";
-import Icon from "@/components/ui/Icon";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
-import MobileSidebar from "@/components/navbar/MobileSidebar";
+import { useEffect, useRef, useState } from "react";
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -45,17 +45,6 @@ export default function Navbar() {
   }, []);
 
   const isActive = (path: string) => pathname.startsWith(path);
-
-  // Helper to get user initials
-  function getUserInitials() {
-    if (user?.name && user.name.trim().length > 0) {
-      return user.name.trim().split(' ').map(n => n[0]).join('').toUpperCase();
-    }
-    if (user?.first_name || user?.last_name) {
-      return `${user?.first_name?.[0] || ''}${user?.last_name?.[0] || ''}`.toUpperCase();
-    }
-    return null;
-  }
 
   // Helper to get display name
   function getDisplayName() {
@@ -118,25 +107,7 @@ export default function Navbar() {
                     aria-label="Open profile menu"
                     type="button"
                   >
-                    {hasRealAvatar() ? (
-                      <Image
-                        src={user.avatar || ""}
-                        alt={getDisplayName() || ""}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      getUserInitials() ? (
-                        <span
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-lg font-extrabold text-white ring-2 ring-primary/30 shadow-md select-none"
-                        >
-                          {getUserInitials()}
-                        </span>
-                      ) : (
-                        <Icon icon={UserCircle2} size={24} className="text-muted-foreground" />
-                      )
-                    )}
+                    <Avatar src={user?.avatar ?? undefined} name={getDisplayName() ?? undefined} size={40} />
                   </button>
                   {/* Improved Dropdown */}
                   {profileDropdownOpen && (
@@ -146,22 +117,8 @@ export default function Navbar() {
                     >
                       <div className="flex flex-col items-center gap-2 py-5 border-b border-border">
                         {hasRealAvatar() ? (
-                          <Image
-                            src={user.avatar || ""}
-                            alt={getDisplayName() || ""}
-                            width={64}
-                            height={64}
-                            className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/30 shadow"
-                          />
-                        ) : (
-                          getUserInitials() ? (
-                            <span className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-primary/70 via-accent/60 to-secondary/70 text-3xl font-extrabold text-white ring-2 ring-primary/30 shadow-md select-none">
-                              {getUserInitials()}
-                            </span>
-                          ) : (
-                            <Icon icon={UserCircle2} size={40} className="text-muted-foreground" />
-                          )
-                        )}
+                          <Avatar src={user?.avatar ?? undefined} name={getDisplayName() ?? undefined} size={80} />
+                        ) : null }
                         <span className="font-bold text-lg">{getDisplayName()}</span>
                         <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
                       </div>

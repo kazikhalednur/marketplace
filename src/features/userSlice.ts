@@ -18,6 +18,7 @@ export interface UserState {
   linkedin?: string | null;
   twitter?: string | null;
   about?: string | null;
+  bio?: string | null;
   is_payment_verified?: boolean | null;
   is_phone_verified?: boolean | null;
 }
@@ -39,6 +40,7 @@ const initialState: UserState = {
   linkedin: null,
   twitter: null,
   about: null,
+  bio: null,
   is_payment_verified: null,
   is_phone_verified: null,
 };
@@ -48,29 +50,10 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<Partial<UserState>>) {
-      // Log the incoming data for debugging
-      console.log('Setting user data:', action.payload);
       return { ...state, ...action.payload };
     },
-    clearUser(state) {
-      state.first_name = null;
-      state.last_name = null;
-      state.email = null;
-      state.username = null;
-      state.phone = null;
-      state.role = null;
-      state.email_verified = null;
-      state.is_google_login = null;
-      state.student_id = null;
-      state.freelancer_sub_profiles = null;
-      state.avatar = null;
-      state.name = null;
-      state.company_name = null;
-      state.linkedin = null;
-      state.twitter = null;
-      state.about = null;
-      state.is_payment_verified = null;
-      state.is_phone_verified = null;
+    clearUser() {
+      return initialState;
     },
   },
 });
