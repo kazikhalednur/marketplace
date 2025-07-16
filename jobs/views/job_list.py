@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
 
 from ..filters import JobFilter
 from ..models import Job
@@ -14,10 +15,14 @@ class JobPagination(PageNumberPagination):
 
 
 class JobListView(ListAPIView):
-    permission_classes = []
-    authentication_classes = []
+    permission_classes = [AllowAny]
     queryset = Job.objects.published()
     serializer_class = JobSerializer
     pagination_class = JobPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = JobFilter
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context

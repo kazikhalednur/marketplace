@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from ...models import Education, Experience, FreelancerSubProfile, Project
+from jobs.models import Skill
 
-# from jobs.models import Skill
+from ...models import Education, Experience, FreelancerSubProfile, Project
 
 
 class FreelancerSubProfileProjectSerializer(serializers.ModelSerializer):
@@ -44,6 +44,14 @@ class FreelancerSubProfileExperienceSerializer(serializers.ModelSerializer):
     #     return super().validate(attrs)
 
 
+class FreelancerSkillSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        model = Skill
+        fields = ["id", "name"]
+
+
 class FreelancerSubProfileEducationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
 
@@ -63,9 +71,9 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
     projects = FreelancerSubProfileProjectSerializer(many=True, required=False)
     experiences = FreelancerSubProfileExperienceSerializer(many=True, required=False)
     educations = FreelancerSubProfileEducationSerializer(many=True, required=False)
-    # skills = serializers.PrimaryKeyRelatedField(
-    #     many=True, queryset=Skill.objects.all(), required=False
-    # )
+    skills = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Skill.objects.all(), required=False
+    )
 
     class Meta:
         model = FreelancerSubProfile
@@ -79,17 +87,25 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
             "twitter",
             "github",
             "portfolio",
-            # "skills",
+            "skills",
             "projects",
             "experiences",
             "educations",
         ]
 
+    def to_representation(self, instance):
+        """Customize output to return full Skill objects instead of IDs"""
+        representation = super().to_representation(instance)
+        representation["skills"] = FreelancerSkillSerializer(
+            instance.skills.all(), many=True
+        ).data
+        return representation
+
     def create(self, validated_data):
         projects_data = validated_data.pop("projects", [])
         experiences_data = validated_data.pop("experiences", [])
         educations_data = validated_data.pop("educations", [])
-        # skills_ids = validated_data.pop("skills", [])
+        skills_ids = validated_data.pop("skills", [])
 
         sub_profile = FreelancerSubProfile.objects.create(**validated_data)
 
@@ -102,8 +118,8 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         for education_data in educations_data:
             Education.objects.create(sub_profile=sub_profile, **education_data)
 
-        # if skills_ids:
-        #     sub_profile.skills.set(skills_ids)
+        if skills_ids:
+            sub_profile.skills.set(skills_ids)
 
         return sub_profile
 
@@ -113,8 +129,8 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         educations_data = validated_data.pop("educations", [])
 
         # Update skills
-        # skills_ids = validated_data.pop("skills", [])
-        # instance.skills.set(skills_ids)
+        skills = validated_data.pop("skills", [])
+        instance.skills.set(skills)
 
         # Update base sub-profile fields
         for attr, value in validated_data.items():

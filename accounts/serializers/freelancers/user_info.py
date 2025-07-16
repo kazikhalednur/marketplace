@@ -68,14 +68,27 @@ class UserInfoSerializer(serializers.ModelSerializer):
                 sub_id = sub_data.get("id")
                 if sub_id and sub_id in existing_profiles:
                     sub_instance = existing_profiles[sub_id]
+                    skills_data = sub_data.pop("skills", [])
+                    if skills_data:
+                        skills_ids = [skill.id for skill in skills_data]
+                        sub_data["skills"] = skills_ids
                     serializer = FreelancerSubProfileSerializer(
-                        instance=sub_instance, data=sub_data, partial=True
+                        instance=sub_instance,
+                        data=sub_data,
+                        partial=True,
+                        context=self.context,
                     )
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
                     updated_ids.append(sub_id)
                 else:
-                    serializer = FreelancerSubProfileSerializer(data=sub_data)
+                    skills_data = sub_data.pop("skills", [])
+                    if skills_data:
+                        skills_ids = [skill.id for skill in skills_data]
+                        sub_data["skills"] = skills_ids
+                    serializer = FreelancerSubProfileSerializer(
+                        data=sub_data, context=self.context
+                    )
                     serializer.is_valid(raise_exception=True)
                     serializer.save(freelancer_profile=freelancer_profile)
 

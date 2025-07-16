@@ -15,6 +15,7 @@ class JobSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     skills = SkillSerializer(many=True, read_only=True)
     created_by = ClientSerializer(read_only=True)
+    is_applied = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -37,4 +38,15 @@ class JobSerializer(serializers.ModelSerializer):
             "created_by",
             "created_at",
             "status",
+            "is_applied",
         ]
+
+    def get_is_applied(self, obj):
+        print(self.context)
+        user = self.context.get("request").user
+        print(user)
+        if user.is_authenticated:
+            return obj.proposals.filter(
+                freelancer_sub_profile__freelancer_profile__freelancer__id=user.id
+            ).exists()
+        return False
