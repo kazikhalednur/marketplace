@@ -24,6 +24,7 @@ interface JobApi {
   id: string;
   title: string;
   description: string;
+  is_applied?: boolean;
   tags: string[];
   category: JobApiCategory;
   skills: JobApiSkill[];
@@ -174,6 +175,7 @@ export const jobsApi = createApi({
             status: job.status,
             created_by: job.created_by,
             created_at: job.created_at,
+            is_applied: job.is_applied ?? false,
           }));
           return {
             jobs,
@@ -278,6 +280,7 @@ export const jobsApi = createApi({
             status: job.status,
             created_by: job.created_by,
             created_at: job.created_at,
+            is_applied: job.is_applied ?? false,
           }));
           return {
             jobs,
@@ -297,6 +300,14 @@ export const jobsApi = createApi({
     getAcceptedDomains: builder.query<AcceptedDomainResponse, void>({
       query: () => '/accounts/accepted-domain/',
     }),
+    applyToJob: builder.mutation<unknown, FormData>({
+      query: (formData) => ({
+        url: '/biding/proposals/',
+        method: 'POST',
+        body: formData,
+        // Do NOT set headers: { 'Content-Type': ... }
+      }),
+    }),
   }),
 });
 
@@ -307,5 +318,6 @@ export const {
   useDeleteJobMutation, 
   useGetDropdownsQuery, 
   useGetMyJobsQuery,
-  useGetAcceptedDomainsQuery
+  useGetAcceptedDomainsQuery,
+  useApplyToJobMutation
 } = jobsApi; 

@@ -30,6 +30,7 @@ export interface JobDetail {
   max_proposal_count?: number;
   created_by?: JobCreator;
   created_at?: string;
+  is_applied?: boolean;
 }
 
 export interface JobListProps {

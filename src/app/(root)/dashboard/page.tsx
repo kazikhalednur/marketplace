@@ -104,6 +104,18 @@ function DashboardContent() {
     refetch();
   };
 
+  const handleJobApplied = () => {
+    refetch();
+    // After refetch, update selectedJob to the latest job object
+    setTimeout(() => {
+      const jobId = searchParams.get('jobId');
+      if (jobId && jobs.length > 0) {
+        const job = jobs.find(j => j.id === jobId);
+        if (job) setSelectedJob(job);
+      }
+    }, 300); // Wait a bit for refetch
+  };
+
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-5xl mx-auto">
@@ -194,7 +206,9 @@ function DashboardContent() {
             </>
           )}
         </section>
-        <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
+        <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} 
+          onJobApplied={handleJobApplied}
+        />
       </div>
     </main>
   );
