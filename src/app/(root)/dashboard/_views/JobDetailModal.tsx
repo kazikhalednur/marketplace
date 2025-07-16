@@ -487,9 +487,9 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                 <Button
                   className="w-full mt-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all disabled:cursor-not-allowed"
                   onClick={() => setShowApplyForm(true)}
-                  disabled={job.is_applied}
+                  disabled={job.is_applied || job.status === 'closed'}
                 >
-                  {job.is_applied ? 'Applied' : 'Apply for this Job'}
+                  {job.is_applied ? 'Applied' : job.status === 'closed' ? 'Closed' : 'Apply for this Job'}
                 </Button>
               )}
             </div>
