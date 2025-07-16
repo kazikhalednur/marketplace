@@ -20,6 +20,13 @@ class ProposalSerializer(serializers.ModelSerializer):
         many=True, read_only=True, source="attachments.all"
     )
     job_link = serializers.SerializerMethodField()
+    bid_amount = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Proposal
