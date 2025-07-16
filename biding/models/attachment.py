@@ -11,7 +11,7 @@ class Attachment(models.Model):
     proposal = models.ForeignKey(
         Proposal, related_name="attachments", on_delete=models.CASCADE
     )
-    file = models.ImageField(upload_to="attachments/")
+    file = models.FileField(upload_to="attachments/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     history = HistoricalRecords()
 
