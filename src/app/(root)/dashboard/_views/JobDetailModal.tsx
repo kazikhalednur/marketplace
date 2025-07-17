@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getExperienceBadge } from '@/utils/experienceBadge';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
-import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle, Copy, Check, ArrowLeft, Trash2 } from 'lucide-react';
+import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle, Copy, Check, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import type { JobDetail } from './JobList';
@@ -14,6 +14,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useApplyToJobMutation } from '@/features/api/jobsApi';
+import BidsList from './BidsList';
 
 // Utility for file validation
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "zip", "rar", "txt"];
@@ -134,16 +135,6 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
 
   return (
     <div className="p-3 md:p-6 relative">
-      {/* Back Icon */}
-      <button
-        type="button"
-        onClick={onCancel}
-        className="absolute left-0 top-0 mt-2 ml-2 flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 border border-border/30 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        aria-label="Back to job details"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="sr-only">Back</span>
-      </button>
       <h2 className="text-xl font-bold mb-4 text-primary text-center">Apply for {job.title}</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent max-h-[80vh] overflow-y-auto">
@@ -253,6 +244,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
   const [copied, setCopied] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const [showApplyForm, setShowApplyForm] = React.useState(false);
+  const [showBids, setShowBids] = React.useState(false);
   // Remove local applied state, use job.is_applied
 
   // Reset copied state when modal opens/closes
@@ -307,15 +299,24 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
         ref={modalRef}
         className="relative w-full max-w-3xl md:max-w-4xl p-0 rounded-2xl shadow-2xl bg-background focus:outline-none py-4"
       >
-        <button
-          onClick={onClose}
-          className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
-          aria-label="Close"
-        >
-          <X className="w-6 h-6" />
-        </button>
+        {/* Only show close button if not in BidsList view */}
+        {!showBids && (
+          <button
+            onClick={onClose}
+            className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        )}
         {showApplyForm ? (
           <ApplyJobForm job={job} onSuccess={() => { setShowApplyForm(false); if (onJobApplied) onJobApplied(); }} onCancel={() => setShowApplyForm(false)} />
+        ) : showBids ? (
+          <div className="flex flex-col items-center justify-center p-0 min-h-[300px] w-full">
+            <div className="w-full px-8 pb-8">
+              <BidsList jobId={job.id} onBack={() => setShowBids(false)} />
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col md:flex-row gap-0 md:gap-8 p-6 md:p-8 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
             {/* Left/Main Info */}
@@ -490,6 +491,16 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                   disabled={job.is_applied || job.status === 'closed'}
                 >
                   {job.is_applied ? 'Applied' : job.status === 'closed' ? 'Closed' : 'Apply for this Job'}
+                </Button>
+              )}
+              {/* Bids button for client users */}
+              {isAuthenticated && user.role === 'client' && (
+                <Button
+                  className="w-full mb-2 py-3 text-base font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
+                  variant="outline"
+                  onClick={() => setShowBids(true)}
+                >
+                  View Bids
                 </Button>
               )}
             </div>

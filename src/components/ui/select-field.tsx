@@ -1,34 +1,86 @@
-import React, { useState } from "react";
-import { X, ChevronDown } from "lucide-react";
+import * as React from "react";
+import { Check, ChevronDown, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-interface SelectFieldOption {
+export interface SelectFieldOption {
   value: string | number;
   label: string;
 }
 
-interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectFieldProps {
   options: SelectFieldOption[];
+  value: string | number;
+  onChange: (value: string | number) => void;
   placeholder?: string;
+  className?: string;
+  disabled?: boolean;
 }
 
-export const SelectField = React.forwardRef<HTMLSelectElement, SelectFieldProps>(
-  ({ options, placeholder, ...props }, ref) => (
-    <div className="relative">
-      <select
-        ref={ref}
-        className="block w-full rounded-md border border-input bg-background px-3 pr-10 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary appearance-none transition"
-        {...props}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-    </div>
-  )
+export const SelectField = React.forwardRef<HTMLButtonElement, SelectFieldProps>(
+  ({ options, value, onChange, placeholder = "Select an option", className, disabled }, ref) => {
+    const [open, setOpen] = React.useState(false);
+    const selected = options.find((opt) => String(opt.value) === String(value));
+
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            className={cn(
+              "w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition outline-none",
+              disabled && "opacity-60 pointer-events-none",
+              className
+            )}
+            disabled={disabled}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+          >
+            <span className={cn(!selected && "text-muted-foreground")}>{selected ? selected.label : placeholder}</span>
+            <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-full min-w-[var(--radix-popover-trigger-width)] max-w-none" align="start" sideOffset={4}>
+          <ul
+            tabIndex={-1}
+            role="listbox"
+            className="max-h-60 overflow-y-auto rounded-md bg-background py-1 text-sm shadow-lg border border-border focus:outline-none"
+          >
+            {options.map((opt) => (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={String(opt.value) === String(value)}
+                className={cn(
+                  "flex items-center cursor-pointer select-none px-4 py-2 transition-colors",
+                  String(opt.value) === String(value)
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "hover:bg-muted/60 hover:text-primary"
+                )}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                <span className="flex-1">{opt.label}</span>
+                {String(opt.value) === String(value) && (
+                  <Check className="ml-2 h-4 w-4 text-primary" />
+                )}
+              </li>
+            ))}
+            {options.length === 0 && (
+              <li className="px-4 py-2 text-muted-foreground">No options</li>
+            )}
+          </ul>
+        </PopoverContent>
+      </Popover>
+    );
+  }
 );
 SelectField.displayName = "SelectField";
 
@@ -42,7 +94,7 @@ interface MultiSelectFieldProps {
 
 export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFieldProps>(
   ({ options, value, onChange, placeholder, className = "" }, ref) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = React.useState(false);
 
     const handleSelect = (optionValue: string) => {
       if (value.includes(optionValue)) {

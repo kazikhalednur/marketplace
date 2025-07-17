@@ -100,6 +100,68 @@ interface AcceptedDomainResponse {
   };
 }
 
+// Types for Bids API
+export interface BidAttachment {
+  id: string;
+  file: string;
+}
+
+export interface BidFreelancerProfile {
+  id: number;
+  hours_per_week: number;
+  is_more_available: boolean;
+  hour_rate: string;
+  bio: string;
+  linkedin: string;
+  twitter: string;
+  github: string;
+  portfolio: string;
+  projects: Array<{
+    id: number;
+    title: string;
+    link: string;
+    description: string;
+  }>;
+  experiences: Array<{
+    id: number;
+    job_title: string;
+    company_name: string;
+    start_date: string;
+    end_date: string;
+    is_present: boolean;
+    description: string;
+  }>;
+  educations: Array<{
+    id: number;
+    institution_name: string;
+    degree: string;
+    start_date: string;
+    end_date: string;
+  }>;
+}
+
+export interface Bid {
+  id: string;
+  freelancer_profile: BidFreelancerProfile;
+  cover_letter: string;
+  attachments: BidAttachment[];
+  bid_amount: string;
+  status: string;
+  submitted_at: string;
+}
+
+export interface PaginatedBidsResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Bid[];
+  };
+}
+
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
   baseQuery: fetchBaseQuery({ 
@@ -308,6 +370,34 @@ export const jobsApi = createApi({
         // Do NOT set headers: { 'Content-Type': ... }
       }),
     }),
+
+    // Get bids for a job (client role)
+    getBidsForJob: builder.query<PaginatedBidsResponse['data'], { job_id: string; page?: number; pageSize?: number }>({
+      query: ({ job_id, page = 1, pageSize = 10 }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', pageSize.toString());
+        return `/biding/client/proposals/${job_id}/?${params.toString()}`;
+      },
+      transformResponse: (response: PaginatedBidsResponse) => response.data,
+    }),
+
+    // Update proposal status (client role)
+    updateProposalStatus: builder.mutation<
+      {
+        success: boolean;
+        status_code: number;
+        message: string;
+        data: Bid;
+      },
+      { proposal_id: string; status: string }
+    >({
+      query: ({ proposal_id, status }) => ({
+        url: `/biding/client/proposals/update/${proposal_id}/`,
+        method: 'PATCH',
+        body: { status },
+      }),
+    }),
   }),
 });
 
@@ -319,5 +409,7 @@ export const {
   useGetDropdownsQuery, 
   useGetMyJobsQuery,
   useGetAcceptedDomainsQuery,
-  useApplyToJobMutation
+  useApplyToJobMutation,
+  useGetBidsForJobQuery,
+  useUpdateProposalStatusMutation
 } = jobsApi; 
