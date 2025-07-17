@@ -398,6 +398,16 @@ export const jobsApi = createApi({
         body: { status },
       }),
     }),
+
+    getMyBids: builder.query<PaginatedBidsResponse['data'], { page?: number; pageSize?: number }>({
+      query: ({ page = 1, pageSize = 10 }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', pageSize.toString());
+        return `/biding/proposals/?${params.toString()}`;
+      },
+      transformResponse: (response: PaginatedBidsResponse) => response.data,
+    }),
   }),
 });
 
@@ -411,5 +421,6 @@ export const {
   useGetAcceptedDomainsQuery,
   useApplyToJobMutation,
   useGetBidsForJobQuery,
-  useUpdateProposalStatusMutation
+  useUpdateProposalStatusMutation,
+  useGetMyBidsQuery
 } = jobsApi; 

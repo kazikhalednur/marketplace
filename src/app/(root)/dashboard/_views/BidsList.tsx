@@ -229,27 +229,27 @@ export default function BidsList({ jobId, onBack }: BidsListProps) {
   const customHeader = (
     <div className="sticky top-0 z-30 px-2 md:px-0">
       <div className="bg-gradient-to-r from-blue-50 via-white to-purple-50 rounded-2xl shadow-lg border border-border/20 flex items-center px-6 py-5 mt-2 mb-10">
-        <button
-          onClick={onBack || (() => window.history.back())}
+      <button
+        onClick={onBack || (() => window.history.back())}
           className="mr-4 p-2 rounded-full hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary transition-colors duration-150 cursor-pointer"
-          aria-label="Back"
-          type="button"
-        >
+        aria-label="Back"
+        type="button"
+      >
           <svg width="24" height="24" viewBox="0 0 22 22" fill="none"><path d="M14 17l-5-5 5-5" stroke="#6366f1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </button>
+      </button>
         <div className="flex-1 flex flex-col items-center">
           <span className="text-xl md:text-2xl font-extrabold text-primary drop-shadow-sm tracking-tight mb-1">Bids for Job</span>
           <div className="w-16 h-1 bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 rounded-full mb-1" />
           <span className="text-center text-base md:text-lg font-semibold text-secondary-foreground tracking-tight select-all bg-primary/5 px-3 py-1 rounded-lg shadow-sm border border-primary/10">{jobId}</span>
         </div>
-        <button
-          onClick={onBack || (() => window.history.back())}
+      <button
+        onClick={onBack || (() => window.history.back())}
           className="ml-auto p-2 rounded-full hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-destructive hidden md:inline-flex transition-colors duration-150 cursor-pointer"
-          aria-label="Close"
-          type="button"
-        >
+        aria-label="Close"
+        type="button"
+      >
           <svg width="24" height="24" viewBox="0 0 22 22" fill="none"><path d="M6 6l10 10M6 16L16 6" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </button>
+      </button>
       </div>
     </div>
   );

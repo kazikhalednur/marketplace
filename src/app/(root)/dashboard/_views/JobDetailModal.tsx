@@ -301,13 +301,13 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
       >
         {/* Only show close button if not in BidsList view */}
         {!showBids && (
-          <button
-            onClick={onClose}
-            className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
-            aria-label="Close"
-          >
-            <X className="w-6 h-6" />
-          </button>
+        <button
+          onClick={onClose}
+          className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
+          aria-label="Close"
+        >
+          <X className="w-6 h-6" />
+        </button>
         )}
         {showApplyForm ? (
           <ApplyJobForm job={job} onSuccess={() => { setShowApplyForm(false); if (onJobApplied) onJobApplied(); }} onCancel={() => setShowApplyForm(false)} />

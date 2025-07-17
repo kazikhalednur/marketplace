@@ -80,6 +80,9 @@ export default function Navbar() {
             {user?.role === "client" && (
               <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>
             )}
+            {user?.role === "freelancer" && (
+              <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>
+            )}
             {/* {isAuthenticated && (
               <>
                 <Link href="/messages" className={cn("hover:text-primary", isActive("/messages") && "text-primary font-medium")}>Messages</Link>
