@@ -9,31 +9,9 @@ import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { setUser } from "@/features/userSlice";
 import { transformClientFormToPayload } from "@/utils/profile";
 import { getStatusBadge } from "@/utils/statusBadge";
-import { Briefcase, Building2, Calendar, Check, CheckCircle2, ChevronLeft, ChevronRight, DollarSign, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User } from "lucide-react";
+import { Briefcase, Building2, Calendar, Check, CheckCircle2, ChevronLeft, ChevronRight, DollarSign, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-interface User {
-  bio?: string;
-  avatar?: string;
-  name?: string;
-  first_name?: string;
-  last_name?: string;
-  role?: string;
-  about?: string;
-  email?: string;
-  website?: string;
-  linkedin?: string;
-  twitter?: string;
-  company_name?: string;
-  phone?: string;
-  email_verified?: boolean;
-  is_payment_verified?: boolean;
-  is_phone_verified?: boolean;
-  username?: string;
-  is_google_login?: boolean;
-  student_id?: string;
-  projects?: Array<{ name: string; link: string; description: string }>;
-}
+import type { User } from '@/types/user';
 
 export default function ClientProfile({ user, onProfileUpdate }: { user: User; onProfileUpdate?: () => void }) {
   const [editMode, setEditMode] = useState(false);
@@ -248,7 +226,7 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
             {/* Username */}
             {user.username && (
               <div className="flex items-center gap-2 mt-1">
-                <Icon icon={User} size={16} className="text-muted-foreground" />
+                <Icon icon={UserIcon} size={16} className="text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">@{user.username}</span>
               </div>
             )}
@@ -349,7 +327,7 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
           ) : (
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-muted-foreground" />
+                <UserIcon className="w-8 h-8 text-muted-foreground" />
               </div>
               <p className="text-muted-foreground text-base leading-relaxed mb-2">
                 Tell us about yourself
@@ -407,7 +385,7 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
                     
                     {/* Experience Level */}
                     <div className="flex items-center gap-2">
-                      <Icon icon={User} size={14} className="text-primary" />
+                      <Icon icon={UserIcon} size={14} className="text-primary" />
                       <span className="text-muted-foreground">{job.experience_level}</span>
                     </div>
                   </div>
@@ -415,7 +393,7 @@ export default function ClientProfile({ user, onProfileUpdate }: { user: User; o
                   {/* Tags */}
                   {job.tags && job.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {job.tags.slice(0, 3).map((tag, index) => (
+                      {job.tags.slice(0, 3).map((tag: string, index: number) => (
                         <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                           {tag}
                         </span>

@@ -22,6 +22,8 @@ import { useToast } from "@/components/ui/toast-provider";
 import { useCreateJobMutation, useGetDropdownsQuery } from '@/features/api/jobsApi';
 import { Briefcase, DollarSign, TrendingUp } from "lucide-react";
 import { useForm } from "react-hook-form";
+import type { DropdownCategory, DropdownSkill } from '@/types/job';
+import { EXPERIENCE_LEVEL_OPTIONS, STATUS_OPTIONS } from '@/lib/constants';
 
 // Define a type for the form values
 interface JobFormValues {
@@ -38,27 +40,6 @@ interface JobFormValues {
   min_proposal_count: number;
   max_proposal_count: number | string;
   status: string;
-}
-
-// Types for dropdowns
-interface DropdownCategory {
-  id: number;
-  name: string;
-  slug: string;
-  skills?: DropdownSkill[];
-}
-interface DropdownSkill {
-  id: number;
-  name: string;
-  slug: string;
-}
-interface DropdownExperienceLevel {
-  label: string;
-  value: string;
-}
-interface DropdownStatus {
-  label: string;
-  value: string;
 }
 
 export default function JobCreateModal({ open, onClose, onJobPosted }: { open: boolean; onClose: () => void; onJobPosted?: () => void }) {
@@ -84,8 +65,6 @@ export default function JobCreateModal({ open, onClose, onJobPosted }: { open: b
   const { data: dropdowns, isLoading: dropdownsLoading } = useGetDropdownsQuery();
   // Removed jobsData and refetch; handled in parent page
   const CATEGORY_OPTIONS = (dropdowns?.categories as DropdownCategory[] | undefined)?.map((c) => ({ value: c.id, label: c.name, skills: c.skills })) || [];
-  const EXPERIENCE_LEVEL_OPTIONS = (dropdowns?.experience_levels as DropdownExperienceLevel[] | undefined)?.map((e) => ({ value: e.value, label: e.label })) || [];
-  const STATUS_OPTIONS = (dropdowns?.status as DropdownStatus[] | undefined)?.map((s) => ({ value: s.value, label: s.label })) || [];
 
   // Get selected category object
   const selectedCategory = CATEGORY_OPTIONS.find((cat) => String(cat.value) === String(form.watch('category')));

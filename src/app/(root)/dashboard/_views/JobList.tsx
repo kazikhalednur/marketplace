@@ -5,33 +5,7 @@ import { getExperienceBadge } from '@/utils/experienceBadge';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
 import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle, Edit, Trash2 } from 'lucide-react';
-
-export interface JobCreator {
-  full_name: string;
-  is_payment_verified?: boolean | null;
-  date_joined?: string;
-}
-
-export interface JobDetail {
-  id: string;
-  title: string;
-  description: string;
-  tags: string[];
-  category?: string | { name: string; slug: string };
-  skills?: { name: string; slug: string }[];
-  currency?: string;
-  min_budget?: number | string;
-  max_budget?: number | string;
-  is_fixed?: boolean;
-  duration?: string;
-  experience_level?: string;
-  status?: string;
-  min_proposal_count?: number;
-  max_proposal_count?: number;
-  created_by?: JobCreator;
-  created_at?: string;
-  is_applied?: boolean;
-}
+import type { JobDetail } from '@/types/job';
 
 export interface JobListProps {
   jobs: JobDetail[];

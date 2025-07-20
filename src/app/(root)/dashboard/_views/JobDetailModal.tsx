@@ -8,7 +8,7 @@ import { getRelativeTime } from '@/utils/time';
 import { CheckCircle, Clock, Layers, Tag, TrendingUp, User, X, XCircle, Copy, Check, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
-import type { JobDetail } from './JobList';
+import type { JobDetail } from '@/types/job';
 import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";

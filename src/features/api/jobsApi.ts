@@ -1,4 +1,4 @@
-import type { JobDetail } from '@/app/(root)/dashboard/_views/JobList';
+import type { JobDetail } from '@/types/job';
 import { normalizeTag } from '@/utils/tags';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';

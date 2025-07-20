@@ -11,47 +11,7 @@ import { useAppSelector } from "@/hooks/useTypedSelector";
 import { transformFreelancerFormToPayload } from "@/utils/profile";
 import { Check, CheckCircle2, Edit, Github, Globe, Linkedin, Mail, MapPin, Plus, Trash2, Twitter } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-interface Experience {
-  id?: number | null;
-  title: string;
-  company: string;
-  start: string;
-  end: string | null;
-  is_present?: boolean;
-  description: string;
-  type?: string;
-}
-
-interface Education {
-  id?: number | null;
-  school: string;
-  degree: string;
-  start: string;
-  end: string | null;
-  is_present?: boolean;
-}
-
-interface User {
-  avatar?: string;
-  name?: string;
-  first_name?: string;
-  last_name?: string;
-  role?: string;
-  about?: string;
-  bio?: string;
-  location?: string;
-  email?: string;
-  website?: string;
-  linkedin?: string;
-  twitter?: string;
-  github?: string;
-  phone?: string;
-  skills?: string[];
-  education?: Education[];
-  experience?: Experience[];
-  projects?: Array<{ name: string; link: string; description: string }>;
-}
+import type { User, Experience, Education } from '@/types/user';
 
 export default function StudentProfile({ user, onProfileUpdate }: { user: User; onProfileUpdate?: () => void }) {
   const [editMode, setEditMode] = useState(false);
@@ -548,7 +508,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
                           <div className="flex items-start justify-between mb-3">
                             <h3 className="font-bold text-accent text-lg group-hover:text-accent/80 transition-colors">{exp.title}</h3>
                             <span className="text-xs font-semibold text-accent bg-accent/10 px-3 py-1.5 rounded-full border border-accent/20 shadow-sm">
-                              {exp.start} - {exp.is_present ? "Present" : exp.end} <span className="ml-1 text-accent/80">({getDuration(exp.start, exp.end, exp.is_present)})</span>
+                              {exp.start} - {exp.is_present ? "Present" : exp.end} <span className="ml-1 text-accent/80">({getDuration(exp.start || "", exp.end || "", exp.is_present)})</span>
                             </span>
                           </div>
                           <p className="text-sm font-semibold text-foreground mb-3 flex items-center">

@@ -14,7 +14,8 @@ import DashboardFiltersSkeleton from "../dashboard/_views/DashboardFiltersSkelet
 import JobCreateModal from "../dashboard/_views/JobCreateModal";
 import JobDetailModal from "../dashboard/_views/JobDetailModal";
 import JobEditModal from "../dashboard/_views/JobEditModal";
-import JobList, { JobDetail } from "../dashboard/_views/JobList";
+import JobList from "../dashboard/_views/JobList";
+import type { JobDetail } from "@/types/job";
 import JobListSkeleton from "../dashboard/_views/JobListSkeleton";
 import UnauthorizedPage from "@/app/unauthorized/page";
 
