@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from ..models import Category, Job
@@ -41,6 +42,7 @@ class JobSerializer(serializers.ModelSerializer):
             "is_applied",
         ]
 
+    @extend_schema_field(serializers.BooleanField)
     def get_is_applied(self, obj):
         print(self.context)
         user = self.context.get("request").user

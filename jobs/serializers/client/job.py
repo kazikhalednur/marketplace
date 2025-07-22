@@ -34,10 +34,8 @@ class ClientJobSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["category_detail"] = ClientCategorySerializer(
-            instance.category
-        ).data
-        representation["skill_detail"] = ClientSkillSerializer(
+        representation["category"] = ClientCategorySerializer(instance.category).data
+        representation["skill"] = ClientSkillSerializer(
             instance.skills.all(), many=True
         ).data
         return representation
