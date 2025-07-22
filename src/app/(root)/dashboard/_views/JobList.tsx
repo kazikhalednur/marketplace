@@ -5,6 +5,7 @@ import { getExperienceBadge } from '@/utils/experienceBadge';
 import { getStatusBadge } from '@/utils/statusBadge';
 import { getRelativeTime } from '@/utils/time';
 import { Briefcase, CheckCircle, Clock, Layers, Tag, TrendingUp, XCircle, Edit, Trash2 } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import type { JobDetail } from '@/types/job';
 
 export interface JobListProps {
@@ -67,6 +68,19 @@ function JobCard({ job, onClick, showEditButton, onEditJob, onDeleteJob }: {
                   </Button>
                 )}
               </div>
+            )}
+            {/* Applied check icon at the end */}
+            {job.is_applied && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-2 text-blue-600 cursor-pointer">
+                    <CheckCircle className="w-5 h-5" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  You have already applied.
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
           <div className="text-xs text-muted-foreground mb-1">
