@@ -242,20 +242,13 @@ export default function BidsList({ jobId, onBack }: BidsListProps) {
           <div className="w-16 h-1 bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 rounded-full mb-1" />
           <span className="text-center text-base md:text-lg font-semibold text-secondary-foreground tracking-tight select-all bg-primary/5 px-3 py-1 rounded-lg shadow-sm border border-primary/10">{jobId}</span>
         </div>
-      <button
-        onClick={onBack || (() => window.history.back())}
-          className="ml-auto p-2 rounded-full hover:bg-destructive/10 focus:outline-none focus:ring-2 focus:ring-destructive hidden md:inline-flex transition-colors duration-150 cursor-pointer"
-        aria-label="Close"
-        type="button"
-      >
-          <svg width="24" height="24" viewBox="0 0 22 22" fill="none"><path d="M6 6l10 10M6 16L16 6" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      </button>
+        {/* Close icon button removed */}
       </div>
     </div>
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto max-h-[80vh] overflow-y-auto">
       {customHeader}
       <div className="space-y-8">
         {data.results.map((bid) => (
