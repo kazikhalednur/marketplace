@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { Bell, HelpCircle, LogOut, Menu, Settings, User as UserIcon } from "lucide-react";
+import { HelpCircle, LogOut, Menu, Settings, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -95,11 +96,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon" className="p-1.5 relative">
-                  <Icon icon={Bell} size={32} />
-                  {/* Example unread dot */}
-                  <span className="absolute top-0 right-0 block w-2 h-2 rounded-full bg-red-500" />
-                </Button>
+                <NotificationDropdown />
                 <div className="relative">
                   <button
                     ref={profileButtonRef}

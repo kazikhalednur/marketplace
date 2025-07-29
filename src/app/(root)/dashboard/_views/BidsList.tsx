@@ -271,4 +271,4 @@ export default function BidsList({ jobId, onBack }: BidsListProps) {
       )}
     </div>
   );
-} 
+}
