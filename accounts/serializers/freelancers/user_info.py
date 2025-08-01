@@ -20,6 +20,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
     avatar = serializers.URLField(
         source="freelancer_profile.avatar", allow_null=True, required=False
     )
+    notification_id = serializers.CharField(
+        source="websocket.notication_id", read_only=True
+    )
 
     class Meta:
         model = User
@@ -35,6 +38,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "student_id",
             "is_available",
             "avatar",
+            "notification_id",
             "freelancer_sub_profiles",
         ]
 

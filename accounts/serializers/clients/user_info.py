@@ -29,6 +29,9 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     is_phone_verified = serializers.BooleanField(
         source="client_profile.is_phone_verified", read_only=True
     )
+    notification_id = serializers.CharField(
+        source="websocket.notication_id", read_only=True
+    )
 
     class Meta:
         model = User
@@ -48,6 +51,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
             "avatar",
             "is_payment_verified",
             "is_phone_verified",
+            "notification_id",
         ]
 
     def update(self, instance, validated_data):

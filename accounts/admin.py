@@ -15,6 +15,7 @@ from .models import (
     FreelancerSubProfile,
     Project,
     User,
+    WebSocketID,
 )
 
 
@@ -164,3 +165,4 @@ admin.site.register(FreelancerSubProfile)
 admin.site.register(Education)
 admin.site.register(Experience)
 admin.site.register(Project)
+admin.site.register(WebSocketID)

@@ -73,3 +73,15 @@ class User(AbstractUser):
         Generate a token for email verification.
         """
         return email_verify_token.make_token(self)
+
+    def is_freelancer(self):
+        """
+        Check if the user is a freelancer.
+        """
+        return self.role == self.UserRole.FREELANCER
+
+    def is_client(self):
+        """
+        Check if the user is a client.
+        """
+        return self.role == self.UserRole.CLIENT

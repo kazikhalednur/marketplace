@@ -9,6 +9,7 @@ from .profile import (
     Project,
 )
 from .user import Arbitrator, Auditor, Client, Freelancer, User
+from .websocket_id import WebSocketID
 
 __all__ = [
     "User",
@@ -24,4 +25,5 @@ __all__ = [
     "Project",
     "Education",
     "Experience",
+    "WebSocketID",
 ]

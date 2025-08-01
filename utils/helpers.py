@@ -139,6 +139,58 @@ def extract_message_from_schema(schema, components):
     return message_example, cleaned_schema  # Return message and updated schema
 
 
+def unwrap_top_level_array_wrapper(schema, components, wrapper_keys):
+    """
+    Unwrap top-level keys like 'receive', 'send', 'chat_message' by replacing them with their 'items'.  # noqa: E501
+    If a $ref is encountered, resolve it using the components.
+    """
+
+    if not schema or not isinstance(schema, dict):
+        return schema
+
+    # Resolve $ref if present at the top level
+    if "$ref" in schema:
+        ref_path = schema["$ref"].split("/")[-1]
+        schema = components.get(ref_path, {})
+
+    if "type" in schema and schema["type"] != "object":
+        return schema  # Only unwrap object schemas
+
+    if "properties" not in schema:
+        return schema
+
+    properties = schema.get("properties", {})
+    intersecting_keys = wrapper_keys.intersection(properties.keys())
+
+    if not intersecting_keys:
+        return schema  # No wrapper keys to unwrap
+
+    key_to_unwrap = next(iter(intersecting_keys))
+    wrapper = properties[key_to_unwrap]
+
+    # Handle $ref inside wrapper
+    if "$ref" in wrapper:
+        ref_path = wrapper["$ref"].split("/")[-1]
+        wrapper = components.get(ref_path, {})
+
+    if (
+        isinstance(wrapper, dict)
+        and wrapper.get("type") == "array"
+        and "items" in wrapper
+        and isinstance(wrapper["items"], dict)
+    ):
+        item_schema = wrapper["items"]
+
+        # Resolve $ref inside items if any
+        if "$ref" in item_schema:
+            ref_path = item_schema["$ref"].split("/")[-1]
+            item_schema = components.get(ref_path, item_schema)
+
+        return item_schema  # ✅ Return unwrapped array item schema
+
+    return schema  # 🔁 Return original if not matched
+
+
 def custom_schema_postprocessing(result, generator, request, public):
     """
     Modify all API responses to follow the JSONRenderer format dynamically,
@@ -147,6 +199,8 @@ def custom_schema_postprocessing(result, generator, request, public):
     components = result.get("components", {}).get(
         "schemas", {}
     )  # Get all schema definitions
+
+    wrapper_keys = {"receive", "send", "chat_message"}  # ✅ Define here
 
     for path, methods in result["paths"].items():
         for method, details in methods.items():
@@ -158,6 +212,10 @@ def custom_schema_postprocessing(result, generator, request, public):
                     ):
                         schema = response["content"]["application/json"].get(
                             "schema", {}
+                        )
+
+                        schema = unwrap_top_level_array_wrapper(
+                            schema, components, wrapper_keys
                         )
 
                         # 🔥 Extract message and remove it from schema
