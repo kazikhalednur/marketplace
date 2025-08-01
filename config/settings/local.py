@@ -5,24 +5,10 @@ from .base import *
 AUTH_PASSWORD_VALIDATORS = []
 
 
-INSTALLED_APPS = [
-    *INSTALLED_APPS,
-    "drf_spectacular_sidecar",  # required for Django collectstatic discovery
-]
-
-
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-SPECTACULAR_SETTINGS.update(
-    {
-        "SWAGGER_UI_DIST": "SIDECAR",
-        "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
-        "REDOC_DIST": "SIDECAR",
-    }
-)
 
 
 REST_FRAMEWORK.update(
