@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from notifications.serializers import SendNotificationOutputSerializer
+from notifications.serializers import SendNotificationSerializer
 
 from .models import Notification
 
@@ -26,14 +26,19 @@ def send_notification_on_create(sender, instance, created, **kwargs):
     current_page = paginator.page(page)
     notifications = current_page.object_list
 
-    serializer = SendNotificationOutputSerializer(notifications, many=True)
+    serializer = SendNotificationSerializer(notifications, many=True)
 
     message = {
-        "notifications": serializer.data,
-        "total": paginator.count,
-        "page": page,
-        "page_size": page_size,
-        "total_pages": paginator.num_pages,
+        "success": True,
+        "status_code": 200,
+        "message": "Request Successful",
+        "data": {
+            "count": paginator.count,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": paginator.num_pages,
+            "results": serializer.data,
+        },
     }
 
     async_to_sync(channel_layer.group_send)(

@@ -5,7 +5,9 @@ from .views import freelancer as freelancer_views
 
 urlpatterns = [
     path(
-        "proposals/", freelancer_views.ProposalListView.as_view(), name="proposal-list"
+        "proposals/",
+        freelancer_views.ProposalListCreateView.as_view(),
+        name="proposal-list-create",
     ),
     path(
         "proposals/<uuid:id>/",

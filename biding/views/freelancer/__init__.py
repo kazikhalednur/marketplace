@@ -1,7 +1,7 @@
 from .detail import ProposalDetailView
-from .list import ProposalListView
+from .list import ProposalListCreateView
 
 __all__ = [
     "ProposalDetailView",
-    "ProposalListView",
+    "ProposalListCreateView",
 ]

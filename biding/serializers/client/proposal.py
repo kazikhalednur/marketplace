@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from accounts.serializers.freelancers.sub_profile import FreelancerSubProfileSerializer
+from jobs.models import Job
+from notifications.models import Notification
 
 from ...models import Proposal
 from .attachment import ClientAttachmentSerializer
@@ -32,3 +34,29 @@ class ClientProposalSerializer(serializers.ModelSerializer):
             "bid_amount",
             "submitted_at",
         )
+
+    def save(self, **kwargs):
+        if self.instance and self.instance.status == Proposal.BidStatus.ACCEPTED:
+            raise serializers.ValidationError(
+                {"status": "Cannot modify an accepted proposal."}
+            )
+        proposal: Proposal = super().save(**kwargs)
+        if proposal.status == Proposal.BidStatus.ACCEPTED:
+            proposal.job.status = Job.JobStatus.IN_PROGRESS
+            proposal.job.save(update_fields=["status"])
+            Notification.objects.create(
+                user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,
+                message=f"Your proposal for {proposal.job.title} has been accepted.",
+                message_type=Notification.NotificationType.SUCCESS,
+            )
+            closed_proposal = Proposal.objects.filter(job=proposal.job).exclude(
+                id=proposal.id
+            )
+            closed_proposal.update(status=Proposal.BidStatus.CLOSED)
+            for closed in closed_proposal:
+                Notification.objects.create(
+                    user=closed.freelancer_sub_profile.freelancer_profile.freelancer,
+                    message=f"Your proposal for {closed.job.title} has been closed.",
+                    message_type=Notification.NotificationType.INFO,
+                )
+        return proposal

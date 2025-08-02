@@ -9,8 +9,10 @@ from .attachment import AttachmentSerializer
 
 
 class ProposalSerializer(serializers.ModelSerializer):
-    attachments = serializers.ListField(child=serializers.ImageField(), write_only=True)
-    job = serializers.PrimaryKeyRelatedField(queryset=Job.objects.open())
+    attachments = serializers.ListField(
+        child=serializers.ImageField(), write_only=True, required=False
+    )
+    job = serializers.PrimaryKeyRelatedField(queryset=Job.objects.all())
     status = serializers.ChoiceField(
         choices=Proposal.BidStatus.choices,
         default=Proposal.BidStatus.PENDING,
@@ -65,7 +67,15 @@ class ProposalSerializer(serializers.ModelSerializer):
         return f"{frontend_url}/dashboard?jobId={obj.job.id}/"
 
     def validate(self, attrs):
-        if attrs.get("job").is_fixed:
+        if "job" not in attrs:
+            raise serializers.ValidationError({"job": "This field is required."})
+
+        if attrs["job"].status != Job.JobStatus.OPEN:
+            raise serializers.ValidationError(
+                {"job": "The job must be open to submit a proposal."}
+            )
+
+        if attrs["job"].is_fixed:
             attrs["bid_amount"] = attrs["job"].min_budget
 
         if attrs["bid_amount"] < attrs["job"].min_budget:

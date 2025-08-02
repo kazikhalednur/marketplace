@@ -98,8 +98,8 @@ class NotificationConsumer(BaseAuthConsumer):
 
         return {
             "count": total,
-            "results": list(current_page.object_list),
             "page": current_page.number,
             "page_size": page_size,
             "total_pages": paginator.num_pages,
+            "results": list(current_page.object_list),
         }

@@ -18,7 +18,7 @@ class JobPagination(PageNumberPagination):
     get=extend_schema(tags=["Freelancer Proposals"]),
     post=extend_schema(tags=["Freelancer Proposals"]),
 )
-class ProposalListView(ListCreateAPIView):
+class ProposalListCreateView(ListCreateAPIView):
     permission_classes = [IsFreelancer]
     serializer_class = ProposalSerializer
     pagination_class = JobPagination
