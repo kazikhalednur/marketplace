@@ -71,7 +71,7 @@ class AcceptedDomainAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-class UserRoleAdmin(admin.ModelAdmin):
+class UserRoleAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "email", "password")}),
         (

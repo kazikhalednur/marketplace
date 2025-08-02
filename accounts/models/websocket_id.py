@@ -13,5 +13,5 @@ class WebSocketID(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.notication_id:
-            self.notication_id = "".join(str(uuid4()).split("-")).upper()[:10]
+            self.notication_id = "".join(str(uuid4()).split("-")).upper()
         super(WebSocketID, self).save(*args, **kwargs)
