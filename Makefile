@@ -1,3 +1,6 @@
+include .env
+export
+
 # Detect OS
 UNAME_S := $(shell uname -s)
 

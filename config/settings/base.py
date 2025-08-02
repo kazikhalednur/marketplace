@@ -180,6 +180,8 @@ CORS_ALLOW_CREDENTIALS = True
 #     "X-CSRFToken",
 # ]
 
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())
+
 
 from .rest_framework import *
 from .simple_jwt import *
