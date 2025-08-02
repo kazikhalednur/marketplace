@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from accounts.models import ClientProfile, FreelancerSubProfile
+from accounts.models import Client, FreelancerSubProfile
 from jobs.models import Job
 
 from .proposal import Proposal
@@ -21,8 +21,8 @@ class Contract(models.Model):
     freelancer_sub_profile = models.ForeignKey(
         FreelancerSubProfile, related_name="contracts", on_delete=models.CASCADE
     )
-    client_profile = models.ForeignKey(
-        ClientProfile, related_name="contracts", on_delete=models.CASCADE
+    client = models.ForeignKey(
+        Client, related_name="contracts", on_delete=models.CASCADE
     )
     proposal = models.OneToOneField(
         Proposal, related_name="contract", on_delete=models.CASCADE

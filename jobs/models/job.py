@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 from simple_history.models import HistoricalRecords
 
-from accounts.models import User
+from accounts.models import Client
 
 from .category import Category
 from .skills import Skill
@@ -120,7 +120,7 @@ class Job(models.Model):
         help_text="Maximum number of proposals allowed for the job",
     )
     created_by = models.ForeignKey(
-        User,
+        Client,
         on_delete=models.CASCADE,
         related_name="created_jobs",
         help_text="User who created the job",

@@ -4,7 +4,7 @@ from accounts.serializers.freelancers.sub_profile import FreelancerSubProfileSer
 from jobs.models import Job
 from notifications.models import Notification
 
-from ...models import Proposal
+from ...models import Contract, Proposal
 from .attachment import ClientAttachmentSerializer
 
 
@@ -49,6 +49,15 @@ class ClientProposalSerializer(serializers.ModelSerializer):
                 message=f"Your proposal for {proposal.job.title} has been accepted.",
                 message_type=Notification.NotificationType.SUCCESS,
             )
+            # Create a contract
+            Contract.objects.create(
+                freelancer_sub_profile=proposal.freelancer_sub_profile,
+                client=proposal.job.created_by,
+                proposal=proposal,
+                job=proposal.job,
+            )
+
+            # Notify other freelancers
             closed_proposal = Proposal.objects.filter(job=proposal.job).exclude(
                 id=proposal.id
             )
