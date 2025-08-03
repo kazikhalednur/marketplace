@@ -10,6 +10,7 @@ import { getRelativeTime } from '@/utils/time';
 
 interface BidsListProps {
   jobId: string;
+  jobTitle?: string;
   onBack?: () => void;
 }
 
@@ -174,21 +175,21 @@ function BidCard({ bid }: { bid: Bid }) {
 
 function BidsListSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {Array.from({ length: 3 }).map((_, i) => (
-        <Card key={i} className="p-0 overflow-hidden rounded-2xl shadow-lg border border-border/20 bg-white animate-pulse">
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-64 w-full flex flex-col items-center md:items-start gap-3 bg-muted/40 p-6 border-b md:border-b-0 md:border-r border-border/10">
-              <div className="w-14 h-14 rounded-full bg-muted animate-pulse mb-2" />
-              <div className="h-4 w-24 bg-muted rounded mb-1" />
+        <Card key={i} className="mb-8 p-0 overflow-hidden rounded-2xl shadow-xl border border-border/10 bg-white animate-pulse">
+          <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border/20">
+            <div className="md:w-72 w-full flex flex-col items-center md:items-start gap-4 bg-gradient-to-b from-blue-50 to-white p-8">
+              <div className="w-18 h-18 rounded-full bg-muted animate-pulse mb-2" />
+              <div className="h-5 w-24 bg-muted rounded mb-1" />
               <div className="h-3 w-32 bg-muted rounded mb-1" />
               <div className="h-3 w-16 bg-muted rounded" />
             </div>
-            <div className="flex-1 flex flex-col gap-3 p-6">
-              <div className="h-4 w-32 bg-muted rounded mb-2" />
-              <div className="h-3 w-48 bg-muted rounded mb-1" />
-              <div className="h-3 w-40 bg-muted rounded mb-1" />
-              <div className="h-3 w-24 bg-muted rounded" />
+            <div className="flex-1 flex flex-col gap-4 p-8">
+              <div className="h-6 w-32 bg-muted rounded mb-2" />
+              <div className="h-4 w-48 bg-muted rounded mb-1" />
+              <div className="h-4 w-40 bg-muted rounded mb-1" />
+              <div className="h-4 w-24 bg-muted rounded" />
             </div>
           </div>
         </Card>
@@ -212,18 +213,10 @@ function EmptyBidsState() {
   );
 }
 
-export default function BidsList({ jobId, onBack }: BidsListProps) {
+export default function BidsList({ jobId, jobTitle, onBack }: BidsListProps) {
   const [page, setPage] = React.useState(1);
   const pageSize = 10;
   const { data, isLoading, isError } = useGetBidsForJobQuery({ job_id: jobId, page, pageSize });
-
-  // Remove the header definition and all references to it
-
-  if (isLoading) return <BidsListSkeleton />;
-  if (isError) return <div className="p-12 text-center text-destructive text-lg font-semibold">Failed to load bids.</div>;
-  if (!data || data.results.length === 0) return <EmptyBidsState />;
-
-  const totalPages = Math.ceil((data.count || 0) / pageSize);
 
   // Enhanced custom header: visually appealing with gradient, rounded corners, shadow, divider, and improved typography
   const customHeader = (
@@ -240,7 +233,7 @@ export default function BidsList({ jobId, onBack }: BidsListProps) {
         <div className="flex-1 flex flex-col items-center">
           <span className="text-xl md:text-2xl font-extrabold text-primary drop-shadow-sm tracking-tight mb-1">Bids for Job</span>
           <div className="w-16 h-1 bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 rounded-full mb-1" />
-          <span className="text-center text-base md:text-lg font-semibold text-secondary-foreground tracking-tight select-all bg-primary/5 px-3 py-1 rounded-lg shadow-sm border border-primary/10">{jobId}</span>
+          <span className="text-center text-base md:text-lg font-semibold text-secondary-foreground tracking-tight select-all bg-primary/5 px-3 py-1 rounded-lg shadow-sm border border-primary/10">{jobTitle || jobId}</span>
         </div>
         {/* Close icon button removed */}
       </div>
@@ -250,24 +243,37 @@ export default function BidsList({ jobId, onBack }: BidsListProps) {
   return (
     <div className="w-full max-w-4xl mx-auto max-h-[80vh] overflow-y-auto">
       {customHeader}
-      <div className="space-y-8">
-        {data.results.map((bid) => (
-          <BidCard key={bid.id} bid={bid} />
-        ))}
-      </div>
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center mt-12 gap-4">
-          <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1} className="rounded-full px-4">
-            Previous
-          </Button>
-          <span className="text-base text-muted-foreground font-medium">
-            Page {page} of {totalPages}
-          </span>
-          <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages} className="rounded-full px-4">
-            Next
-          </Button>
-        </div>
+      {isLoading ? (
+        <BidsListSkeleton />
+      ) : isError ? (
+        <div className="p-12 text-center text-destructive text-lg font-semibold">Failed to load bids.</div>
+      ) : !data || data.results.length === 0 ? (
+        <EmptyBidsState />
+      ) : (
+        <>
+          <div className="space-y-8">
+            {data.results.map((bid) => (
+              <BidCard key={bid.id} bid={bid} />
+            ))}
+          </div>
+          {/* Pagination */}
+          {(() => {
+            const totalPages = Math.ceil((data.count || 0) / pageSize);
+            return totalPages > 1 ? (
+              <div className="flex items-center justify-center mt-12 gap-4">
+                <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1} className="rounded-full px-4">
+                  Previous
+                </Button>
+                <span className="text-base text-muted-foreground font-medium">
+                  Page {page} of {totalPages}
+                </span>
+                <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages} className="rounded-full px-4">
+                  Next
+                </Button>
+              </div>
+            ) : null;
+          })()}
+        </>
       )}
     </div>
   );

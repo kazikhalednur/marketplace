@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import type { JobDetail } from '@/types/job';
 import type { DropdownCategory, DropdownSkill } from '@/types/job';
-import { EXPERIENCE_LEVEL_OPTIONS, STATUS_OPTIONS } from '@/lib/constants';
+import { EXPERIENCE_LEVEL_OPTIONS, JOB_STATUS_OPTIONS } from '@/lib/constants';
 
 // Define a type for the form values
 interface JobFormValues {
@@ -74,6 +74,8 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
     },
   });
 
+  const CATEGORY_OPTIONS = dropdowns?.categories?.map((c: DropdownCategory) => ({ value: c.id, label: c.name, skills: c.skills })) || [];
+
   // Pre-populate form when job changes
   useEffect(() => {
     if (job && dropdowns) {
@@ -90,11 +92,16 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
         return skillId?.toString() || skill.slug || skill.name;
       }).filter(Boolean) || [];
 
-      form.reset({
+      // Map category to ID
+      const categorySlug = typeof job.category === 'object' ? job.category.slug : job.category;
+      const categoryOption = CATEGORY_OPTIONS.find(cat => cat.label.toLowerCase() === (typeof job.category === 'object' ? job.category.name : job.category)?.toLowerCase());
+      const categoryId = categoryOption?.value?.toString() || categorySlug;
+
+      const formData = {
         title: job.title || "",
         description: job.description || "",
         tags: job.tags || [],
-        category: typeof job.category === 'object' ? job.category.slug || "" : job.category || "",
+        category: categoryId,
         skills: mappedSkills,
         is_fixed: job.is_fixed || false,
         duration: job.duration || "",
@@ -104,10 +111,12 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
         min_proposal_count: job.min_proposal_count || 1,
         max_proposal_count: job.max_proposal_count?.toString() || "",
         status: job.status || "draft",
-      });
+      };
+
+      form.reset(formData);
     }
-  }, [job, form, dropdowns]);
-  const CATEGORY_OPTIONS = dropdowns?.categories?.map((c: DropdownCategory) => ({ value: c.id, label: c.name, skills: c.skills })) || [];
+  }, [job, dropdowns, form, CATEGORY_OPTIONS]);
+
   const selectedCategory = CATEGORY_OPTIONS.find(cat => String(cat.value) === String(form.watch('category')));
   const SKILL_OPTIONS = (selectedCategory?.skills || []).map((s: DropdownSkill) => ({ value: s.id, label: s.name }));
 
@@ -403,7 +412,7 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
                           <FormControl>
                             <SelectField
                               {...field}
-                              options={STATUS_OPTIONS}
+                              options={JOB_STATUS_OPTIONS}
                               placeholder="Select status"
                             />
                           </FormControl>

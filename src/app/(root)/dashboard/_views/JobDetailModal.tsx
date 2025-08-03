@@ -314,7 +314,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
         ) : showBids ? (
           <div className="flex flex-col items-center justify-center p-0 min-h-[300px] w-full">
             <div className="w-full px-8 pb-8">
-              <BidsList jobId={job.id} onBack={() => setShowBids(false)} />
+              <BidsList jobId={job.id} jobTitle={job.title} onBack={() => setShowBids(false)} />
             </div>
           </div>
         ) : (
