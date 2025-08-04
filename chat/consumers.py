@@ -335,7 +335,7 @@ class ChatConsumer(BaseAuthConsumer):
             return
 
         # Security: Validate message types
-        allowed_actions = ["message", "typing", "read_receipt"]
+        allowed_actions = ["message", "typing", "read_message"]
         if message_type not in allowed_actions:
             await self.handle_bad_request("Invalid message type")
             return
@@ -345,7 +345,7 @@ class ChatConsumer(BaseAuthConsumer):
                 await self.handle_message(data)
             elif message_type == "typing":
                 await self.handle_typing(data)
-            elif message_type == "read_receipt":
+            elif message_type == "read_message":
                 await self.handle_read_receipt(data)
 
         except Exception:
@@ -500,7 +500,7 @@ class ChatConsumer(BaseAuthConsumer):
         request=ReadReceiptSerializer,
         responses=MessageListSerializer,
     )
-    async def read_receipt(self, event):
+    async def read_message(self, event):
         """Handle read receipt events - now sends updated message list"""
         await self.send_success_response(
             {
