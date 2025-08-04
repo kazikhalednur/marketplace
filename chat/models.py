@@ -64,6 +64,13 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
+    # Seen timestamps for freelancer and client
+    seen_by_freelancer_at = models.DateTimeField(null=True, blank=True)
+    seen_by_client_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
     def __str__(self):
         return f"Message {str(self.id)} by {self.freelancer_profile or self.client_profile} at {self.timestamp}"  # noqa: E501
 
@@ -72,44 +79,55 @@ class Message(models.Model):
             raise ValueError("Either freelancer_profile or client_profile must be set.")
         super().save(*args, **kwargs)
 
+    def mark_as_seen_by_freelancer(self):
+        """Mark message as seen by freelancer"""
+        from django.utils import timezone
 
-class MessageSeen(models.Model):
-    """
-    Tracks which users have seen which messages.
-    Useful for read receipts in group chats.
-    """
+        self.seen_by_freelancer_at = timezone.now()
+        self.save(update_fields=["seen_by_freelancer_at"])
 
-    message = models.ForeignKey(
-        Message, related_name="seen_by", on_delete=models.CASCADE
-    )
-    freelancer_profile = models.ForeignKey(
-        FreelancerProfile,
-        related_name="message_seen_records",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-    client_profile = models.ForeignKey(
-        ClientProfile,
-        related_name="message_seen_records",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-    seen_at = models.DateTimeField(auto_now_add=True)
+    def mark_as_seen_by_client(self):
+        """Mark message as seen by client"""
+        from django.utils import timezone
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["message", "freelancer_profile", "client_profile"],
-                name="unique_message_seen",
+        self.seen_by_client_at = timezone.now()
+        self.save(update_fields=["seen_by_client_at"])
+
+    def mark_as_read(self, user):
+        """Mark message as read by user (freelancer or client)"""
+
+        # Determine if user is freelancer or client
+        try:
+            FreelancerProfile.objects.get(freelancer=user)
+            self.mark_as_seen_by_freelancer()
+        except FreelancerProfile.DoesNotExist:
+            try:
+                ClientProfile.objects.get(client=user)
+                self.mark_as_seen_by_client()
+            except ClientProfile.DoesNotExist:
+                raise ValueError("User profile not found")
+
+        self.is_read = True
+        self.save(update_fields=["is_read"])
+
+    def get_seen_list(self):
+        """Get list of users who have seen this message with timestamps"""
+        seen_list = []
+
+        if self.seen_by_freelancer_at:
+            seen_list.append(
+                {
+                    "username": self.conversation.contract.freelancer_profile.freelancer.username,  # noqa: E501
+                    "seen_at": self.seen_by_freelancer_at.isoformat(),
+                }
             )
-        ]
 
-    def __str__(self):
-        return f"MessageSeen {str(self.id)} for {self.message} by {self.freelancer_profile or self.client_profile} at {self.seen_at}"  # noqa: E501
+        if self.seen_by_client_at:
+            seen_list.append(
+                {
+                    "username": self.conversation.contract.client_profile.client.username,  # noqa: E501
+                    "seen_at": self.seen_by_client_at.isoformat(),
+                }
+            )
 
-    def save(self, *args, **kwargs):
-        if not self.freelancer_profile and not self.client_profile:
-            raise ValueError("Either freelancer_profile or client_profile must be set.")
-        super().save(*args, **kwargs)
+        return seen_list

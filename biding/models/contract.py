@@ -39,7 +39,7 @@ class Contract(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"Contract for {self.job.title} between {self.client.username} and {self.freelancer_sub_profile.freelancer_profile.freelancer.username}"  # noqa: E501
+        return f"Contract for {self.job.title} between {self.client_profile.client.username} and {self.freelancer_sub_profile.freelancer_profile.freelancer.username}"  # noqa: E501
 
     def save(self, *args, **kwargs):
         if not self.id:
