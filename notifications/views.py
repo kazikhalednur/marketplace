@@ -59,6 +59,7 @@ class NotificationCreateView(CreateAPIView):
 
 
 class MarkNotificationReadView(UpdateAPIView):
+    http_method_names = ["patch"]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
