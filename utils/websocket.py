@@ -84,7 +84,7 @@ class BaseAuthConsumer(AsyncWebsocketConsumer):
             # Resource created
             response = {"success": True, "status": "created"}
             if data:
-                response.update(data)
+                response.update({"data": data})
         elif status_code == 204:
             # No content - send empty message
             await self.send(text_data="")
@@ -93,7 +93,7 @@ class BaseAuthConsumer(AsyncWebsocketConsumer):
             # Default success response
             response = {"success": True, "status_code": status_code}
             if data:
-                response.update(data)
+                response.update({"data": data})
 
         await self.send_json(response)
 
