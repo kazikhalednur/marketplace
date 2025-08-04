@@ -44,9 +44,7 @@ class JobSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.BooleanField)
     def get_is_applied(self, obj):
-        print(self.context)
         user = self.context.get("request").user
-        print(user)
         if user.is_authenticated:
             return obj.proposals.filter(
                 freelancer_sub_profile__freelancer_profile__freelancer__id=user.id
