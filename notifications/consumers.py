@@ -5,7 +5,7 @@ from django.core.paginator import EmptyPage, Paginator
 from drf_spectacular_websocket.decorators import extend_ws_schema
 
 from accounts.models import WebSocketID
-from utils.permissions import AllowAny
+from utils.permissions import IsAuthenticated
 from utils.websocket import BaseAuthConsumer
 
 from .models import Notification
@@ -17,18 +17,16 @@ from .serializers import (
 
 
 class NotificationConsumer(BaseAuthConsumer):
-    permission_classes = [AllowAny]  # Allow initial connection without auth
+    permission_classes = [IsAuthenticated]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.notification_group_name = None
         self.user = None
         self.websocket_id = None
-        self.is_authenticated = False
 
     async def custom_connect(self):
         """Custom connect logic that runs after authentication is successful"""
-        # Don't authenticate immediately - wait for auth message
         self.user = self.scope["user"]
 
         # Get notification_id from URL
@@ -37,138 +35,17 @@ class NotificationConsumer(BaseAuthConsumer):
             await self.handle_bad_request("Notification ID required")
             return
 
-        # Accept connection but don't setup notification yet
-        # Wait for authentication message
-        await self.send_json(
-            {
-                "type": "connection_established",
-                "message": "WebSocket connected. Send authentication message.",
-                "requires_auth": True,
-            }
+        if not await self.setup_notification():
+            await self.handle_bad_request("Notification not found")
+            return
+
+        self.notification_group_name = f"notification_{self.notification_id}"
+
+        await self.channel_layer.group_add(
+            self.notification_group_name, self.channel_name
         )
 
-    async def disconnect(self, close_code):
-        if self.notification_group_name is not None:
-            await self.channel_layer.group_discard(
-                self.notification_group_name, self.channel_name
-            )
-
-    @extend_ws_schema(
-        type="receive",
-        summary="Receive notification actions",
-        description="Handle incoming WebSocket messages for notification actions",
-        request=SendNotificationInputSerializer,
-        responses=SendNotificationOutputSerializer(many=True),
-    )
-    async def receive_notification(self, text_data=None, bytes_data=None):
-        if not text_data:
-            await self.handle_bad_request("No data provided")
-            return
-
-        try:
-            data = json.loads(text_data)
-        except json.JSONDecodeError:
-            await self.handle_bad_request("Invalid JSON format")
-            return
-
-        # Validate required fields
-        if not isinstance(data, dict):
-            await self.handle_bad_request("Invalid message format")
-            return
-
-        message_type = data.get("type")
-        if not message_type:
-            await self.handle_bad_request("Message type is required")
-            return
-
-        # Handle authentication first
-        if message_type == "auth":
-            await self.handle_auth(data)
-            return
-
-        # Check if authenticated for other operations
-        if not self.is_authenticated:
-            await self.handle_unauthorized("Authentication required")
-            return
-
-        # Handle other message types
-        if message_type == "ping":
-            await self.send_success_response({"message": "pong"})
-        elif message_type == "get_notifications":
-            await self.handle_get_notifications(data)
-        else:
-            await self.handle_bad_request("Invalid message type")
-
-    async def handle_auth(self, data):
-        """Handle authentication message"""
-        try:
-            token = data.get("token")
-
-            if not token:
-                await self.handle_bad_request("Token is required")
-                return
-
-            # Remove 'Bearer ' prefix if present
-            if token.startswith("Bearer "):
-                token = token[7:]
-
-            # Validate token and get user
-            user = await self.validate_token(token)
-            if not user:
-                await self.handle_unauthorized("Invalid token")
-                return
-
-            # Update user in scope
-            self.scope["user"] = user
-            self.user = user
-
-            # Setup notification access
-            if not await self.setup_notification():
-                await self.handle_not_found("Notification not found or access denied")
-                return
-
-            # Join notification group
-            self.notification_group_name = f"notification_{self.notification_id}"
-            await self.channel_layer.group_add(
-                self.notification_group_name, self.channel_name
-            )
-            # Mark as authenticated
-            self.is_authenticated = True
-            # Send success response
-            await self.send_success_response(
-                {
-                    "type": "auth_success",
-                    "message": "Authentication successful",
-                }
-            )
-            # Send initial notifications
-            await self.send_paginated_notifications(user, page=1, page_size=10)
-
-        except Exception:
-            await self.handle_server_error("Authentication failed")
-
-    @sync_to_async
-    def validate_token(self, token):
-        """Validate JWT token and return user"""
-        try:
-            from django.contrib.auth import get_user_model
-            from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-            from rest_framework_simplejwt.tokens import AccessToken
-
-            User = get_user_model()
-
-            # Decode token
-            access_token = AccessToken(token)
-            user_id = access_token["user_id"]
-
-            # Get user
-            user = User.objects.get(id=user_id)
-            return user
-
-        except (InvalidToken, TokenError, User.DoesNotExist, KeyError):
-            return None
-        except Exception:
-            return None
+        await self.send_paginated_notifications(self.user, page=1, page_size=10)
 
     async def setup_notification(self):
         """Setup and validate notification access"""
@@ -212,6 +89,56 @@ class NotificationConsumer(BaseAuthConsumer):
         # For example, check if user is admin, or has specific permissions
 
         return False
+
+    async def disconnect(self, close_code):
+        if self.notification_group_name is not None:
+            await self.channel_layer.group_discard(
+                self.notification_group_name, self.channel_name
+            )
+
+    @extend_ws_schema(
+        type="receive",
+        summary="Receive notification actions",
+        description="Handle incoming WebSocket messages for notification actions",
+        request=None,
+        responses=SendNotificationOutputSerializer(many=True),
+    )
+    async def receive_notification(self, text_data=None, bytes_data=None):
+        if not text_data:
+            await self.handle_bad_request("No data provided")
+            return
+
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.handle_bad_request("Invalid JSON format")
+            return
+
+        # Validate required fields
+        if not isinstance(data, dict):
+            await self.handle_bad_request("Invalid message format")
+            return
+
+        action = data.get("action")
+        if not action:
+            await self.handle_bad_request("Action is required")
+            return
+
+        # Security: Validate action types
+        allowed_actions = ["ping", "get_notifications"]
+        if action not in allowed_actions:
+            await self.handle_bad_request("Invalid action")
+            return
+
+        try:
+            if action == "ping":
+                await self.send_success_response({"message": "pong"})
+
+            elif action == "get_notifications":
+                await self.handle_get_notifications(data)
+
+        except Exception:
+            await self.handle_server_error("Internal server error")
 
     async def handle_get_notifications(self, data):
         """Handle get_notifications action with proper validation"""
