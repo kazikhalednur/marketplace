@@ -498,16 +498,14 @@ class ChatConsumer(BaseAuthConsumer):
         summary="Send read receipt",
         description="Send read receipt notification to conversation participants",
         request=ReadReceiptSerializer,
-        responses=ReadReceiptSerializer,
+        responses=MessageListSerializer,
     )
     async def read_receipt(self, event):
-        """Handle read receipt events"""
+        """Handle read receipt events - now sends updated message list"""
         await self.send_success_response(
             {
-                "type": "read_receipt",
-                "message_id": event["message_id"],
-                "read_by_type": event["read_by_type"],
-                "read_by_name": event["read_by_name"],
+                "type": "message",
+                "data": event["data"],
             }
         )
 
