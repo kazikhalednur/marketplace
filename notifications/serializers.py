@@ -9,6 +9,30 @@ class SendNotificationSerializer(serializers.ModelSerializer):
         fields = ["id", "message_type", "message", "is_read", "created_at"]
 
 
+class NotificationCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ["user", "message_type", "message"]
+        extra_kwargs = {
+            "user": {"required": True},
+            "message_type": {"required": True},
+            "message": {"required": True},
+        }
+
+
+class NotificationListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = [
+            "id",
+            "message_type",
+            "message",
+            "is_read",
+            "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
 class SendNotificationOutputSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     page = serializers.IntegerField()
