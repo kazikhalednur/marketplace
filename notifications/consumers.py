@@ -87,7 +87,7 @@ class NotificationConsumer(BaseAuthConsumer):
             ),
         ],
     )
-    async def chat_message_notification(self, event):
+    async def send_notification(self, event):
         await self.send_json(event["message"])
 
     async def send_paginated_notifications(self, user, page, page_size):
@@ -133,4 +133,4 @@ class NotificationConsumer(BaseAuthConsumer):
         }
 
     receive = receive_notification
-    chat_message = chat_message_notification
+    chat_message = send_notification
