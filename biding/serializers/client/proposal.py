@@ -51,8 +51,9 @@ class ClientProposalSerializer(serializers.ModelSerializer):
             )
             # Create a contract
             Contract.objects.create(
+                freelancer_profile=proposal.freelancer_sub_profile.freelancer_profile,
                 freelancer_sub_profile=proposal.freelancer_sub_profile,
-                client=proposal.job.created_by,
+                client_profile=proposal.job.created_by.client_profile,
                 proposal=proposal,
                 job=proposal.job,
             )
