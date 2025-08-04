@@ -2,6 +2,7 @@ import json
 
 from asgiref.sync import sync_to_async
 from django.core.paginator import EmptyPage, Paginator
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes
 from drf_spectacular_websocket.decorators import extend_ws_schema
 
 from utils.permissions import IsAuthenticated
@@ -18,8 +19,12 @@ from .serializers import (
 class NotificationConsumer(BaseAuthConsumer):
     permission_classes = [IsAuthenticated]
 
-    async def connect(self):
-        await super().connect()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.room_group_name = None
+
+    async def custom_connect(self):
+        """Custom connect logic that runs after authentication is successful"""
         user = self.scope["user"]
         self.room_name = await self.get_notification_room_name(user)
         self.room_group_name = f"notification_{self.room_name}"
@@ -29,15 +34,28 @@ class NotificationConsumer(BaseAuthConsumer):
         await self.send_paginated_notifications(user, page=1, page_size=10)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        if self.room_group_name is not None:
+            await self.channel_layer.group_discard(
+                self.room_group_name, self.channel_name
+            )
 
     @extend_ws_schema(
         type="receive",
-        summary="recieve_notification_summary",
+        summary="Receive notification actions",
+        description="Handle incoming WebSocket messages for notification actions",
         request=None,
         responses=SendNotificationOutputSerializer(many=True),
+        parameters=[
+            OpenApiParameter(
+                name="room_name",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description="User's notification room name",
+            ),
+        ],
     )
-    async def receive(self, text_data=None, bytes_data=None):
+    async def receive_notification(self, text_data=None, bytes_data=None):
         if not text_data:
             return
 
@@ -55,11 +73,21 @@ class NotificationConsumer(BaseAuthConsumer):
 
     @extend_ws_schema(
         type="send",
-        summary="send_notification_summary",
+        summary="Send notification",
+        description="Send a notification to the connected user",
         request=SendNotificationInputSerializer,
         responses=SendNotificationOutputSerializer(many=True),
+        parameters=[
+            OpenApiParameter(
+                name="room_name",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description="User's notification room name",
+            ),
+        ],
     )
-    async def chat_message(self, event):
+    async def chat_message_notification(self, event):
         await self.send_json(event["message"])
 
     async def send_paginated_notifications(self, user, page, page_size):
@@ -103,3 +131,6 @@ class NotificationConsumer(BaseAuthConsumer):
             "total_pages": paginator.num_pages,
             "results": list(current_page.object_list),
         }
+
+    receive = receive_notification
+    chat_message = chat_message_notification
