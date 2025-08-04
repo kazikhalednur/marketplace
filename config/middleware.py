@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs
+
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from django.contrib.auth import get_user_model
@@ -34,8 +36,16 @@ class JWTAuthMiddleware(BaseMiddleware):
             try:
                 jwt_auth = JWTAuthentication()
                 validated_token = jwt_auth.get_validated_token(token)
-                scope["user"] = await get_user(validated_token)
             except (InvalidToken, TokenError):
                 pass  # Invalid token: leave user as AnonymousUser
+        else:
+            query_string = scope.get("query_string", b"").decode()
+            query_params = parse_qs(query_string)
+            token = query_params.get("token", [None])[0]
+            jwt_auth = JWTAuthentication()
+            validated_token = jwt_auth.get_validated_token(token)
+
+        if validated_token:
+            scope["user"] = await get_user(validated_token)
 
         return await super().__call__(scope, receive, send)
