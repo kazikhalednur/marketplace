@@ -166,3 +166,6 @@ admin.site.register(Education)
 admin.site.register(Experience)
 admin.site.register(Project)
 admin.site.register(WebSocketID)
+
+admin.site.register(ClientProfile)
+admin.site.register(FreelancerProfile)
