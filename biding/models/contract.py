@@ -30,18 +30,15 @@ class Contract(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="contracts")
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    chat_room_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     status = models.CharField(
         max_length=20, choices=ContractStatus.choices, default=ContractStatus.ACTIVE
     )
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"Contract for {self.job.title} between {self.client_profile.client.username} and {self.freelancer_sub_profile.freelancer_profile.freelancer.username}"  # noqa: E501
+        return f"Contract for {self.job.title} between {self.client.username} and {self.freelancer_sub_profile.freelancer_profile.freelancer.username}"  # noqa: E501
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.id = uuid4()
-        if not self.chat_room_id:
-            self.chat_room_id = "".join(str(uuid4()).split("-")).upper()
         super().save(*args, **kwargs)

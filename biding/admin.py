@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Attachment, Proposal
+from .models import Attachment, Contract, Proposal
 
 
 class AttachmentInline(admin.TabularInline):
@@ -32,3 +32,6 @@ class ProposalAdmin(admin.ModelAdmin):
         if obj:
             return self.readonly_fields + ("freelancer_sub_profile", "job")
         return self.readonly_fields
+
+
+admin.site.register(Contract)
