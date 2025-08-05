@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView
 
 from utils.helpers import Response
 
@@ -23,7 +23,6 @@ from ...serializers.freelancers import UserInfoSerializer
     ),
     get=extend_schema(tags=["freelancer"]),
 )
-
 class UserInfoView(RetrieveUpdateAPIView):
     """User detail Read and Update API"""
 
@@ -36,13 +35,15 @@ class UserInfoView(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         super().update(request, *args, **kwargs)
         return Response(message="Update Successfully")
-    
-# Retrieve user info by username 
+
+
+# Retrieve user info by username
 @extend_schema_view(
     get=extend_schema(
         tags=["freelancer"],
         summary="Retrieve user info by username",
-        description="Provide a username to retrieve the corresponding user's profile information.",
+        description="Provide a username to retrieve the corresponding user's profile "
+        "information.",
     )
 )
 class UserInfoByUsernameView(RetrieveAPIView):
