@@ -22,6 +22,7 @@ from ...serializers.freelancers import UserInfoSerializer
     ),
     get=extend_schema(tags=["freelancer"]),
 )
+# i went to change here 
 class UserInfoView(RetrieveUpdateAPIView):
     """User detail Read and Update API"""
 
