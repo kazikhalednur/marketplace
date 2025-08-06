@@ -125,6 +125,7 @@ export interface UserInfo {
   about?: string;
   is_payment_verified?: boolean;
   is_phone_verified?: boolean;
+  notification_id?: string;
   created_at?: string;
   updated_at?: string;
 }

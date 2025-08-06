@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
-import { Bell, Info, CheckCircle, AlertTriangle, XCircle, Loader2 } from "lucide-react";
+import { Bell, Info, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import { getRelativeTime } from "@/utils/time";
 import { useNotificationContext } from "@/components/NotificationWebSocketProvider";
 import { useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from "@/features/api/notificationsApi";
@@ -38,6 +38,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
 export default function NotificationDropdown() {
   const { notifications, isLoading, refreshNotifications } = useNotificationContext();
   const [open, setOpen] = useState(false);
+  const [hasError, setHasError] = useState(false);
   // Ref to track if this is the first render
   const firstRender = useRef(true);
 
@@ -57,6 +58,13 @@ export default function NotificationDropdown() {
       firstRender.current = false;
     }
   }, [notifications.length]);
+
+  // Reset error state when notifications are loaded successfully
+  useEffect(() => {
+    if (notifications.length > 0 || !isLoading) {
+      setHasError(false);
+    }
+  }, [notifications.length, isLoading]);
 
   const [markNotificationAsRead] = useMarkNotificationAsReadMutation();
   const [markAllNotificationsAsRead, { isLoading: isMarkingAllAsRead }] = useMarkAllNotificationsAsReadMutation();
@@ -81,6 +89,11 @@ export default function NotificationDropdown() {
     }
     // Additional action when clicking on a notification (e.g., navigate to related content)
     alert(`Clicked notification: ${notification.message}`);
+  };
+
+  const handleRetry = () => {
+    setHasError(false);
+    refreshNotifications();
   };
 
   return (
@@ -117,21 +130,41 @@ export default function NotificationDropdown() {
         </div>
         <div className="overflow-y-auto max-h-[400px] min-h-[120px] divide-y divide-border/50 bg-background">
           {(() => {
-            if (isLoading) {
+            if (hasError) {
               return (
-                <div className="p-10 flex flex-col items-center justify-center">
-                  <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-                  <p className="text-sm font-medium text-muted-foreground">Loading notifications...</p>
+                <div className="p-10 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center mb-4">
+                    <XCircle className="w-8 h-8 text-red-500" />
+                  </div>
+                  <p className="text-base font-semibold text-muted-foreground mb-1">Connection Error</p>
+                  <p className="text-sm text-muted-foreground/70 mb-4">Unable to load notifications</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleRetry}
+                    className="text-xs"
+                  >
+                    Try Again
+                  </Button>
                 </div>
               );
             } else if (notifications.length === 0) {
               return (
                 <div className="p-10 flex flex-col items-center justify-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center mb-4">
                     <Bell className="w-8 h-8 text-muted-foreground/60" />
                   </div>
-                  <p className="text-base font-semibold text-muted-foreground mb-1">No notifications yet</p>
-                  <p className="text-sm text-muted-foreground/70">We&apos;ll notify you when something important happens</p>
+                  <p className="text-base font-semibold text-muted-foreground mb-1">All caught up!</p>
+                  <p className="text-sm text-muted-foreground/70 mb-4">No new notifications at the moment</p>
+                  <div className="flex flex-col gap-2 text-xs text-muted-foreground/60">
+                    <p>You&apos;ll see notifications here for:</p>
+                    <ul className="text-left space-y-1">
+                      <li>• Job proposal updates</li>
+                      <li>• Payment confirmations</li>
+                      <li>• Important alerts</li>
+                      <li>• System announcements</li>
+                    </ul>
+                  </div>
                 </div>
               );
             } else {

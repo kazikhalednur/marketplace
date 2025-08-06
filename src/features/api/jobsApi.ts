@@ -175,6 +175,7 @@ export const jobsApi = createApi({
     },
     credentials: 'include' 
   }),
+  tagTypes: ['Jobs', 'MyJobs', 'DashboardJobs', 'JobDetail', 'Bids'],
   endpoints: (builder) => ({
     getJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { 
       page?: number; 
@@ -252,11 +253,13 @@ export const jobsApi = createApi({
           next: null,
           previous: null,
         };
-      }
+      },
+      providesTags: ['Jobs']
     }),
     getDropdowns: builder.query<JobsDropdownsResponse['data'], void>({
       query: () => '/jobs/dropdown/',
       transformResponse: (response: JobsDropdownsResponse) => response.data,
+      providesTags: ['Jobs']
     }),
     createJob: builder.mutation<CreateJobResponse, CreateJobRequest>({
       query: (body) => ({
@@ -265,6 +268,8 @@ export const jobsApi = createApi({
         body,
         credentials: 'include',
       }),
+      // Invalidate all job-related queries after creating a job
+      invalidatesTags: ['Jobs', 'MyJobs', 'DashboardJobs'],
     }),
     updateJob: builder.mutation<CreateJobResponse, UpdateJobRequest>({
       query: ({ id, ...body }) => ({
@@ -273,6 +278,8 @@ export const jobsApi = createApi({
         body,
         credentials: 'include',
       }),
+      // Invalidate all job-related queries after updating a job
+      invalidatesTags: ['Jobs', 'MyJobs', 'DashboardJobs', 'JobDetail'],
     }),
     deleteJob: builder.mutation<CreateJobResponse, { id: string }>({
       query: ({ id }) => ({
@@ -280,6 +287,8 @@ export const jobsApi = createApi({
         method: 'DELETE',
         credentials: 'include',
       }),
+      // Invalidate all job-related queries after deleting a job
+      invalidatesTags: ['Jobs', 'MyJobs', 'DashboardJobs', 'JobDetail'],
     }),
     getMyJobs: builder.query<{ jobs: JobDetail[]; count: number; next: string | null; previous: string | null }, { 
       page?: number; 
@@ -358,9 +367,11 @@ export const jobsApi = createApi({
           previous: null,
         };
       },
+      providesTags: ['MyJobs']
     }),
     getAcceptedDomains: builder.query<AcceptedDomainResponse, void>({
       query: () => '/accounts/accepted-domain/',
+      providesTags: ['Jobs']
     }),
     applyToJob: builder.mutation<unknown, FormData>({
       query: (formData) => ({
@@ -369,17 +380,22 @@ export const jobsApi = createApi({
         body: formData,
         // Do NOT set headers: { 'Content-Type': ... }
       }),
+      invalidatesTags: ['Jobs', 'Bids']
     }),
 
     // Get bids for a job (client role)
-    getBidsForJob: builder.query<PaginatedBidsResponse['data'], { job_id: string; page?: number; pageSize?: number }>({
-      query: ({ job_id, page = 1, pageSize = 10 }) => {
+    getBidsForJob: builder.query<PaginatedBidsResponse['data'], { job_id: string; page?: number; pageSize?: number; status?: string }>({
+      query: ({ job_id, page = 1, pageSize = 10, status }) => {
         const params = new URLSearchParams();
         params.append('page', page.toString());
         params.append('page_size', pageSize.toString());
+        if (status && status !== 'all') {
+          params.append('status', status);
+        }
         return `/biding/client/proposals/${job_id}/?${params.toString()}`;
       },
       transformResponse: (response: PaginatedBidsResponse) => response.data,
+      providesTags: ['Bids']
     }),
 
     // Update proposal status (client role)
@@ -397,6 +413,7 @@ export const jobsApi = createApi({
         method: 'PATCH',
         body: { status },
       }),
+      invalidatesTags: ['Bids']
     }),
 
     getMyBids: builder.query<PaginatedBidsResponse['data'], { page?: number; pageSize?: number }>({
@@ -407,6 +424,7 @@ export const jobsApi = createApi({
         return `/biding/proposals/?${params.toString()}`;
       },
       transformResponse: (response: PaginatedBidsResponse) => response.data,
+      providesTags: ['Bids']
     }),
   }),
 });

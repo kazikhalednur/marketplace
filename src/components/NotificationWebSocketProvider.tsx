@@ -29,7 +29,7 @@ export default function NotificationWebSocketProvider({
 }) {
   const user = useAppSelector((state) => state.user);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Changed to false initially
   const wsRef = useRef<NotificationWebSocket | null>(null);
   const isMountedRef = useRef(true);
   const previousNotificationCount = useRef(0);
@@ -53,8 +53,8 @@ export default function NotificationWebSocketProvider({
       wsRef.current = new NotificationWebSocket(user.notification_id, (newNotifications) => {
         logNotification('Provider received notifications (refresh):', newNotifications);
         if (isMountedRef.current) {
-          setNotifications(newNotifications);
           setIsLoading(false);
+          setNotifications(newNotifications || []);
         }
       });
     } else {
@@ -68,12 +68,9 @@ export default function NotificationWebSocketProvider({
     logWebSocket('User:', user);
     logWebSocket('Notification ID:', user?.notification_id);
     
-    // Reset loading state when notification_id changes
-    setIsLoading(true);
-    
+    // Don't set loading state initially - show empty state immediately
     if (!user?.notification_id) {
       logWebSocket('No notification_id available, skipping WebSocket connection');
-      setIsLoading(false);
       return;
     }
 
@@ -92,49 +89,43 @@ export default function NotificationWebSocketProvider({
         logNotification('Provider received notifications:', newNotifications);
         
         if (isMountedRef.current) {
-          // Always set loading to false immediately when we receive any response
+          // Set loading to false when we receive any response
           setIsLoading(false);
           
           setNotifications((prev) => {
-            // Merge new notifications, avoid duplicates by id
-            const ids = new Set(prev.map((n) => n.id));
-            const mergedNotifications = [...newNotifications.filter((n) => !ids.has(n.id)), ...prev];
-            logNotification('Merged notifications:', mergedNotifications);
-            
-            // Play sound if we have new notifications
-            if (mergedNotifications.length > previousNotificationCount.current) {
-              logNotification('Playing notification sound');
-              // playNotificationSound(); // Commented out for future implementation
+            // If we received notifications, merge them
+            if (newNotifications && newNotifications.length > 0) {
+              // Merge new notifications, avoid duplicates by id
+              const ids = new Set(prev.map((n) => n.id));
+              const mergedNotifications = [...newNotifications.filter((n) => !ids.has(n.id)), ...prev];
+              logNotification('Merged notifications:', mergedNotifications);
+              
+              // Play sound if we have new notifications
+              if (mergedNotifications.length > previousNotificationCount.current) {
+                logNotification('Playing notification sound');
+                // playNotificationSound(); // Commented out for future implementation
+              }
+              
+              previousNotificationCount.current = mergedNotifications.length;
+              return mergedNotifications;
+            } else {
+              // If we received empty notifications, keep existing ones but ensure loading is false
+              logNotification('Received empty notifications, keeping existing ones');
+              return prev;
             }
-            
-            previousNotificationCount.current = mergedNotifications.length;
-            return mergedNotifications;
           });
         }
       },
       () => {
         // Connection established callback
         if (isMountedRef.current) {
-          // If we haven't received any notifications yet, set loading to false after connection
-          setTimeout(() => {
-            if (isMountedRef.current && isLoading) {
-              setIsLoading(false);
-            }
-          }, 2000); // Wait 2 seconds after connection to see if we get notifications
+          // Don't set loading state on connection - let it show empty state immediately
         }
       }
     );
 
-    // Set a timeout to ensure loading state is updated even if no messages are received
-    const loadingTimeout = setTimeout(() => {
-      if (isMountedRef.current && isLoading) {
-        setIsLoading(false);
-      }
-    }, 5000); // 5 second timeout
-
     // Cleanup function
     return () => {
-      clearTimeout(loadingTimeout);
       logWebSocket('Cleaning up WebSocket connection on unmount/change');
       isMountedRef.current = false;
       // Add a small delay to allow the WebSocket to establish connection
@@ -145,7 +136,7 @@ export default function NotificationWebSocketProvider({
         }
       }, 100);
     };
-  }, [user?.notification_id, isLoading, user]); // Include all dependencies
+  }, [user?.notification_id, user]); // Removed isLoading from dependencies
 
   const value: NotificationContextType = {
     notifications,

@@ -7,6 +7,8 @@ import { useGetBidsForJobQuery, Bid, useUpdateProposalStatusMutation } from '@/f
 import * as React from 'react';
 import { useToast } from '@/components/ui/toast-provider';
 import { getRelativeTime } from '@/utils/time';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { STATUS_OPTIONS } from '@/lib/constants';
 
 interface BidsListProps {
   jobId: string;
@@ -14,17 +16,15 @@ interface BidsListProps {
   onBack?: () => void;
 }
 
-const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pending', color: 'bg-gray-200 text-gray-700' },
-  { value: 'reviewed', label: 'Reviewed', color: 'bg-blue-100 text-blue-700' },
-  { value: 'accepted', label: 'Accepted', color: 'bg-green-100 text-green-700' },
-  { value: 'closed', label: 'Closed', color: 'bg-gray-400 text-white' },
-  { value: 'rejected', label: 'Rejected', color: 'bg-red-100 text-red-700' },
-];
-
 function getStatusStyle(status: string) {
-  const found = STATUS_OPTIONS.find(opt => opt.value === status);
-  return found ? found.color : 'bg-gray-200 text-gray-700';
+  const statusColors = {
+    'pending': 'bg-gray-200 text-gray-700',
+    'reviewed': 'bg-blue-100 text-blue-700',
+    'accepted': 'bg-green-100 text-green-700',
+    'closed': 'bg-gray-400 text-white',
+    'rejected': 'bg-red-100 text-red-700',
+  };
+  return statusColors[status as keyof typeof statusColors] || 'bg-gray-200 text-gray-700';
 }
 
 function BidCard({ bid }: { bid: Bid }) {
@@ -198,7 +198,24 @@ function BidsListSkeleton() {
   );
 }
 
-function EmptyBidsState() {
+function EmptyBidsState({ activeTab }: { activeTab: string }) {
+  const getEmptyMessage = () => {
+    if (activeTab === 'all') {
+      return {
+        title: "No Bids Yet",
+        message: "No freelancers have applied to this job yet."
+      };
+    }
+    
+    const statusLabel = STATUS_OPTIONS.find(opt => opt.value === activeTab)?.label || activeTab;
+    return {
+      title: `No ${statusLabel} Bids`,
+      message: `No bids with ${statusLabel.toLowerCase()} status found.`
+    };
+  };
+  
+  const { title, message } = getEmptyMessage();
+  
   return (
     <div className="flex flex-col items-center justify-center py-16">
       <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mb-4">
@@ -207,16 +224,55 @@ function EmptyBidsState() {
         <path d="M24 44v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4" stroke="#a1a1aa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
         <circle cx="32" cy="32" r="4" fill="#a1a1aa" />
       </svg>
-      <div className="text-xl font-semibold text-muted-foreground mb-2">No Bids Yet</div>
-      <div className="text-sm text-muted-foreground">No freelancers have applied to this job yet.</div>
+      <div className="text-xl font-semibold text-muted-foreground mb-2">{title}</div>
+      <div className="text-sm text-muted-foreground">{message}</div>
     </div>
   );
 }
 
 export default function BidsList({ jobId, jobTitle, onBack }: BidsListProps) {
   const [page, setPage] = React.useState(1);
+  const [activeTab, setActiveTab] = React.useState('all');
   const pageSize = 10;
-  const { data, isLoading, isError } = useGetBidsForJobQuery({ job_id: jobId, page, pageSize });
+  
+  // Reset page when tab changes
+  React.useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
+  
+  // Get all bids (we'll filter client-side for better control)
+  const { data, isLoading, isError, isFetching } = useGetBidsForJobQuery({ 
+    job_id: jobId, 
+    page: 1, 
+    pageSize: 1000, // Get all bids at once
+    status: undefined // Always get all bids, filter client-side
+  }, {
+    // Skip the query if we don't have a valid jobId
+    skip: !jobId,
+  });
+  
+  // Calculate counts for each status
+  const getStatusCount = (status: string) => {
+    if (!data?.results) return 0;
+    if (status === 'all') return data.results.length;
+    return data.results.filter(bid => bid.status.toLowerCase() === status.toLowerCase()).length;
+  };
+  
+  // Filter bids based on active tab
+  const getFilteredBids = () => {
+    if (!data?.results) return [];
+    if (activeTab === 'all') return data.results;
+    return data.results.filter(bid => bid.status.toLowerCase() === activeTab.toLowerCase());
+  };
+  
+  const allFilteredBids = getFilteredBids();
+  
+  // Paginate the filtered bids
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const filteredBids = allFilteredBids.slice(startIndex, endIndex);
+  
+
 
   // Enhanced custom header: visually appealing with gradient, rounded corners, shadow, divider, and improved typography
   const customHeader = (
@@ -235,7 +291,6 @@ export default function BidsList({ jobId, jobTitle, onBack }: BidsListProps) {
           <div className="w-16 h-1 bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30 rounded-full mb-1" />
           <span className="text-center text-base md:text-lg font-semibold text-secondary-foreground tracking-tight select-all bg-primary/5 px-3 py-1 rounded-lg shadow-sm border border-primary/10">{jobTitle || jobId}</span>
         </div>
-        {/* Close icon button removed */}
       </div>
     </div>
   );
@@ -243,29 +298,57 @@ export default function BidsList({ jobId, jobTitle, onBack }: BidsListProps) {
   return (
     <div className="w-full max-w-4xl mx-auto max-h-[80vh] overflow-y-auto">
       {customHeader}
-      {isLoading ? (
+      
+      {/* Tabs */}
+      <div className="mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="all" className="text-sm font-medium">
+              All
+              <span className="ml-1 text-xs bg-muted-foreground/20 text-muted-foreground px-1.5 py-0.5 rounded-full">
+                {getStatusCount('all')}
+              </span>
+            </TabsTrigger>
+            {STATUS_OPTIONS.map((option) => (
+              <TabsTrigger key={option.value} value={option.value} className="text-sm font-medium">
+                {option.label}
+                <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${
+                  activeTab === option.value 
+                    ? 'bg-primary/20 text-primary' 
+                    : 'bg-muted-foreground/20 text-muted-foreground'
+                }`}>
+                  {getStatusCount(option.value)}
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {isLoading || isFetching ? (
         <BidsListSkeleton />
       ) : isError ? (
         <div className="p-12 text-center text-destructive text-lg font-semibold">Failed to load bids.</div>
-      ) : !data || data.results.length === 0 ? (
-        <EmptyBidsState />
+      ) : !data || allFilteredBids.length === 0 ? (
+        <EmptyBidsState activeTab={activeTab} />
       ) : (
         <>
           <div className="space-y-8">
-            {data.results.map((bid) => (
+            {filteredBids.map((bid) => (
               <BidCard key={bid.id} bid={bid} />
             ))}
           </div>
-          {/* Pagination */}
+          {/* Pagination - Only show if we have more than pageSize bids */}
           {(() => {
-            const totalPages = Math.ceil((data.count || 0) / pageSize);
+            const totalFilteredBids = allFilteredBids.length;
+            const totalPages = Math.ceil(totalFilteredBids / pageSize);
             return totalPages > 1 ? (
               <div className="flex items-center justify-center mt-12 gap-4">
                 <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1} className="rounded-full px-4">
                   Previous
                 </Button>
                 <span className="text-base text-muted-foreground font-medium">
-                  Page {page} of {totalPages}
+                  Page {page} of {totalPages} ({filteredBids.length} of {totalFilteredBids} bids)
                 </span>
                 <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages} className="rounded-full px-4">
                   Next

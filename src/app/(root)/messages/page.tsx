@@ -25,15 +25,14 @@ interface EnhancedConversation extends Conversation {
 }
 
 export default function MessagesPage() {
-  const { conversations, isLoading } = useConversations();
+  const { conversations, isLoading, error } = useConversations();
   const user = useAppSelector((state) => state.user);
-  const { fetchMessages, messages: currentChatMessages, setOnMessageSent, connectToRoom } = useChatContext();
+  const { messages: currentChatMessages, setOnMessageSent, connectToRoom } = useChatContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [selectedConversationData, setSelectedConversationData] = useState<EnhancedConversation | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [conversationMessages, setConversationMessages] = useState<Map<string, ChatMessage[]>>(new Map());
-  const [loadingMessages, setLoadingMessages] = useState<Set<string>>(new Set());
   
   const selectedConversationRef = useRef<string | null>(null);
   
@@ -45,58 +44,30 @@ export default function MessagesPage() {
     selectedConversationRef.current = selectedConversation;
   }, [selectedConversation]);
 
-  // Load messages for all conversations
+  // Load messages for all conversations (now just initialize empty arrays)
   const loadConversationMessages = useCallback(async (conversationId: string) => {
     if (!user?.username || !conversations.length) return [];
 
-    const newConversationMessages: ChatMessage[] = [];
-    const newLoadingMessages = new Set<string>();
-
-    try {
-      console.log(`📥 Fetching messages for conversation: ${conversationId}`);
-      const messages = await fetchMessages(conversationId);
-      console.log(`✅ Successfully fetched ${messages.length} messages for conversation: ${conversationId}`);
-      
-      newConversationMessages.push(...messages);
-      setConversationMessages(prev => {
-        const updated = new Map(prev);
-        updated.set(conversationId, messages);
-        console.log(`📋 Updated conversation messages Map for ${conversationId}:`, messages.length, 'messages');
-        return updated;
-      });
-      
-      // Force conversation list update after loading messages
-      setConversationUpdateTrigger(prev => {
-        console.log(`🔄 Triggering conversation list update after loading messages (${prev + 1}) for conversation: ${conversationId}`);
-        return prev + 1;
-      });
-      
-    } catch (error) {
-      console.error(`❌ Failed to fetch messages for conversation ${conversationId}:`, error);
-      
-      // Handle specific error types
-      if (error instanceof Error) {
-        if (error.message.includes('timeout')) {
-          console.warn(`⏰ Timeout fetching messages for conversation ${conversationId}, will retry later`);
-          // Could implement retry logic here
-        } else if (error.message.includes('not connected')) {
-          console.warn(`🔌 WebSocket not connected for conversation ${conversationId}, will retry when connection is available`);
-          // Could implement connection retry logic here
-        }
-      }
-      
-      // Set empty array for failed conversations to avoid repeated attempts
-      setConversationMessages(prev => {
-        const updated = new Map(prev);
-        updated.set(conversationId, []);
-        return updated;
-      });
-    } finally {
-      newLoadingMessages.delete(conversationId);
-      setLoadingMessages(new Set(newLoadingMessages));
-    }
-    return newConversationMessages;
-  }, [user?.username, conversations.length, fetchMessages]);
+    console.log(`📥 Initializing messages for conversation: ${conversationId}`);
+    
+    // Initialize with empty array since server doesn't support fetching historical messages
+    const messages: ChatMessage[] = [];
+    
+    setConversationMessages(prev => {
+      const updated = new Map(prev);
+      updated.set(conversationId, messages);
+      console.log(`📋 Updated conversation messages Map for ${conversationId}:`, messages.length, 'messages');
+      return updated;
+    });
+    
+    // Force conversation list update after initializing messages
+    setConversationUpdateTrigger(prev => {
+      console.log(`🔄 Triggering conversation list update after initializing messages (${prev + 1}) for conversation: ${conversationId}`);
+      return prev + 1;
+    });
+    
+    return messages;
+  }, [user?.username, conversations.length]);
 
   // Set current user when component mounts
   useEffect(() => {
@@ -333,6 +304,42 @@ export default function MessagesPage() {
     }
   }, [conversationUpdateTrigger, conversationMessages.size]);
 
+  // Debug logging for conversations
+  console.log('🔍 MessagesPage Debug:', {
+    user: user?.username,
+    isLoading,
+    error,
+    conversationsCount: conversations?.length || 0,
+    conversations: conversations,
+    hasUser: !!user,
+    userNotificationId: user?.notification_id
+  });
+
+  // Show loading state only if we have a user and the API call is still loading
+  const shouldShowLoading = isLoading && user?.username;
+
+  // Show error state if there's an error
+  if (error) {
+    console.error('❌ Conversations API error:', error);
+  }
+
+  // If no user, show a simple message
+  if (!user?.username) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Please log in to view messages
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Helper function to format username to full name
   const formatUsernameToFullName = (username: string) => {
     if (!username) return 'Unknown User';
@@ -442,6 +449,12 @@ export default function MessagesPage() {
     
     if (!user?.username) return [];
     
+    // If conversations is undefined or null, return empty array
+    if (!conversations) {
+      console.log('📋 No conversations data available');
+      return [];
+    }
+    
     // Get all conversations where user is involved
     const allUserConversations = conversations.filter(conversation => 
       conversation.freelancer_name === user.username || 
@@ -545,20 +558,36 @@ export default function MessagesPage() {
   );
 
   const handleConversationClick = (conversationId: string, conversationData: EnhancedConversation) => {
+    console.log(`💬 Opening conversation: ${conversationId} (${conversationData.conversation_id})`);
+    
     setSelectedConversation(conversationId);
     setSelectedConversationData(conversationData);
     setIsChatOpen(true);
+    
+    // Connect to the specific conversation's WebSocket room
+    if (conversationData.conversation_id) {
+      console.log(`🔌 Connecting to conversation WebSocket room: ${conversationData.conversation_id}`);
+      connectToRoom(conversationData.conversation_id);
+    }
   };
 
   const handleCloseChat = () => {
+    console.log('❌ Closing chat modal');
     setIsChatOpen(false);
     setSelectedConversation(null);
     setSelectedConversationData(null);
+    
+    // Reconnect to global room when closing chat
+    if (user?.username) {
+      const globalRoomName = `global_${user.username}`;
+      console.log(`🔌 Reconnecting to global room: ${globalRoomName}`);
+      connectToRoom(globalRoomName);
+    }
   };
 
   const totalUnreadCount = uniqueProfiles.reduce((total, profile) => total + (profile.unread_count || 0), 0);
 
-  if (isLoading) {
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -667,7 +696,7 @@ export default function MessagesPage() {
                 const otherPartyName = profile.display_name || getOtherPartyName(profile);
                 const lastMessageTime = profile.last_message_timestamp || profile.created_at;
                 const lastMessage = profile.last_message ? formatLastMessage(profile.last_message, profile.is_last_message_from_user) : null;
-                const isLoading = loadingMessages.has(profile.conversation_id);
+                const isLoading = false; // Removed loadingMessages.has(profile.conversation_id)
 
                 return (
                   <Card 

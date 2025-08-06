@@ -148,7 +148,7 @@ export default function MyJobsPage() {
       await deleteJob({ id: jobToDelete.id }).unwrap();
       showToast({ type: 'success', message: 'Job deleted successfully' });
       handleCloseDeleteModal();
-      refetch();
+      // Cache invalidation will automatically refetch the data
     } catch (err) {
       console.log(err);
       showToast({ type: 'error', message: 'Failed to delete job' });
@@ -164,8 +164,7 @@ export default function MyJobsPage() {
   const handleFiltersChange = () => {
     // Reset to first page when filters change
     setCurrentPage(1);
-    // Refetch jobs with new filters
-    refetch();
+    // Cache invalidation will automatically refetch the data
   };
 
   return (

@@ -17,7 +17,6 @@ interface ChatContextType {
   markMessageAsSeen: (messageId: number, conversationId: string) => void;
   connectToRoom: (roomName: string) => void;
   disconnect: () => void;
-  fetchMessages: (conversationId: string) => Promise<ChatMessage[]>;
   onMessageSent?: (message: ChatMessage) => void;
   setOnMessageSent: (callback: ((message: ChatMessage) => void) | undefined) => void;
 }
@@ -120,7 +119,7 @@ export default function ChatWebSocketProvider({
         }
       }
     );
-  }, [user?.username, onMessageSent]);
+  }, [onMessageSent]);
 
   // Create a global WebSocket connection for all conversations
   const createGlobalWebSocketConnection = useCallback(() => {
@@ -217,49 +216,6 @@ export default function ChatWebSocketProvider({
     currentRoomRef.current = null;
   }, []);
 
-  const fetchMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
-    // Create a temporary WebSocket connection to fetch messages
-    const tempWs = new ChatWebSocket(
-      conversationId,
-      () => {
-        // This will be called when messages are received
-      },
-      () => {
-        // Typing callback - not needed for fetching
-      },
-      () => {
-        // Connection callback - not needed for fetching
-      }
-    );
-
-    try {
-      // Wait for connection to be established
-      await new Promise<void>((resolve, reject) => {
-        const checkConnection = () => {
-          if (tempWs.getConnectionStatus() === 'connected') {
-            resolve();
-          } else if (tempWs.getConnectionStatus() === 'disconnected') {
-            reject(new Error('Failed to connect'));
-          } else {
-            setTimeout(checkConnection, 100);
-          }
-        };
-        checkConnection();
-      });
-
-      // Fetch messages
-      const messages = await tempWs.fetchMessages();
-      
-      // Disconnect the temporary connection
-      tempWs.disconnect();
-      
-      return messages;
-    } catch (error) {
-      tempWs.disconnect();
-      throw error;
-    }
-  }, []);
-
   useEffect(() => {
     logChat('ChatWebSocketProvider mounted');
     
@@ -284,7 +240,6 @@ export default function ChatWebSocketProvider({
     markMessageAsSeen,
     connectToRoom,
     disconnect,
-    fetchMessages,
     onMessageSent,
     setOnMessageSent,
   };

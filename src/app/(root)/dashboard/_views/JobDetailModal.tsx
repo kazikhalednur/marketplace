@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useApplyToJobMutation } from '@/features/api/jobsApi';
 import BidsList from './BidsList';
 
+
 // Utility for file validation
 const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "zip", "rar", "txt"];
 const EXECUTABLE_EXTENSIONS = ["exe", "bat", "sh", "msi", "apk", "com", "scr", "pif", "gadget", "jar"];
@@ -245,6 +246,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
   const { isAuthenticated, user } = useAuth();
   const [showApplyForm, setShowApplyForm] = React.useState(false);
   const [showBids, setShowBids] = React.useState(false);
+
   // Remove local applied state, use job.is_applied
 
   // Reset copied state when modal opens/closes
@@ -299,8 +301,6 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
         ref={modalRef}
         className="relative w-full max-w-3xl md:max-w-4xl p-0 rounded-2xl shadow-2xl bg-background focus:outline-none py-4"
       >
-        {/* Only show close button if not in BidsList view */}
-        {!showBids && (
         <button
           onClick={onClose}
           className="absolute right-6 top-6 text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-full z-10 cursor-pointer"
@@ -308,7 +308,6 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
         >
           <X className="w-6 h-6" />
         </button>
-        )}
         {showApplyForm ? (
           <ApplyJobForm job={job} onSuccess={() => { setShowApplyForm(false); if (onJobApplied) onJobApplied(); }} onCancel={() => setShowApplyForm(false)} />
         ) : showBids ? (

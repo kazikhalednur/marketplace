@@ -29,7 +29,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
 
   // Fetch jobs from API with pagination and filters
-  const { data: jobsData, isLoading, isError, refetch } = useGetJobsQuery({ 
+  const { data: jobsData, isLoading, isError } = useGetJobsQuery({ 
     page: currentPage, 
     pageSize,
     status,
@@ -96,20 +96,19 @@ function DashboardContent() {
   const handleFiltersChange = () => {
     // Reset to first page when filters change
     setCurrentPage(1);
-    // Refetch jobs with new filters
-    refetch();
+    // Cache invalidation will automatically refetch the data
   };
 
   const handleJobApplied = () => {
-    refetch();
-    // After refetch, update selectedJob to the latest job object
+    // Cache invalidation will automatically refetch the data
+    // After cache invalidation, update selectedJob to the latest job object
     setTimeout(() => {
       const jobId = searchParams.get('jobId');
       if (jobId && jobs.length > 0) {
         const job = jobs.find(j => j.id === jobId);
         if (job) setSelectedJob(job);
       }
-    }, 300); // Wait a bit for refetch
+    }, 300); // Wait a bit for cache invalidation
   };
 
   return (

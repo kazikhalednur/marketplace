@@ -124,6 +124,20 @@ export class ChatWebSocket {
         try {
           const raw = JSON.parse(event.data);
           logChat('Raw chat WebSocket message received:', raw);
+          logChat('Message structure analysis:', {
+            hasSuccess: !!raw?.success,
+            hasData: !!raw?.data,
+            dataType: typeof raw?.data,
+            dataKeys: raw?.data ? Object.keys(raw.data) : [],
+            nestedDataKeys: raw?.data?.data ? Object.keys(raw.data.data) : [],
+            isNotificationData: !!(raw?.data?.data?.results && Array.isArray(raw.data.data.results))
+          });
+
+          // Check if this is notification data (which we should ignore for chat)
+          if (raw && raw.success && raw.data && raw.data.data && Array.isArray(raw.data.data.results)) {
+            logChat('Received notification data through chat WebSocket, ignoring for chat functionality');
+            return;
+          }
 
           if (raw && raw.success && raw.data) {
             if (raw.data.type === 'conversation_info') {
@@ -143,7 +157,11 @@ export class ChatWebSocket {
               const message = raw.data.data;
               logChat('Single message received:', message);
               this.onMessages([message]);
+            } else {
+              logChat('Unknown message type received:', raw.data);
             }
+          } else {
+            logChat('Message does not match expected chat format:', raw);
           }
         } catch (err) {
           logError('Failed to parse chat message', err);
@@ -209,6 +227,8 @@ export class ChatWebSocket {
       };
       this.ws.send(JSON.stringify(messageData));
       logChat('Message sent:', messageData);
+      logChat('WebSocket state when sending:', this.ws.readyState);
+      logChat('Room name:', this.roomName);
       
       // Return a promise to track message status
       return new Promise<boolean>((resolve) => {
@@ -223,6 +243,8 @@ export class ChatWebSocket {
       });
     } else {
       logWebSocket('Cannot send message: WebSocket not connected');
+      logWebSocket('WebSocket state:', this.ws?.readyState);
+      logWebSocket('Room name:', this.roomName);
       return Promise.resolve(false);
     }
   }
@@ -309,93 +331,10 @@ export class ChatWebSocket {
   }
 
   // Method to fetch all messages for a conversation
+  // Note: The server doesn't support fetching historical messages via WebSocket
+  // This method returns an empty array as a fallback
   public async fetchMessages(): Promise<ChatMessage[]> {
-    return new Promise((resolve, reject) => {
-      // Check if WebSocket is connected
-      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-        logWebSocket('WebSocket not connected, attempting to connect first...');
-        
-        // Try to connect if not connected
-        if (!this.isConnecting && this.connectionAttempts < this.maxReconnectAttempts) {
-          this.connect();
-          
-          // Wait for connection to be established
-          const checkConnection = () => {
-            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-              // Connection established, proceed with fetch
-              this.performFetchMessages(resolve, reject);
-            } else if (this.connectionAttempts >= this.maxReconnectAttempts) {
-              reject(new Error('Failed to establish WebSocket connection'));
-            } else {
-              // Wait a bit more and check again
-              setTimeout(checkConnection, 1000);
-            }
-          };
-          
-          setTimeout(checkConnection, 1000);
-        } else {
-          reject(new Error('WebSocket not connected and cannot establish connection'));
-        }
-        return;
-      }
-
-      // WebSocket is connected, proceed with fetch
-      this.performFetchMessages(resolve, reject);
-    });
-  }
-
-  private performFetchMessages(resolve: (messages: ChatMessage[]) => void, reject: (error: Error) => void) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      reject(new Error('WebSocket not connected'));
-      return;
-    }
-
-    // Set up a one-time message handler for the fetch response
-    const originalOnMessage = this.ws.onmessage;
-    const timeout = setTimeout(() => {
-      this.ws!.onmessage = originalOnMessage;
-      logWebSocket('Fetch messages timeout - no response from server');
-      reject(new Error('Fetch messages timeout - server did not respond'));
-    }, 15000); // Increased timeout to 15 seconds
-
-    this.ws.onmessage = (event) => {
-      try {
-        const raw = JSON.parse(event.data);
-        logChat('Fetch messages response:', raw);
-
-        if (raw && raw.success && raw.data) {
-          if (raw.data.type === 'message' && Array.isArray(raw.data.data)) {
-            clearTimeout(timeout);
-            this.ws!.onmessage = originalOnMessage;
-            logChat('Fetch messages successful:', raw.data.data);
-            resolve(raw.data.data);
-          } else if (raw.data.type === 'error') {
-            clearTimeout(timeout);
-            this.ws!.onmessage = originalOnMessage;
-            logWebSocket('Fetch messages error from server:', raw.data);
-            reject(new Error(raw.data.message || 'Server error during fetch'));
-          }
-        } else if (raw && !raw.success) {
-          clearTimeout(timeout);
-          this.ws!.onmessage = originalOnMessage;
-          logWebSocket('Fetch messages failed:', raw);
-          reject(new Error(raw.message || 'Fetch messages failed'));
-        }
-      } catch (err) {
-        clearTimeout(timeout);
-        this.ws!.onmessage = originalOnMessage;
-        logError('Failed to parse fetch messages response', err);
-        reject(new Error('Invalid response from server'));
-      }
-    };
-
-    // Send fetch request
-    const fetchRequest = {
-      type: 'fetch_messages',
-      conversation_id: this.roomName
-    };
-
-    logWebSocket('Sending fetch messages request:', fetchRequest);
-    this.ws.send(JSON.stringify(fetchRequest));
+    logWebSocket('Fetch messages not supported by server, returning empty array');
+    return [];
   }
 } 

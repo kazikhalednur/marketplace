@@ -30,6 +30,8 @@ export class NotificationWebSocket {
   private onNotifications: NotificationCallback;
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private onConnected?: () => void;
+  private connectionAttempts = 0;
+  private maxConnectionAttempts = 3;
 
   constructor(notificationId: string, onNotifications: NotificationCallback, onConnected?: () => void) {
     this.notificationId = notificationId;
@@ -57,6 +59,15 @@ export class NotificationWebSocket {
       this.onNotifications([]);
       return;
     }
+
+    // Check if we've exceeded max connection attempts
+    if (this.connectionAttempts >= this.maxConnectionAttempts) {
+      logWebSocket('Max connection attempts reached, stopping reconnection');
+      this.onNotifications([]);
+      return;
+    }
+    
+    this.connectionAttempts++;
     
     // Connect without token in URL - send it as a message after connection
     const url = `wss://cpchub.diu.edu.bd:8443/ws/notification/${this.notificationId}/?token=${token}`;
@@ -65,12 +76,14 @@ export class NotificationWebSocket {
     logWebSocket('Notification ID:', this.notificationId);
     logWebSocket('WebSocket URL:', url);
     logWebSocket('Token available:', !!token);
+    logWebSocket('Connection attempt:', this.connectionAttempts);
     
     try {
       this.ws = new WebSocket(url);
 
       this.ws.onopen = () => {
         logWebSocket('WebSocket connected successfully:', url);
+        this.connectionAttempts = 0; // Reset connection attempts on successful connection
         this.onConnected?.();
       };
 

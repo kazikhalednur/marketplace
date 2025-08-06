@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface MessageAvatarProps {
   username: string;
@@ -10,71 +11,86 @@ interface MessageAvatarProps {
   className?: string;
 }
 
-export default function MessageAvatar({ username, profilePicture, size = 'md', className = '' }: MessageAvatarProps) {
+export default function MessageAvatar({ 
+  username, 
+  profilePicture, 
+  size = 'md',
+  className 
+}: MessageAvatarProps) {
   // Helper to get user initials
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-    return name.trim().split(' ').map((n: string) => n[0]).join('').toUpperCase();
-  };
+  function getUserInitials() {
+    const name = username.replace(/[_-]/g, ' ').trim();
+    if (name && name.length > 0) {
+      return name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+    }
+    return null;
+  }
 
   // Helper to determine if avatar is real
-  const hasRealAvatar = (avatarUrl?: string) => {
+  function hasRealAvatar() {
+    if (!profilePicture) return false;
+    const avatarUrl = profilePicture.trim();
     if (!avatarUrl) return false;
-    const url = avatarUrl.trim();
-    if (!url) return false;
     
     // Check if it's a placeholder
     const placeholderList = ["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"];
     const isPlaceholder = placeholderList.some(placeholder => 
-      url.toLowerCase().includes(placeholder.toLowerCase())
+      avatarUrl.toLowerCase().includes(placeholder.toLowerCase())
     );
     
     // Check if it's a valid URL
-    const isValidUrl = url.startsWith('http://') || 
-                      url.startsWith('https://') || 
-                      url.startsWith('/') ||
-                      url.startsWith('data:') ||
-                      url.includes('.jpg') ||
-                      url.includes('.jpeg') ||
-                      url.includes('.png') ||
-                      url.includes('.gif') ||
-                      url.includes('.webp') ||
-                      url.includes('blob:') ||
-                      url.includes('gravatar') ||
-                      url.includes('cloudinary') ||
-                      url.includes('amazonaws') ||
-                      url.includes('googleusercontent');
+    const isValidUrl = avatarUrl.startsWith('http://') || 
+                      avatarUrl.startsWith('https://') || 
+                      avatarUrl.startsWith('/') ||
+                      avatarUrl.startsWith('data:') ||
+                      avatarUrl.includes('.jpg') ||
+                      avatarUrl.includes('.jpeg') ||
+                      avatarUrl.includes('.png') ||
+                      avatarUrl.includes('.gif') ||
+                      avatarUrl.includes('.webp') ||
+                      avatarUrl.includes('blob:') ||
+                      avatarUrl.includes('gravatar') ||
+                      avatarUrl.includes('cloudinary') ||
+                      avatarUrl.includes('amazonaws') ||
+                      avatarUrl.includes('googleusercontent');
     
     return !isPlaceholder && isValidUrl;
+  }
+
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'sm':
+        return 'w-6 h-6 text-xs';
+      case 'lg':
+        return 'w-10 h-10 text-lg';
+      default:
+        return 'w-8 h-8 text-sm';
+    }
   };
 
-  const sizeClasses = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base'
-  };
+  if (hasRealAvatar() && profilePicture) {
+    return (
+      <Image
+        src={profilePicture}
+        alt={`${username}'s avatar`}
+        width={size === 'sm' ? 24 : size === 'lg' ? 40 : 32}
+        height={size === 'sm' ? 24 : size === 'lg' ? 40 : 32}
+        className={cn(
+          'rounded-full object-cover border border-border',
+          getSizeClasses(),
+          className
+        )}
+      />
+    );
+  }
 
   return (
-    <div className={`flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 ${sizeClasses[size]} ${className}`}>
-      {hasRealAvatar(profilePicture) && profilePicture ? (
-        <Image 
-          src={profilePicture} 
-          alt={username || 'User'}
-          fill
-          className="object-cover"
-          onError={() => {
-            // Fallback to initials if image fails to load
-            const fallback = document.querySelector(`[data-avatar-fallback="${username}"]`) as HTMLElement;
-            if (fallback) fallback.style.display = 'flex';
-          }}
-        />
-      ) : null}
-      <span 
-        data-avatar-fallback={username}
-        className={`font-bold text-white ${hasRealAvatar(profilePicture) && profilePicture ? 'hidden' : 'flex'}`}
-      >
-        {getUserInitials(username || 'User')}
-      </span>
+    <div className={cn(
+      'rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium border border-border',
+      getSizeClasses(),
+      className
+    )}>
+      {getUserInitials() || username.charAt(0).toUpperCase()}
     </div>
   );
 } 

@@ -153,6 +153,7 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
       showToast({ type: 'success', message: 'Job updated successfully' });
       onClose();
       if (onJobUpdated) onJobUpdated();
+      // Cache invalidation will automatically refetch the data
     } catch (err) {
       console.log(err);
       showToast({ type: 'error', message: 'Failed to update job' });

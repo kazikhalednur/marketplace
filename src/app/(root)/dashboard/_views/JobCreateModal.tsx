@@ -117,7 +117,7 @@ export default function JobCreateModal({ open, onClose, onJobPosted }: { open: b
       });
       onClose();
       if (onJobPosted) onJobPosted();
-      // refetch(); // This line was removed as per the edit hint
+      // Cache invalidation will automatically refetch the data
     } catch (err) {
       console.log(err);
       showToast({ type: 'error', message: 'Failed to post job' });
