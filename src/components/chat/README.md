@@ -1,258 +1,103 @@
-# Chat System - Modern Messaging Implementation
+# Chat Components
 
-## Overview
+This directory contains all the chat-related components for the application.
 
-This chat system has been completely refactored to follow modern messaging app conventions and best practices. The implementation provides a robust, scalable, and user-friendly messaging experience similar to popular platforms like WhatsApp, Telegram, and Facebook Messenger.
+## Components
 
-## 🎯 Key Improvements
+### ChatInterface
+The main chat interface component that handles message display, input, and real-time communication.
 
-### 1. **Reusable Components Architecture**
-- **MessageAvatar**: Consistent avatar display across all chat components
-- **MessageStatus**: Unified message delivery status (Sent/Delivered/Seen)
-- **MessageTime**: Standardized time formatting and date grouping
-- **MessageSender**: Consistent sender name display
-- **TypingIndicator**: Enhanced typing indicator with avatar support
+**Key Features:**
+- Real-time message display
+- Typing indicators
+- Message grouping by sender and time (1-minute intervals)
+- Auto-scroll to bottom
+- Message read status
 
-### 2. **Modern Design Patterns**
-- **Component Composition**: Small, focused components that compose well
-- **Consistent Styling**: Unified design language across all chat elements
-- **Responsive Design**: Mobile-first approach with adaptive layouts
-- **Accessibility**: Proper ARIA labels and keyboard navigation
+**Message Layout:**
+Messages are displayed with the following layout:
+- **Profile Picture**: Shown at the last message of each group (both own and other messages)
+- **Full Name**: Shown at the first message of each group ("You" for own messages, full name for others)
+- **Time**: Shown at the last message of each group below the message text
+- **Message Status**: Shown at the last message of own message groups
 
-### 3. **Performance Optimizations**
-- **Reduced Re-renders**: Optimized component structure
-- **Efficient State Management**: Minimal state updates
-- **Memory Management**: Proper cleanup and ref management
-- **Lazy Loading**: Components load only when needed
+**Grouping Logic:**
+Messages are grouped based on two criteria:
+1. **Same Sender**: Messages must be from the same sender
+2. **Time Difference**: Messages must be sent within 1 minute of each other
 
-## 📁 Component Structure
+If either condition is not met, a new group is created.
 
-```
-src/components/chat/
-├── MessageAvatar.tsx      # Reusable avatar component
-├── MessageBubble.tsx      # Main message display component
-├── MessageSender.tsx      # Sender name display
-├── MessageStatus.tsx      # Message delivery status
-├── MessageTime.tsx        # Time and date formatting
-├── TypingIndicator.tsx    # Typing indicator with avatar
-├── ChatInterface.tsx      # Main chat interface
-├── ChatModal.tsx          # Modal wrapper for chat
-└── README.md             # This documentation
-```
+**Recent Updates:**
+Updated message grouping to implement 1-minute time difference logic:
+1. Profile pictures appear at the last message of each group
+2. Full names (or "You" for own messages) appear at the first message of each group
+3. Time appears at the last message of each group below the message text
+4. Messages are only grouped if they are from the same sender AND within 1 minute of each other
 
-## 🎨 Design Features
+### MessageBubble
+Individual message bubble component that displays a single message.
 
-### Message Bubbles
-- **Own Messages**: Blue gradient with rounded bottom-right corner
-- **Other Messages**: White/dark background with rounded bottom-left corner
-- **Hover Effects**: Subtle shadow transitions
-- **Status Indicators**: Sent/Delivered/Seen with appropriate icons
+**Props:**
+- `message`: The message object
+- `isOwnMessage`: Whether the message is from the current user
+- `profilePicture`: Profile picture URL
+- `isFirstInGroup`: Whether this is the first message in a group
+- `isLastInGroup`: Whether this is the last message in a group
 
-### Typography & Spacing
-- **Consistent Spacing**: 8px (mb-1) between messages for compact feel
-- **Readable Font Sizes**: 14px for message text, 12px for metadata
-- **Proper Hierarchy**: Clear visual distinction between elements
+**Layout Features:**
+- **Own Messages**: Right-aligned with blue gradient background
+- **Other Messages**: Left-aligned with white/dark background
+- **Profile Pictures**: Shown at the last message of each group
+- **Names and Time**: Shown at the first message of each group
+- **Message Status**: Shown at the last message of own message groups
 
-### Avatar System
-- **Fallback Support**: Graceful fallback to initials when images fail
-- **Multiple Sizes**: sm (32px), md (40px), lg (48px)
-- **Real Avatar Detection**: Smart detection of placeholder vs real images
-- **Error Handling**: Automatic fallback on image load failure
+### MessageAvatar
+Avatar component for chat messages.
 
-## 🔧 Technical Features
+### TypingIndicator
+Shows when another user is typing.
 
-### Message Status System
-```typescript
-// Only shows status for sender's last message in conversation
-const shouldShowStatus = (messageIndex: number) => {
-  const isLastMessageInConversation = messageIndex === messages.length - 1;
-  const isOwnMessage = message.sender_name === currentUser;
-  return isLastMessageInConversation && isOwnMessage;
-};
-```
+### SendMessageButton
+Button component for sending messages.
 
-### Date Grouping
-```typescript
-// Groups messages by date, shows date label only once per group
-const shouldShowDate = (messageIndex: number) => {
-  const currentDate = formatDate(messages[messageIndex].timestamp);
-  const nextDate = formatDate(messages[messageIndex + 1]?.timestamp);
-  return currentDate !== nextDate;
-};
-```
+## Usage
 
-### Real-time Features
-- **Typing Indicators**: Real-time typing status with avatar
-- **Message Status**: Live updates for sent/delivered/seen
-- **Auto-scroll**: Smooth scrolling to latest messages
-- **Connection Status**: Clear connection state indication
-
-## 🚀 Best Practices Implemented
-
-### 1. **Component Reusability**
-- Single responsibility principle
-- Props-based configuration
-- Consistent interfaces
-
-### 2. **Performance**
-- Memoized callbacks
-- Efficient re-renders
-- Proper cleanup
-
-### 3. **Accessibility**
-- Semantic HTML structure
-- Keyboard navigation support
-- Screen reader compatibility
-
-### 4. **Error Handling**
-- Graceful fallbacks
-- Network error recovery
-- User-friendly error messages
-
-## 📱 Responsive Design
-
-### Mobile-First Approach
-- **Touch-friendly**: Large touch targets
-- **Readable**: Appropriate font sizes
-- **Efficient**: Optimized for mobile performance
-
-### Adaptive Layouts
-- **Flexible Widths**: Messages adapt to screen size
-- **Responsive Avatars**: Scale appropriately
-- **Mobile Typing**: Optimized input experience
-
-## 🎯 Modern Messaging Conventions
-
-### 1. **Message Grouping**
-- Messages from same sender are visually grouped
-- Status shown only on last message in group
-- Date separators for different days
-
-### 2. **Visual Hierarchy**
-- Clear distinction between own and other messages
-- Consistent avatar placement
-- Proper spacing and alignment
-
-### 3. **Interactive Elements**
-- Hover effects on message bubbles
-- Smooth transitions and animations
-- Clear visual feedback
-
-### 4. **Status Indicators**
-- Real-time delivery status
-- Typing indicators with avatar
-- Connection status display
-
-## 🔄 State Management
-
-### Context Usage
-```typescript
-const { 
-  messages, 
-  isConnected, 
-  sendMessage, 
-  connectToRoom 
-} = useChatContext();
-```
-
-### Local State
-- Input message state
-- Typing indicator state
-- Connection status
-
-## 🛠️ Usage Examples
-
-### Basic Message Display
 ```tsx
-<MessageBubble
-  message={message}
-  isOwnMessage={isOwnMessage(message)}
-  isLastMessageFromSender={shouldShowStatus(index)}
-  profilePicture={profilePicture}
-  shouldShowDate={shouldShowDate(index)}
+import ChatInterface from '@/components/chat/ChatInterface';
+
+<ChatInterface 
+  roomName="conversation-123"
+  title="John Doe"
+  profilePicture="https://example.com/avatar.jpg"
 />
 ```
 
-### Avatar Component
-```tsx
-<MessageAvatar
-  username={username}
-  profilePicture={profilePicture}
-  size="md"
-  className="custom-class"
-/>
-```
+## Message Grouping
 
-### Status Component
-```tsx
-<MessageStatus
-  isOwnMessage={isOwnMessage}
-  isLastMessageFromSender={isLastMessage}
-  isRead={message.is_read}
-  hasSeen={hasSeen}
-/>
-```
+The chat interface automatically groups messages by sender and time. Messages are only grouped together if they meet both criteria:
+1. **Same Sender**: Messages must be from the same sender
+2. **Time Difference**: Messages must be sent within 1 minute of each other
 
-## 🎨 Customization
+**Grouping Logic:**
+1. Messages are grouped by sender (consecutive messages from the same sender)
+2. Messages are only grouped if the time difference is less than 1 minute
+3. Profile pictures appear at the last message of each group
+4. Names appear at the first message of each group
+5. Time appears at the last message of each group below the message text
+6. Message status appears at the last message of own message groups
 
-### Theme Support
-- Dark/light mode compatibility
-- Consistent color scheme
-- Accessible contrast ratios
+**Display Format:**
+- **First Message**: Shows sender name
+- **Middle Messages**: Show only message content
+- **Last Message**: Shows profile picture, time below message text, and message status (for own messages)
 
-### Styling Options
-- Custom className support
-- Size variants for avatars
-- Flexible layout options
+**Example Scenarios:**
+- **Same sender, 30 seconds apart**: Grouped together
+- **Same sender, 2 minutes apart**: Separate groups
+- **Different senders**: Always separate groups
+- **Same sender, 45 seconds apart**: Grouped together
 
-## 📊 Performance Metrics
+## WebSocket Integration
 
-### Optimizations
-- **Bundle Size**: Reduced through component splitting
-- **Render Performance**: Optimized re-render cycles
-- **Memory Usage**: Proper cleanup and ref management
-- **Network**: Efficient WebSocket usage
-
-### Monitoring
-- Connection status tracking
-- Message delivery confirmation
-- Error rate monitoring
-
-## 🔮 Future Enhancements
-
-### Planned Features
-- **Message Reactions**: Emoji reactions support
-- **File Attachments**: Image and document sharing
-- **Voice Messages**: Audio message support
-- **Message Search**: Full-text search capability
-- **Message Threading**: Reply to specific messages
-
-### Technical Improvements
-- **Offline Support**: Message queuing when offline
-- **Message Encryption**: End-to-end encryption
-- **Push Notifications**: Real-time notifications
-- **Message Backup**: Cloud message synchronization
-
-## 🐛 Troubleshooting
-
-### Common Issues
-1. **Avatar not loading**: Check image URL and fallback logic
-2. **Status not updating**: Verify WebSocket connection
-3. **Typing indicator stuck**: Check typing timeout logic
-4. **Messages not sending**: Verify connection status
-
-### Debug Tools
-- Browser console logging
-- Network tab monitoring
-- React DevTools inspection
-
-## 📚 Additional Resources
-
-- [React Best Practices](https://react.dev/learn)
-- [WebSocket Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- [Modern CSS Techniques](https://developer.mozilla.org/en-US/docs/Web/CSS)
-
----
-
-This chat system represents a modern, scalable approach to real-time messaging that follows industry best practices and provides an excellent user experience. 
+The chat components integrate with WebSocket connections for real-time messaging. The `ChatWebSocketProvider` manages the WebSocket connections and provides the chat context to all chat components. 

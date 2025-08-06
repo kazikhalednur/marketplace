@@ -6,12 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Send, Loader2, Paperclip, Smile } from 'lucide-react';
 import { useChatContext } from '@/components/ChatWebSocketProvider';
 import { useAppSelector } from '@/hooks/useTypedSelector';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+// import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { ChatMessage } from '@/services/chatWebSocket';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
-import { UserOnlineStatus } from '@/components/ui/OnlineStatus';
+// import { UserOnlineStatus } from '@/components/ui/OnlineStatus';
 import MessageAvatar from './MessageAvatar';
+import { isSameMinute } from '@/utils/time';
 
 interface ChatInterfaceProps {
   roomName: string;
@@ -32,7 +33,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
   } = useChatContext();
   
   const user = useAppSelector((state) => state.user);
-  const { getUserStatus } = useNetworkStatus();
+  // const { getUserStatus } = useNetworkStatus();
   const [inputMessage, setInputMessage] = useState('');
   const [isTypingLocal, setIsTypingLocal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -123,7 +124,13 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
     if (!currentMessage?.sender_name || !previousMessage?.sender_name) return true;
     
     // If previous message is from different sender, this is first in group
-    return currentMessage.sender_name !== previousMessage.sender_name;
+    if (currentMessage.sender_name !== previousMessage.sender_name) return true;
+    
+    // If time difference is more than 1 minute, this is first in group
+    if (!isSameMinute(currentMessage.timestamp, previousMessage.timestamp)) return true;
+    
+    // Same sender and within 1 minute, so not first in group
+    return false;
   };
 
   // Function to determine if a message is last in its group
@@ -137,118 +144,14 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
     if (!currentMessage?.sender_name || !nextMessage?.sender_name) return true;
     
     // If next message is from different sender, this is last in group
-    return currentMessage.sender_name !== nextMessage.sender_name;
+    if (currentMessage.sender_name !== nextMessage.sender_name) return true;
+    
+    // If time difference is more than 1 minute, this is last in group
+    if (!isSameMinute(currentMessage.timestamp, nextMessage.timestamp)) return true;
+    
+    // Same sender and within 1 minute, so not last in group
+    return false;
   };
-
-  // Function to determine if a message should show date separator
-  const shouldShowDateSeparator = (messageIndex: number) => {
-    if (messageIndex === 0) return true;
-
-    const currentMessage = messages[messageIndex];
-    const previousMessage = messages[messageIndex - 1];
-
-    const formatDate = (timestamp: string) => {
-      const date = new Date(timestamp);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      if (date.toDateString() === today.toDateString()) {
-        return 'Today';
-      } else if (date.toDateString() === yesterday.toDateString()) {
-        return 'Yesterday';
-      } else {
-        return date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        });
-      }
-    };
-    
-    const currentDate = formatDate(currentMessage.timestamp);
-    const previousDate = formatDate(previousMessage.timestamp);
-    
-    // Show separator if date changed
-    return currentDate !== previousDate;
-  };
-
-  // Function to determine if a message should show date
-  const shouldShowDate = (messageIndex: number) => {
-    if (messageIndex === 0) return true;
-
-    const currentMessage = messages[messageIndex];
-
-    const formatDate = (timestamp: string) => {
-      const date = new Date(timestamp);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      if (date.toDateString() === today.toDateString()) {
-        return 'Today';
-      } else if (date.toDateString() === yesterday.toDateString()) {
-        return 'Yesterday';
-      } else {
-        return date.toLocaleDateString();
-      }
-    };
-    
-    const currentDate = formatDate(currentMessage.timestamp);
-    
-    // Look ahead to find the next message with the same date
-    const nextMessageIndex = messageIndex + 1;
-    for (let i = nextMessageIndex; i < messages.length; i++) {
-      const nextMessage = messages[i];
-      const nextDate = formatDate(nextMessage.timestamp);
-      if (nextDate === currentDate) {
-        // If the next message has the same date, this is not the last in the group
-        return false;
-      }
-      // If we find a message with different date, break
-      break;
-    }
-    
-    // This is the last message in a group with the same date
-    return true;
-  };
-
-  // Helper function to format date for separator
-  const getFormattedDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-    }
-  };
-
-  // Date Separator Component
-  const DateSeparator = ({ date }: { date: string }) => (
-    <div className="flex items-center justify-center my-4">
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
-        <div className="px-4 py-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-            {date}
-          </span>
-        </div>
-        <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
-      </div>
-    </div>
-  );
 
   // Mark messages as read when they come into view
   const markMessagesAsRead = useCallback(() => {
@@ -270,7 +173,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
   return (
     <div className="w-full h-full max-h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="pb-4 pt-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 shadow-sm">
+      <div className="pb-4 pt-4 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
         <div className="flex items-center px-4 md:px-6">
           <div className="flex items-center gap-4">
             <MessageAvatar 
@@ -282,6 +185,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
             <div className="flex flex-col">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight">{title}</h2>
               <div className="flex items-center gap-3 mt-1">
+                {/* Online/Offline Status - Commented out
                 <UserOnlineStatus
                   username={title}
                   isOnline={getUserStatus(title)?.isOnline || false}
@@ -289,6 +193,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
                   size="sm"
                   showText={true}
                 />
+                */}
                 {isTyping && typingUser && typingUser !== user?.username && (
                   <div className="flex items-center gap-2">
                     <div className="flex space-x-1">
@@ -338,11 +243,6 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
           
           {messages.map((message, index) => (
             <Fragment key={`${message.id}-${index}`}>
-              {/* Date Separator */}
-              {shouldShowDateSeparator(index) && (
-                <DateSeparator date={getFormattedDate(message.timestamp)} />
-              )}
-              
               {/* Message Bubble */}
               <MessageBubble
                 message={message}
@@ -350,7 +250,6 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
                 isFirstInGroup={isFirstInGroup(index)}
                 isLastInGroup={isLastInGroup(index)}
                 profilePicture={profilePicture}
-                shouldShowDate={shouldShowDate(index)}
               />
             </Fragment>
           ))}
@@ -376,7 +275,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
                 onKeyPress={handleKeyPress}
                 placeholder="Write your message here..."
                 disabled={!isConnected}
-                className="pr-20 py-3 text-sm border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors rounded-xl bg-white dark:bg-gray-800 shadow-sm"
+                className="pr-20 py-4 text-sm border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors rounded-xl bg-white dark:bg-gray-800 shadow-sm h-12"
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
                 <Button
@@ -417,4 +316,4 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
       </div>
     </div>
   );
-} 
+}

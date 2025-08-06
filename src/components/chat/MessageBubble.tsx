@@ -6,14 +6,12 @@ import { useAppSelector } from '@/hooks/useTypedSelector';
 import MessageAvatar from './MessageAvatar';
 import MessageStatus from './MessageStatus';
 import MessageTime from './MessageTime';
-import MessageSender from './MessageSender';
 
 interface MessageBubbleProps {
   message: ChatMessage;
   isOwnMessage: boolean;
   profilePicture?: string;
   isLastMessageFromSender?: boolean;
-  shouldShowDate?: boolean;
   isFirstInGroup?: boolean;
   isLastInGroup?: boolean;
 }
@@ -23,7 +21,6 @@ export default function MessageBubble({
   isOwnMessage, 
   profilePicture, 
   isLastMessageFromSender, 
-  shouldShowDate,
   isFirstInGroup = false,
   isLastInGroup = false
 }: MessageBubbleProps) {
@@ -32,6 +29,19 @@ export default function MessageBubble({
   // Check if current user has seen the message
   const currentUsername = user?.username;
   const hasSeen = message.seen_list?.some(seen => seen.username === currentUsername);
+
+  // Helper function to get display name
+  const getDisplayName = (senderName: string) => {
+    if (isOwnMessage) {
+      return "You";
+    }
+    // Convert username to full name format
+    return senderName
+      .replace(/[_-]/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
 
   return (
     <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-1`}>
@@ -46,18 +56,35 @@ export default function MessageBubble({
         </div>
       )}
 
+      {/* Avatar for own messages (right side) - only show on last message of group */}
+      {isOwnMessage && isLastInGroup && (
+        <div className="flex-shrink-0 ml-3 self-end order-3">
+          <MessageAvatar 
+            username={user?.username || 'You'} 
+            profilePicture={profilePicture}
+            size="md"
+          />
+        </div>
+      )}
+
       {/* Spacer for alignment when no avatar is shown */}
       {!isOwnMessage && !isLastInGroup && (
         <div className="flex-shrink-0 mr-3 w-10 h-10"></div>
       )}
 
+      {/* Spacer for own messages when no avatar is shown */}
+      {isOwnMessage && !isLastInGroup && (
+        <div className="flex-shrink-0 ml-3 w-10 h-10 order-3"></div>
+      )}
+
       <div className={`max-w-[280px] sm:max-w-xs lg:max-w-md xl:max-w-lg ${isOwnMessage ? 'order-2' : 'order-1'}`}>
         {/* Sender Name - only show on first message of group */}
         {isFirstInGroup && (
-          <MessageSender 
-            senderName={message.sender_name || 'Unknown User'} 
-            isOwnMessage={isOwnMessage}
-          />
+          <div className={`mb-2 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
+            <div className={`text-sm font-medium ${isOwnMessage ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}>
+              {getDisplayName(message.sender_name || 'Unknown User')}
+            </div>
+          </div>
         )}
 
         {/* Message Bubble */}
@@ -94,17 +121,6 @@ export default function MessageBubble({
             </div>
           )}
         </div>
-        
-        {/* Date - only show after last message of group */}
-        {shouldShowDate && isLastInGroup && (
-          <div className={`mt-1 px-1 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
-            <MessageTime 
-              timestamp={message.timestamp} 
-              showDate={true}
-              variant={isOwnMessage ? 'dark' : 'light'}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
