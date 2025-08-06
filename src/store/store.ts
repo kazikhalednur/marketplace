@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { apiSlice } from '@/features/api/apiSlice';
 import { jobsApi } from '@/features/api/jobsApi';
+import { notificationsApi } from '@/features/api/notificationsApi';
 import jobsFilterReducer from '@/features/jobs/jobsFilterSlice';
 import userReducer from '@/features/userSlice';
 
@@ -8,11 +9,12 @@ export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     [jobsApi.reducerPath]: jobsApi.reducer,
+    [notificationsApi.reducerPath]: notificationsApi.reducer,
     jobsFilter: jobsFilterReducer,
     user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware, jobsApi.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware, jobsApi.middleware, notificationsApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

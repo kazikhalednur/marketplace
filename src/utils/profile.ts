@@ -50,19 +50,8 @@ interface FreelancerFormData {
   }>;
 }
 
-// Helper function to convert YYYY-MM to YYYY-MM-DD format
-function formatDateToFull(dateString: string): string {
-  if (!dateString) return '';
-  // If already in YYYY-MM-DD format, return as is
-  if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    return dateString;
-  }
-  // If in YYYY-MM format, add -01 to make it YYYY-MM-DD
-  if (dateString.match(/^\d{4}-\d{2}$/)) {
-    return `${dateString}-01`;
-  }
-  return dateString;
-}
+// Import from the new date utility
+import { formatDateToFull } from './date';
 
 // Transform API user data for ClientProfile
 export function transformClientData(user: UserState) {

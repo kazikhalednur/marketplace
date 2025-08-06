@@ -399,7 +399,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
             setSelectedImage(null);
           }
         } catch (error) {
-          console.error('Failed to upload image:', error);
+          console.log('Failed to upload image:', error);
           return; // Don't proceed with profile update if image upload fails
         }
       }
@@ -417,7 +417,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
         onProfileUpdate();
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.log('Failed to update profile:', error);
       showToast({ type: 'error', message: 'Failed to update profile' });
     }
   }

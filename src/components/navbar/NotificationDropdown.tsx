@@ -1,19 +1,25 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
-import { Bell, Info, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Bell, Info, CheckCircle, AlertTriangle, XCircle, Loader2 } from "lucide-react";
 import { getRelativeTime } from "@/utils/time";
+import { useNotificationContext } from "@/components/NotificationWebSocketProvider";
+import { useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from "@/features/api/notificationsApi";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Notification } from "@/services/notificationWebSocket";
 
 type NotificationType = "info" | "success" | "warning" | "error";
 
-interface Notification {
-  id: number;
-  type: NotificationType;
-  message: string;
-  timestamp: string;
-  read: boolean;
-}
+// We'll map message_type from the API to our UI notification types
+const mapMessageTypeToNotificationType = (messageType: string): NotificationType => {
+  const lowerType = messageType.toLowerCase();
+  if (lowerType.includes('success') || lowerType.includes('payment')) return 'success';
+  if (lowerType.includes('error') || lowerType.includes('fail') || lowerType.includes('alert')) return 'error';
+  if (lowerType.includes('warn') || lowerType.includes('maintenance')) return 'warning';
+  return 'info';
+};
 
 const NOTIFICATION_ICONS: Record<NotificationType, typeof Info> = {
   info: Info,
@@ -29,176 +35,141 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   error: "bg-red-100 text-red-700",
 };
 
-// Helper to generate a UTC ISO string for a time relative to now
-function getRelativeUTCTimestamp({ seconds = 0, minutes = 0, hours = 0, days = 0 }) {
-  const d = new Date();
-  d.setUTCSeconds(d.getUTCSeconds() - seconds);
-  d.setUTCMinutes(d.getUTCMinutes() - minutes);
-  d.setUTCHours(d.getUTCHours() - hours);
-  d.setUTCDate(d.getUTCDate() - days);
-  return d.toISOString();
-}
-
-const mockNotifications: Notification[] = [
-  {
-    id: 1,
-    type: "info",
-    message: "Welcome to UniMarket!",
-    timestamp: getRelativeUTCTimestamp({ seconds: 45 }), // 45 seconds ago
-    read: false,
-  },
-  {
-    id: 2,
-    type: "success",
-    message: "Your job post was approved.",
-    timestamp: getRelativeUTCTimestamp({ minutes: 3 }), // 3 minutes ago
-    read: false,
-  },
-  {
-    id: 3,
-    type: "warning",
-    message: "Profile incomplete. Add more details.",
-    timestamp: getRelativeUTCTimestamp({ hours: 2, minutes: 15 }), // 2 hours 15 min ago
-    read: true,
-  },
-  {
-    id: 4,
-    type: "error",
-    message: "Payment failed. Please try again.",
-    timestamp: getRelativeUTCTimestamp({ hours: 6 }), // 6 hours ago
-    read: true,
-  },
-  {
-    id: 5,
-    type: "info",
-    message: "New message from John Doe.",
-    timestamp: getRelativeUTCTimestamp({ hours: 23 }), // 23 hours ago
-    read: false,
-  },
-  {
-    id: 6,
-    type: "success",
-    message: "Bid accepted for project 'Redesign Website'.",
-    timestamp: getRelativeUTCTimestamp({ days: 1, hours: 3 }), // 1 day 3 hours ago
-    read: false,
-  },
-  {
-    id: 7,
-    type: "warning",
-    message: "Your subscription will expire soon.",
-    timestamp: getRelativeUTCTimestamp({ days: 2, hours: 4 }), // 2 days 4 hours ago
-    read: true,
-  },
-  {
-    id: 8,
-    type: "error",
-    message: "Document upload failed.",
-    timestamp: getRelativeUTCTimestamp({ days: 4, hours: 5 }), // 4 days 5 hours ago
-    read: true,
-  },
-  {
-    id: 9,
-    type: "info",
-    message: "System maintenance scheduled for Sunday.",
-    timestamp: getRelativeUTCTimestamp({ days: 6, hours: 6 }), // 6 days 6 hours ago
-    read: false,
-  },
-  {
-    id: 10,
-    type: "success",
-    message: "Profile verified successfully.",
-    timestamp: getRelativeUTCTimestamp({ days: 7 }), // 7 days ago
-    read: true,
-  },
-];
-
 export default function NotificationDropdown() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { notifications, isLoading, refreshNotifications } = useNotificationContext();
   const [open, setOpen] = useState(false);
-  // Track the last seen notification ID
-  const [lastSeenId, setLastSeenId] = useState<number | null>(null);
   // Ref to track if this is the first render
   const firstRender = useRef(true);
 
-  // Find the latest notification ID
-  const latestId = notifications.length > 0 ? Math.max(...notifications.map(n => n.id)) : null;
-  // Count notifications with ID greater than lastSeenId
-  const newCount = lastSeenId === null ? notifications.length : notifications.filter(n => n.id > lastSeenId).length;
+  // Count unread notifications
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
-  // When dropdown is opened, update lastSeenId to latest notification
+  // When dropdown is opened, update firstRender flag
   useEffect(() => {
     if (open && notifications.length > 0) {
-      setLastSeenId(latestId);
-    }
-  }, [open, latestId, notifications.length]);
-
-  // On first render, set lastSeenId to latest notification (so badge doesn't show on initial load)
-  useEffect(() => {
-    if (firstRender.current && notifications.length > 0) {
-      setLastSeenId(latestId);
       firstRender.current = false;
     }
-  }, [latestId, notifications.length]);
+  }, [open, notifications.length]);
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  // On first render, set firstRender to false if we have notifications
+  useEffect(() => {
+    if (firstRender.current && notifications.length > 0) {
+      firstRender.current = false;
+    }
+  }, [notifications.length]);
+
+  const [markNotificationAsRead] = useMarkNotificationAsReadMutation();
+  const [markAllNotificationsAsRead, { isLoading: isMarkingAllAsRead }] = useMarkAllNotificationsAsReadMutation();
+
+  const markAllAsRead = async () => {
+    try {
+      await markAllNotificationsAsRead().unwrap();
+      refreshNotifications(); // Refresh to get updated notification states
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  const handleNotificationClick = async (notification: Notification) => {
+    if (!notification.is_read) {
+      try {
+        await markNotificationAsRead(notification.id).unwrap();
+        refreshNotifications(); // Refresh to get updated notification states
+      } catch (error) {
+        console.error(`Failed to mark notification ${notification.id} as read:`, error);
+      }
+    }
+    // Additional action when clicking on a notification (e.g., navigate to related content)
+    alert(`Clicked notification: ${notification.message}`);
   };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative p-1.5" aria-label="Open notifications">
+        <Button variant="ghost" size="icon" className="relative p-1.5 hover:bg-accent/50 transition-colors" aria-label="Open notifications">
           <Icon icon={Bell} size={28} />
-          {newCount > 0 && !open && (
-            <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold border-2 border-background z-10">
-              {newCount > 9 ? '9+' : newCount}
+          {unreadCount > 0 && !open && (
+            <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold border-2 border-background z-10 animate-pulse">
+              {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="p-0 w-80">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <span className="font-semibold text-base flex items-center gap-2">
+      <PopoverContent align="end" className="p-0 w-80 shadow-xl rounded-xl border-border bg-background/95 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 bg-gradient-to-r from-background to-muted/20">
+          <span className="font-semibold text-lg flex items-center gap-3">
             Notifications
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+            <span className="px-2.5 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary border border-primary/20">
               {notifications.length}
             </span>
           </span>
-          <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs px-2 py-1">
-            Mark all as read
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={markAllAsRead} 
+              className="text-xs px-3 py-1.5 rounded-full h-8 whitespace-nowrap font-medium hover:bg-primary/5" 
+              disabled={isMarkingAllAsRead || notifications.length === 0}
+            >
+              {isMarkingAllAsRead ? 'Marking...' : 'Mark all as read'}
+            </Button>
+          </div>
         </div>
-        <div className="overflow-y-auto max-h-[350px] min-h-[100px] divide-y divide-border bg-background">
-          {notifications.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground text-sm">No notifications</div>
-          ) : (
-            notifications.map((n) => {
-              const IconComp = NOTIFICATION_ICONS[n.type];
-              const colorClass = NOTIFICATION_COLORS[n.type];
+        <div className="overflow-y-auto max-h-[400px] min-h-[120px] divide-y divide-border/50 bg-background">
+          {(() => {
+            if (isLoading) {
               return (
-                <button
-                  key={n.id}
-                  type="button"
-                  onClick={() => alert(`Clicked notification: ${n.message}`)}
-                  className={`w-full flex items-start gap-3 px-4 py-3 transition-colors focus:outline-none focus:bg-accent/40 hover:bg-accent/40 active:bg-accent/60 ${n.read ? "bg-transparent" : "bg-accent/30"} cursor-pointer`}
-                  role="listitem"
-                  tabIndex={0}
-                  aria-label={n.message}
-                >
-                  <span className={`flex items-center justify-center rounded-full w-8 h-8 ${colorClass}`}>
-                    <Icon icon={IconComp} size={20} />
-                  </span>
-                  <div className="flex-1 min-w-0 flex flex-col items-start justify-center">
-                    <span className={`text-sm ${n.read ? "font-normal" : "font-semibold"} text-left break-words w-full leading-snug`}>{n.message}</span>
-                    <span className="text-xs text-muted-foreground mt-1 text-left w-full">{getRelativeTime(n.timestamp)}</span>
-                  </div>
-                  {!n.read && <span className="mt-1 w-2 h-2 rounded-full bg-primary" />}
-                </button>
+                <div className="p-10 flex flex-col items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
+                  <p className="text-sm font-medium text-muted-foreground">Loading notifications...</p>
+                </div>
               );
-            })
-          )}
+            } else if (notifications.length === 0) {
+              return (
+                <div className="p-10 flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                    <Bell className="w-8 h-8 text-muted-foreground/60" />
+                  </div>
+                  <p className="text-base font-semibold text-muted-foreground mb-1">No notifications yet</p>
+                  <p className="text-sm text-muted-foreground/70">We&apos;ll notify you when something important happens</p>
+                </div>
+              );
+            } else {
+              return notifications.map((n) => {
+                // Map the message_type to our UI notification type
+                const notificationType = mapMessageTypeToNotificationType(n.message_type);
+                const IconComp = NOTIFICATION_ICONS[notificationType];
+                const colorClass = NOTIFICATION_COLORS[notificationType];
+                
+                return (
+                  <button
+                    key={n.id}
+                    type="button"
+                    onClick={() => handleNotificationClick(n)}
+                    className={`w-full flex items-start gap-4 px-5 py-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 hover:bg-accent/30 active:bg-accent/50 ${n.is_read ? "bg-transparent opacity-75" : "bg-primary/5"} cursor-pointer group`}
+                    role="listitem"
+                    tabIndex={0}
+                    aria-label={n.message}
+                  >
+                    <span className={`flex items-center justify-center rounded-xl w-10 h-10 ${colorClass} shadow-sm group-hover:scale-105 transition-transform duration-200`}>
+                      <Icon icon={IconComp} size={20} />
+                    </span>
+                    <div className="flex-1 min-w-0 flex flex-col items-start justify-center">
+                      <span className={`text-sm ${n.is_read ? "font-normal text-foreground/80" : "font-semibold text-foreground"} text-left break-words w-full leading-relaxed`}>{n.message}</span>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="text-xs text-muted-foreground/80 text-left font-medium">{getRelativeTime(n.created_at)}</span>
+                        {!n.is_read && (
+                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-sm" />
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              });
+            }
+          })()}
         </div>
       </PopoverContent>
     </Popover>
   );
-} 
+}

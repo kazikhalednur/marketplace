@@ -22,7 +22,7 @@ import { useToast } from "@/components/ui/toast-provider";
 import { useGetDropdownsQuery, useUpdateJobMutation } from '@/features/api/jobsApi';
 import { Briefcase, DollarSign, TrendingUp } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { JobDetail } from '@/types/job';
 import type { DropdownCategory, DropdownSkill } from '@/types/job';
 import { EXPERIENCE_LEVEL_OPTIONS, JOB_STATUS_OPTIONS } from '@/lib/constants';
@@ -74,7 +74,7 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
     },
   });
 
-  const CATEGORY_OPTIONS = dropdowns?.categories?.map((c: DropdownCategory) => ({ value: c.id, label: c.name, skills: c.skills })) || [];
+  const CATEGORY_OPTIONS = useMemo(() => dropdowns?.categories?.map((c: DropdownCategory) => ({ value: c.id, label: c.name, skills: c.skills })) || [], [dropdowns]);
 
   // Pre-populate form when job changes
   useEffect(() => {

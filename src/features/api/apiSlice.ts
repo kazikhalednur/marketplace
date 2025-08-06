@@ -44,6 +44,26 @@ export interface LoginResponse {
   };
 }
 
+// Conversation Types
+export interface Conversation {
+  id: number;
+  conversation_id: string;
+  status: string;
+  created_at: string;
+  contract_title: string;
+  freelancer_name: string;
+  client_name: string;
+  last_message: string | null;
+  unread_count: number;
+}
+
+export interface ConversationsResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: Conversation[];
+}
+
 export interface FreelancerProject {
   id: number | null;
   title: string;
@@ -96,6 +116,25 @@ export interface UserInfo {
   student_id: string;
   avatar?: string;
   freelancer_sub_profiles: FreelancerSubProfile[];
+  // Additional fields for profile display
+  bio?: string;
+  skills?: string[];
+  company_name?: string;
+  linkedin?: string;
+  twitter?: string;
+  about?: string;
+  is_payment_verified?: boolean;
+  is_phone_verified?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Profile response type
+export interface ProfileResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: UserInfo;
 }
 
 // Profile update types
@@ -150,7 +189,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Me', 'ClientMe'],
+  tagTypes: ['Me', 'ClientMe', 'Conversations', 'Profile'],
   endpoints: (builder) => ({
     studentSignup: builder.mutation<SignupResponse, StudentSignupPayload>({
       query: (body) => ({
@@ -182,6 +221,12 @@ export const apiSlice = createApi({
       query: () => 'accounts/clients/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
       providesTags: ['ClientMe'],
+    }),
+    // Profile endpoint that returns different structures based on user role
+    getProfileByUsername: builder.query<UserInfo, string>({
+      query: (username) => `accounts/info/${username}/`,
+      transformResponse: (response: ProfileResponse) => response.data,
+      providesTags: (result, error, username) => [{ type: 'Profile', id: username }],
     }),
     verifyEmail: builder.query<
       {
@@ -269,7 +314,30 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    getConversations: builder.query<ConversationsResponse, void>({
+      query: () => 'chat/conversations/',
+      transformResponse: (response: ConversationsResponse) => response,
+      providesTags: ['Conversations'],
+    }),
   }),
 });
 
-export const { useStudentSignupMutation, useEmployerSignupMutation, useLoginMutation, useGetMeQuery, useGetClientMeQuery, useVerifyEmailQuery, useResendVerificationEmailQuery, useSendPasswordResetMailMutation, useVerifyOtpMutation, useResetPasswordMutation, useUpdateProfileMutation, useUpdateClientProfileMutation, useUploadImageMutation, useLazyGetMeQuery, useLazyGetClientMeQuery } = apiSlice; 
+export const { 
+  useStudentSignupMutation, 
+  useEmployerSignupMutation, 
+  useLoginMutation, 
+  useGetMeQuery, 
+  useGetClientMeQuery, 
+  useGetProfileByUsernameQuery,
+  useVerifyEmailQuery, 
+  useResendVerificationEmailQuery, 
+  useSendPasswordResetMailMutation, 
+  useVerifyOtpMutation, 
+  useResetPasswordMutation, 
+  useUpdateProfileMutation, 
+  useUpdateClientProfileMutation, 
+  useUploadImageMutation, 
+  useLazyGetMeQuery, 
+  useLazyGetClientMeQuery, 
+  useGetConversationsQuery 
+} = apiSlice; 

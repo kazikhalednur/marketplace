@@ -6,15 +6,19 @@ import Avatar from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/hooks/useAuth";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
-import { HelpCircle, LogOut, Menu, Settings, User as UserIcon } from "lucide-react";
+import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
+import MessagesDropdown from "./MessagesDropdown";
+
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
+  const { isOnline } = useNetworkStatus();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -84,6 +88,7 @@ export default function Navbar() {
             {user?.role === "freelancer" && (
               <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>
             )}
+
             {/* {isAuthenticated && (
               <>
                 <Link href="/messages" className={cn("hover:text-primary", isActive("/messages") && "text-primary font-medium")}>Messages</Link>
@@ -96,7 +101,16 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
+                {/* Network Status Indicator */}
+                {isOnline && (
+                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
+                    <Wifi className="w-4 h-4 text-green-500" />
+                  </div>
+                )}
+                
                 <NotificationDropdown />
+                <MessagesDropdown />
+                
                 <div className="relative">
                   <button
                     ref={profileButtonRef}
@@ -123,7 +137,7 @@ export default function Navbar() {
                         <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
                       </div>
                       <Link 
-                        href="/profile" 
+                        href={`/profile/${user?.username || 'profile'}`}
                         className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold"
                         onClick={() => setProfileDropdownOpen(false)}
                       >

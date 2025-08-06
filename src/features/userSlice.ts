@@ -21,6 +21,7 @@ export interface UserState {
   bio?: string | null;
   is_payment_verified?: boolean | null;
   is_phone_verified?: boolean | null;
+  notification_id?: string | null;
 }
 
 const initialState: UserState = {
