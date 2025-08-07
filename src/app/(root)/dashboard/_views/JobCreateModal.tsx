@@ -23,7 +23,7 @@ import { useCreateJobMutation, useGetDropdownsQuery } from '@/features/api/jobsA
 import { Briefcase, DollarSign, TrendingUp } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type { DropdownCategory, DropdownSkill } from '@/types/job';
-import { EXPERIENCE_LEVEL_OPTIONS, STATUS_OPTIONS } from '@/lib/constants';
+import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/constants';
 
 // Define a type for the form values
 interface JobFormValues {
@@ -69,6 +69,9 @@ export default function JobCreateModal({ open, onClose, onJobPosted }: { open: b
   // Get selected category object
   const selectedCategory = CATEGORY_OPTIONS.find((cat) => String(cat.value) === String(form.watch('category')));
   const SKILL_OPTIONS = selectedCategory?.skills?.map((s: DropdownSkill) => ({ value: s.id, label: s.name })) || [];
+
+  // Get status options from API response
+  const STATUS_OPTIONS = dropdowns?.status || [];
 
   const onSubmit = async (data: JobFormValues) => {
     // Validation

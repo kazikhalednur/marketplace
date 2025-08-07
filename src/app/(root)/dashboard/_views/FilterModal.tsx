@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, DollarSign, Layers, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { X, DollarSign, Layers, TrendingUp } from 'lucide-react';
 import { useAppDispatch } from '@/hooks/useTypedDispatch';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 import { setFilters, clearFilters } from '@/features/jobs/jobsFilterSlice';
@@ -14,17 +14,15 @@ interface FilterModalProps {
   onApply: () => void;
 }
 
-const STATUS_OPTIONS = [
-  { value: 'open', label: 'Open', icon: CheckCircle },
-  { value: 'in_progress', label: 'In Progress', icon: CheckCircle },
-  { value: 'completed', label: 'Completed', icon: CheckCircle },
-  { value: 'closed', label: 'Closed', icon: XCircle },
-];
+// Status options will be loaded from API response
 
 export default function FilterModal({ open, onClose, onApply }: FilterModalProps) {
   const dispatch = useAppDispatch();
   const currentFilters = useAppSelector((state) => state.jobsFilter);
   const { data: dropdownsData } = useGetDropdownsQuery();
+  
+  // Get status options from API response
+  const STATUS_OPTIONS = dropdownsData?.status || [];
   
   // Local state for form
   const [filters, setLocalFilters] = useState({
@@ -120,26 +118,22 @@ export default function FilterModal({ open, onClose, onApply }: FilterModalProps
             <div className="space-y-3">
               <label className="font-medium text-sm">Status</label>
               <div className="grid grid-cols-2 gap-2">
-                {STATUS_OPTIONS.map((status) => {
-                  const Icon = status.icon;
-                  return (
-                    <button
-                      key={status.value}
-                      onClick={() => setLocalFilters(prev => ({ 
-                        ...prev, 
-                        status: prev.status === status.value ? '' : status.value 
-                      }))}
-                      className={`flex items-center gap-2 p-3 rounded-lg border transition-colors cursor-pointer ${
-                        filters.status === status.value
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      {status.label}
-                    </button>
-                  );
-                })}
+                {STATUS_OPTIONS.map((status) => (
+                  <button
+                    key={status.value}
+                    onClick={() => setLocalFilters(prev => ({ 
+                      ...prev, 
+                      status: prev.status === status.value ? '' : status.value 
+                    }))}
+                    className={`flex items-center gap-2 p-3 rounded-lg border transition-colors cursor-pointer ${
+                      filters.status === status.value
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    {status.label}
+                  </button>
+                ))}
               </div>
             </div>
 

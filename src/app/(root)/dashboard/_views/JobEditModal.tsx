@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useMemo } from "react";
 import type { JobDetail } from '@/types/job';
 import type { DropdownCategory, DropdownSkill } from '@/types/job';
-import { EXPERIENCE_LEVEL_OPTIONS, JOB_STATUS_OPTIONS } from '@/lib/constants';
+import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/constants';
 
 // Define a type for the form values
 interface JobFormValues {
@@ -75,6 +75,9 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
   });
 
   const CATEGORY_OPTIONS = useMemo(() => dropdowns?.categories?.map((c: DropdownCategory) => ({ value: c.id, label: c.name, skills: c.skills })) || [], [dropdowns]);
+
+  // Get status options from API response
+  const STATUS_OPTIONS = useMemo(() => dropdowns?.status || [], [dropdowns]);
 
   // Pre-populate form when job changes
   useEffect(() => {
@@ -413,7 +416,7 @@ export default function JobEditModal({ open, onClose, job, onJobUpdated }: JobEd
                           <FormControl>
                             <SelectField
                               {...field}
-                              options={JOB_STATUS_OPTIONS}
+                              options={STATUS_OPTIONS}
                               placeholder="Select status"
                             />
                           </FormControl>
