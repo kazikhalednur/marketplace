@@ -29,7 +29,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
 
   // Fetch jobs from API with pagination and filters
-  const { data: jobsData, isLoading, isError } = useGetJobsQuery({ 
+  const { data: jobsData, isLoading, isError, refetch } = useGetJobsQuery({ 
     page: currentPage, 
     pageSize,
     status,
@@ -50,7 +50,7 @@ function DashboardContent() {
   // Jobs are already filtered by the API, so we use them directly
   const filteredJobs = jobs;
 
-  // Handle URL parameters for job details
+  // Handle URL parameters for job details and update selectedJob when jobs data changes
   useEffect(() => {
     const jobId = searchParams.get('jobId');
     if (jobId && jobs.length > 0) {
@@ -100,15 +100,8 @@ function DashboardContent() {
   };
 
   const handleJobApplied = () => {
-    // Cache invalidation will automatically refetch the data
-    // After cache invalidation, update selectedJob to the latest job object
-    setTimeout(() => {
-      const jobId = searchParams.get('jobId');
-      if (jobId && jobs.length > 0) {
-        const job = jobs.find(j => j.id === jobId);
-        if (job) setSelectedJob(job);
-      }
-    }, 300); // Wait a bit for cache invalidation
+    // Manually refetch the jobs data to get the updated is_applied status
+    refetch();
   };
 
   return (
