@@ -9,8 +9,8 @@ import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { setUser } from "@/features/userSlice";
 import { transformClientFormToPayload } from "@/utils/profile";
 import { getStatusBadge } from "@/utils/statusBadge";
-import { Briefcase, Building2, Calendar, Check, CheckCircle2, ChevronLeft, ChevronRight, DollarSign, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Briefcase, Building2, Calendar, Check, CheckCircle2, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import type { User } from '@/types/user';
 
 export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMessage }: { 
@@ -28,15 +28,19 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
   const [triggerClientMe] = useLazyGetClientMeQuery();
   const dispatch = useAppDispatch();
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(6);
-
-  // Fetch client's jobs
+  // Fetch all client's jobs (no pagination)
   const { data: jobsData, isLoading: jobsLoading } = useGetMyJobsQuery({
-    page: currentPage,
-    pageSize: pageSize,
+    page: 1,
+    pageSize: 100, // Fetch more jobs to have enough for filtering
   });
+
+  // Get the last 5 jobs sorted by creation date
+  const lastFiveJobs = useMemo(() => {
+    if (!jobsData?.jobs) return [];
+    return [...jobsData.jobs]
+      .sort((a, b) => new Date(b.created_at || '').getTime() - new Date(b.created_at || '').getTime())
+      .slice(0, 5);
+  }, [jobsData?.jobs]);
 
   // Helper to get display name
   const getDisplayName = useCallback(() => {
@@ -52,9 +56,9 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
   // Helper to format budget
   function formatBudget(minBudget: string, maxBudget: string, isFixed: boolean) {
     if (isFixed) {
-      return `$${minBudget} - $${maxBudget}`;
+      return <span className="text-black"><span className="text-xl font-bold">৳ </span>{minBudget} - <span className="text-xl font-bold">৳</span> {maxBudget}</span>;
     } else {
-      return `$${minBudget}/hr - $${maxBudget}/hr`;
+      return <span className="text-black"><span className="text-xl font-bold">৳ </span>{minBudget}/hr - <span className="text-xl font-bold">৳</span> {maxBudget}/hr</span>;
     }
   }
 
@@ -358,16 +362,16 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
         <section className="mb-8 bg-gradient-to-br from-card/90 to-card/80 border border-border/60 rounded-2xl p-6 shadow-sm backdrop-blur-sm">
           <h2 className="font-bold text-xl mb-6 text-foreground border-l-4 border-primary pl-3 flex items-center gap-2">
             <Briefcase className="w-5 h-5" />
-            My Jobs
+            Recent Jobs
           </h2>
           {jobsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-primary"></div>
               <span className="ml-3 text-muted-foreground">Loading jobs...</span>
             </div>
-          ) : jobsData && jobsData.jobs.length > 0 ? (
+          ) : lastFiveJobs && lastFiveJobs.length > 0 ? (
             <div className="space-y-4">
-              {jobsData.jobs.map((job) => (
+              {lastFiveJobs.map((job) => (
                 <div key={job.id} className="bg-gradient-to-br from-muted/60 to-muted/30 rounded-xl p-5 border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
                                     <div className="flex items-start justify-between mb-2">
                     <h3 className="font-bold text-primary text-lg truncate">{job.title || 'Untitled Job'}</h3>
@@ -386,7 +390,6 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
                   <div className="flex items-center gap-4 text-sm">
                     {/* Budget */}
                     <div className="flex items-center gap-2">
-                      <Icon icon={DollarSign} size={14} className="text-primary" />
                       <span className="text-foreground font-medium">
                         {formatBudget(String(job.min_budget || '0'), String(job.max_budget || '0'), job.is_fixed || false)}
                       </span>
@@ -422,40 +425,6 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
                   )}
                 </div>
               ))}
-              
-              {/* Pagination */}
-              {jobsData && jobsData.jobs.length > 0 && (
-                <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/20">
-                  <div className="text-sm text-muted-foreground">
-                    Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, jobsData.count || 0)} of {jobsData.count || 0} jobs
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                      className="flex items-center gap-1"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Previous
-                    </Button>
-                    <span className="text-sm text-muted-foreground px-3">
-                      Page {currentPage} of {Math.ceil((jobsData.count || 0) / pageSize)}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => prev + 1)}
-                      disabled={currentPage >= Math.ceil((jobsData.count || 0) / pageSize)}
-                      className="flex items-center gap-1"
-                    >
-                      Next
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-8">
@@ -473,8 +442,8 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
 
       {/* Edit Modal */}
       {editMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div ref={modalRef} className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg min-h-[400px] max-h-[80vh] p-0 relative animate-in fade-in-0 zoom-in-95 flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div ref={modalRef} className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg mx-4 min-h-[400px] max-h-[80vh] p-0 relative animate-in fade-in-0 zoom-in-95 flex flex-col">
             {/* Loading overlay */}
             {isUpdating && (
               <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-50">
@@ -496,7 +465,7 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
               ×
             </button>
             <h2 className="font-bold text-2xl mb-2 text-center pt-8">Edit Profile</h2>
-            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-8 pb-8 overflow-y-auto ${shake ? 'animate-shake' : ''}`} style={{ flex: 1, minHeight: 0 }}>
+            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-4 sm:px-8 pb-8 overflow-y-auto ${shake ? 'animate-shake' : ''}`} style={{ flex: 1, minHeight: 0 }}>
               {/* Profile Image Upload */}
               <div className="flex flex-col gap-2 items-center">
                 <label className="font-semibold text-sm mb-1">Profile Image</label>
@@ -505,7 +474,7 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
                   <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
                   <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex flex-col gap-2 flex-1">
                     <label className="font-semibold text-sm">First Name <span className="text-destructive">*</span></label>
                     <input name="first_name" value={form.first_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.first_name ? ' border-red-500' : ''}`} placeholder="First name" />

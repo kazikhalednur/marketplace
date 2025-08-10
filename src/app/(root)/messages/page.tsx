@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus, Mail, MessageSquare } from 'lucide-react';
+import { Search, Filter, Mail, MessageSquare } from 'lucide-react';
 import { useConversations } from '@/hooks/useNotifications';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 import { formatDistanceToNow } from 'date-fns';
@@ -651,10 +651,10 @@ export default function MessagesPage() {
                   <Filter className="w-4 h-4 mr-2" />
                   Filter
                 </Button>
-                <Button size="sm">
+                {/* <Button size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   New Chat
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>

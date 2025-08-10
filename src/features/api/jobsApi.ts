@@ -214,7 +214,9 @@ export const jobsApi = createApi({
         if (skills && skills.length > 0) params.append('skills', skills.join(','));
         if (category) params.append('category', category);
         
-        return `/jobs/?${params.toString()}`;
+        const url = `/jobs/?${params.toString()}`;
+        console.log('API call URL:', url, { page, pageSize, status, search, tags, min_budget, max_budget, skills, category });
+        return url;
       },
       transformResponse: (response: PaginatedJobsApiResponse) => {
         if (response?.data && Array.isArray(response.data.results)) {

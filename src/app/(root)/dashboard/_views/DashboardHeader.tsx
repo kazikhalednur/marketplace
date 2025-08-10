@@ -4,15 +4,14 @@ import DashboardFiltersSkeleton from './DashboardFiltersSkeleton';
 
 type DashboardHeaderProps = {
   isLoading: boolean;
-  onFiltersChange: () => void;
 };
 
-export default function DashboardHeader({ isLoading, onFiltersChange }: DashboardHeaderProps) {
+export default function DashboardHeader({ isLoading }: DashboardHeaderProps) {
   return (
     <>
       <h1 className="text-3xl font-bold mb-8 text-center">Job Dashboard</h1>
       <Card className="p-6 mb-8">
-        {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters onFiltersChange={onFiltersChange} />}
+        {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters />}
       </Card>
     </>
   );

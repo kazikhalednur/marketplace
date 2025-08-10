@@ -161,18 +161,12 @@ export default function MyJobsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleFiltersChange = () => {
-    // Reset to first page when filters change
-    setCurrentPage(1);
-    // Cache invalidation will automatically refetch the data
-  };
-
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">My Jobs</h1>
         <Card className="p-6 mb-8">
-          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters onFiltersChange={handleFiltersChange} />}
+          {isLoading ? <DashboardFiltersSkeleton /> : <DashboardFilters />}
         </Card>
         {/* Create Job Button */}
         <div className="flex flex-col sm:flex-row sm:justify-end mb-6">

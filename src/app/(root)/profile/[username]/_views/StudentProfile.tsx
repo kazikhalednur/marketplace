@@ -574,8 +574,8 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
         </section>
       </div>
       {editMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div ref={modalRef} className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg min-h-[400px] max-h-[80vh] p-0 relative animate-in fade-in-0 zoom-in-95 flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div ref={modalRef} className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg mx-4 min-h-[400px] max-h-[80vh] p-0 relative animate-in fade-in-0 zoom-in-95 flex flex-col">
             {/* Loading overlay */}
             {isUpdating && (
               <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-50">
@@ -597,7 +597,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
               ×
             </button>
             <h2 className="font-bold text-2xl mb-2 text-center pt-8">Edit Profile</h2>
-            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-8 pb-8 overflow-y-auto`}>
+            <form onSubmit={handleSave} className={`flex flex-col gap-6 px-4 sm:px-8 pb-8 overflow-y-auto`}>
               {/* Profile Image Upload */}
               <div className="flex flex-col gap-2 items-center">
                 <label className="font-semibold text-sm mb-1">Profile Image</label>
@@ -606,7 +606,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                   <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
                   <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex flex-col gap-2 flex-1">
                     <label className="font-semibold text-sm">First Name <span className="text-destructive">*</span></label>
                     <input name="first_name" ref={firstNameRef} value={form.first_name} onChange={handleChange} className={`input rounded-md border px-3 py-2 bg-muted${fieldErrors.first_name ? ' border-red-500' : ''}`} placeholder="First name" />

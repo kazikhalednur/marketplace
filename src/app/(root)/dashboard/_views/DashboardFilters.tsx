@@ -3,38 +3,54 @@ import { Input } from '@/components/ui/input';
 import { setSearchText, toggleTag } from '@/features/jobs/jobsFilterSlice';
 import { useAppDispatch } from '@/hooks/useTypedDispatch';
 import { useAppSelector } from '@/hooks/useTypedSelector';
+import { useDebounce } from '@/utils/hooks';
 import { TAGS } from '@/lib/constants';
 import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FilterModal from './FilterModal';
 
-interface DashboardFiltersProps {
-  onFiltersChange?: () => void;
-}
-
-export default function DashboardFilters({ onFiltersChange }: DashboardFiltersProps) {
+export default function DashboardFilters() {
   const dispatch = useAppDispatch();
   const { searchText, selectedTags } = useAppSelector((state) => state.jobsFilter);
   const [localSearch, setLocalSearch] = useState(searchText);
+  
+  // Use the useDebounce hook for better search performance
+  const debouncedSearch = useDebounce(localSearch, 500);
+  
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-  // Use a ref to store the timeout id with correct type
-  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Debug logging for state changes
+  console.log('DashboardFilters render:', { localSearch, debouncedSearch, searchText, selectedTags });
+
+  // Log initial state
+  useEffect(() => {
+    console.log('DashboardFilters mounted with initial state:', { searchText, selectedTags });
+  }, [searchText, selectedTags]);
+
+  // Update search text when debounced value changes
+  useEffect(() => {
+    if (debouncedSearch !== searchText) {
+      console.log('Search triggered:', { debouncedSearch, searchText });
+      dispatch(setSearchText(debouncedSearch));
+      // No need to call onFiltersChange since we're filtering locally
+    }
+  }, [debouncedSearch, dispatch, searchText]);
+
+  // Sync local search with global state when it changes externally
+  useEffect(() => {
+    setLocalSearch(searchText);
+  }, [searchText]);
+
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSearch(e.target.value);
     const value = e.target.value;
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => {
-      dispatch(setSearchText(value));
-      onFiltersChange?.(); // Trigger API call with debounced search
-    }, 500); // Increased debounce time for better UX
-  }, [dispatch, onFiltersChange]);
+    console.log('Search input changed:', value);
+    setLocalSearch(value);
+  }, []);
 
   const handleFilterApply = useCallback(() => {
-    // Trigger refetch when filters are applied
-    onFiltersChange?.();
-  }, [onFiltersChange]);
+    // No need to trigger refetch since we're filtering locally
+  }, []);
 
   return (
     <motion.div
@@ -79,7 +95,7 @@ export default function DashboardFilters({ onFiltersChange }: DashboardFiltersPr
             className={`rounded-full px-4 whitespace-nowrap transition-colors ${selectedTags.includes(tag) ? 'bg-primary text-primary-foreground' : ''}`}
             onClick={() => {
               dispatch(toggleTag(tag));
-              onFiltersChange?.(); // Instant API call for tag changes
+              // No need to call onFiltersChange since we're filtering locally
             }}
           >
             {tag}
