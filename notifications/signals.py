@@ -15,7 +15,7 @@ def send_notification_on_create(sender, instance, created, **kwargs):
         return
 
     user = instance.user
-    group_name = f"notification_{user.websocket.notication_id}"
+    group_name = f"notification_{user.websocket.notification_id}"
     channel_layer = get_channel_layer()
 
     page = 1

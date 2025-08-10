@@ -71,7 +71,7 @@ class NotificationConsumer(BaseAuthConsumer):
     def get_websocket_id_by_notification_id(self, notification_id):
         """Get WebSocketID by notification_id"""
         try:
-            return WebSocketID.objects.get(notication_id=notification_id)
+            return WebSocketID.objects.get(notification_id=notification_id)
         except WebSocketID.DoesNotExist:
             return None
 
@@ -196,7 +196,7 @@ class NotificationConsumer(BaseAuthConsumer):
 
     @sync_to_async
     def get_notification_room_name(self, user):
-        return user.websocket.notication_id
+        return user.websocket.notification_id
 
     @sync_to_async
     def get_paginated_notifications(self, user, page, page_size):

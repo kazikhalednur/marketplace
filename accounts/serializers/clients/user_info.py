@@ -30,7 +30,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
         source="client_profile.is_phone_verified", read_only=True
     )
     notification_id = serializers.CharField(
-        source="websocket.notication_id", read_only=True
+        source="websocket.notification_id", read_only=True
     )
 
     class Meta:

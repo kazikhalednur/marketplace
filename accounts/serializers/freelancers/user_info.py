@@ -21,7 +21,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         source="freelancer_profile.avatar", allow_null=True, required=False
     )
     notification_id = serializers.CharField(
-        source="websocket.notication_id", read_only=True
+        source="websocket.notification_id", read_only=True
     )
 
     class Meta:
