@@ -61,7 +61,7 @@ function DashboardContent() {
     if (!jobs.length) return [];
     
     return jobs.filter(job => {
-      // Search text filter
+      // Search text filter - simple word matching
       if (search && search.trim()) {
         const searchLower = search.toLowerCase().trim();
         const titleMatch = job.title.toLowerCase().includes(searchLower);
@@ -86,10 +86,10 @@ function DashboardContent() {
         return false;
       }
       
-      // Tags filter
+      // Tags filter - simple word matching
       if (tags && tags.length > 0) {
         const hasMatchingTag = tags.some(tag => 
-          job.tags.some(jobTag => jobTag.toLowerCase() === tag.toLowerCase())
+          job.tags.some(jobTag => jobTag.toLowerCase().includes(tag.toLowerCase()))
         );
         if (!hasMatchingTag) {
           return false;
@@ -110,20 +110,20 @@ function DashboardContent() {
         }
       }
       
-      // Skills filter
+      // Skills filter - simple word matching
       if (skills && skills.length > 0 && job.skills) {
         const hasMatchingSkill = skills.some(skill => 
-          job.skills!.some(jobSkill => jobSkill.name.toLowerCase() === skill.toLowerCase())
+          job.skills!.some(jobSkill => jobSkill.name.toLowerCase().includes(skill.toLowerCase()))
         );
         if (!hasMatchingSkill) {
           return false;
         }
       }
       
-      // Category filter
+      // Category filter - simple word matching
       if (category && job.category) {
         const jobCategoryName = typeof job.category === 'object' ? job.category.name : job.category;
-        if (jobCategoryName !== category) {
+        if (!jobCategoryName.toLowerCase().includes(category.toLowerCase())) {
           return false;
         }
       }
