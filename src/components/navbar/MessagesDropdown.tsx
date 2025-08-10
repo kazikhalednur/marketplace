@@ -91,7 +91,7 @@ export default function MessagesDropdown() {
         ref={buttonRef}
         variant="ghost"
         size="icon"
-        className="relative p-2 hover:bg-muted/50 transition-colors"
+        className="relative p-2 hover:bg-accent/50 transition-colors"
         onClick={handleMessagesClick}
         aria-label="Open messages"
       >

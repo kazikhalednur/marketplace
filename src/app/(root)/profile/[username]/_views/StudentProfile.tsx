@@ -13,7 +13,12 @@ import { Check, CheckCircle2, Edit, Github, Globe, Linkedin, Mail, MapPin, Plus,
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User, Experience, Education } from '@/types/user';
 
-export default function StudentProfile({ user, onProfileUpdate }: { user: User; onProfileUpdate?: () => void }) {
+export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendMessage }: { 
+  user: User; 
+  onProfileUpdate?: () => void; 
+  isOwner: boolean;
+  onSendMessage: () => void;
+}) {
   const [editMode, setEditMode] = useState(false);
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
   const [uploadImage] = useUploadImageMutation();
@@ -399,7 +404,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
             setSelectedImage(null);
           }
         } catch (error) {
-          console.log('Failed to upload image:', error);
+          console.error('Failed to upload image:', error);
           return; // Don't proceed with profile update if image upload fails
         }
       }
@@ -417,7 +422,7 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
         onProfileUpdate();
       }
     } catch (error) {
-      console.log('Failed to update profile:', error);
+      console.error('Failed to update profile:', error);
       showToast({ type: 'error', message: 'Failed to update profile' });
     }
   }
@@ -474,13 +479,23 @@ export default function StudentProfile({ user, onProfileUpdate }: { user: User; 
           </div>
           {/* Edit Button */}
           <div className="absolute top-6 right-6">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditMode(true)}
-            >
-              <Edit className="w-4 h-4 mr-1" /> Edit Profile
-            </Button>
+            {isOwner ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditMode(true)}
+              >
+                <Edit className="w-4 h-4 mr-1" /> Edit Profile
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onSendMessage}
+              >
+                <Mail className="w-4 h-4 mr-1" /> Send Message
+              </Button>
+            )}
           </div>
         </section>
         <section className="mb-8 bg-gradient-to-br from-card/90 to-card/80 border border-border/60 rounded-2xl p-6 shadow-sm backdrop-blur-sm">

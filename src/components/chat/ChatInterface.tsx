@@ -212,7 +212,7 @@ export default function ChatInterface({ roomName, title = "Chat", profilePicture
       
       <div className="flex-1 flex flex-col p-0 min-h-0 h-full">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-1 bg-gray-50 dark:bg-gray-900 min-h-0">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-0">
           {!isConnected && (
             <div className="flex items-center justify-center h-full">
               <div className="flex flex-col items-center gap-4">

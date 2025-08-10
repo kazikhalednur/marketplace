@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 const testimonials = [
   {
-    quote: "I landed my first remote job thanks to UniMarket. The process was smooth and secure!",
+            quote: "I landed my first remote job thanks to CPCHUB. The process was smooth and secure!",
     name: "Ayesha Rahman",
     role: "Student, DIU",
     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
@@ -46,7 +46,7 @@ export default function LandingPage() {
       {/* Sticky Navbar */}
 {/*      <nav className="sticky top-0 z-30 w-full bg-[var(--card)]/90 backdrop-blur border-b border-[var(--border)] flex items-center justify-between px-6 py-3 shadow-sm">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]">
-          <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">UniMarket</span>
+          <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">CPCHUB</span>
         </Link>
         <div className="flex gap-2 items-center">
           <Button asChild variant="ghost" className="text-base px-4 text-[var(--primary)]">
@@ -90,13 +90,13 @@ export default function LandingPage() {
           className="mt-14 flex justify-center gap-8 flex-wrap"
         >
           <Button asChild size="lg" className="px-10 py-5 text-xl bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 shadow-md flex items-center gap-3 min-h-[56px] min-w-[220px]">
-            <Link href="/register/student">
+            <Link href="/register">
               <GraduationCap className="w-6 h-6 mr-2" />
               Join as Freelancer
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="px-10 py-5 text-xl border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)]/10 flex items-center gap-3 min-h-[56px] min-w-[220px]">
-            <Link href="/register/employer">
+            <Link href="/register">
               <Briefcase className="w-6 h-6 mr-2" />
               Join as Client
             </Link>
@@ -233,12 +233,12 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-10 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--foreground)] mb-3">Frequently Asked Questions</h2>
-            <p className="text-muted-foreground text-lg">Find answers to common questions about UniMarket.</p>
+            <p className="text-muted-foreground text-lg">Find answers to common questions about CPCHUB.</p>
           </div>
           <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] divide-y divide-[var(--border)]">
             <FAQAccordionFlat />
             <div className="mt-3 py-5 border-t border-[var(--border)] text-center">
-              <span className="text-[var(--foreground)] text-base">Still have questions? <a href="mailto:contact@unimarket.com" className="text-[var(--accent)] underline">Contact us</a></span>
+              <span className="text-[var(--foreground)] text-base">Still have questions? <a href="mailto:contact@cpchub.diu.edu.bd" className="text-[var(--accent)] underline">Contact us</a></span>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@ export default function LandingPage() {
       <section className="w-full bg-[var(--primary)] py-14 px-4 flex flex-col items-center justify-center text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-[var(--primary-foreground)] mb-2">Ready to Get Started?</h2>
         <p className="text-base md:text-lg text-[var(--secondary)] mb-6 max-w-2xl mx-auto">
-          Join UniMarket today and unlock real opportunities. Whether you&apos;re a student or an employer, it&apos;s free to get started.
+          Join CPCHUB today and unlock real opportunities. Whether you&apos;re a student or an employer, it&apos;s free to get started.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xl justify-center items-center">
           <a
@@ -257,22 +257,22 @@ export default function LandingPage() {
           >
             Create Your Free Account
           </a>
-          <a
-            href="mailto:contact@unimarket.com"
+          {/* <a
+            href="mailto:contact@cpchub.diu.edu.bd"
             className="inline-flex items-center justify-center px-7 py-3 text-base font-semibold rounded-lg border border-[var(--card)] text-[var(--primary-foreground)] bg-[var(--primary)] hover:bg-[var(--primary)]/90 hover:border-[var(--border)] transition-colors w-full sm:w-auto"
           >
             Contact Sales
-          </a>
+          </a> */}
         </div>
       </section>
 
       {/* Footer */}
       {/* <footer className="w-full bg-[var(--card)] border-t border-[var(--border)] py-6 px-6 mt-0 text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="font-semibold">&copy; {new Date().getFullYear()} UniMarket. All rights reserved.</span>
+          <span className="font-semibold">&copy; {new Date().getFullYear()} CPCHUB. All rights reserved.</span>
         </div>
         <div className="flex gap-3">
-          <a href="mailto:contact@unimarket.com" className="hover:underline">Contact</a>
+          <a href="mailto:contact@cpchub.com" className="hover:underline">Contact</a>
           <a href="#" className="hover:underline">Privacy Policy</a>
           <a href="#" className="hover:underline">Terms</a>
         </div>
@@ -283,13 +283,13 @@ export default function LandingPage() {
 
 function FAQAccordionFlat() {
   const faqs = [
-    { q: "Who can join UniMarket?", a: "Only verified university students and employers can join. Students must provide valid university credentials during registration." },
-    { q: "Is there a fee to use UniMarket?", a: "Registration is free. A small service fee is deducted from each completed transaction to support platform operations and security." },
+    { q: "Who can join CPCHUB?", a: "Only verified university students and employers can join. Students must provide valid university credentials during registration." },
+    { q: "Is there a fee to use CPCHUB?", a: "Registration is free. A small service fee is deducted from each completed transaction to support platform operations and security." },
     { q: "How do I apply for jobs?", a: "Browse available jobs, submit your proposal, and attach relevant work or portfolio. Employers will review and respond if interested." },
     { q: "How do I get paid?", a: "Once your work is approved by the employer, payment is released from escrow directly to your account." },
     { q: "How does escrow work?", a: "Employers fund the project upfront. Payment is held securely and only released to the student after the employer approves the completed work." },
     { q: "What types of jobs can be posted?", a: "Any remote-friendly development, design, or tech-related job suitable for university students. All jobs must comply with our terms of service." },
-    { q: "How do I get support?", a: "You can contact our support team anytime at contact@unimarket.com." },
+    { q: "How do I get support?", a: "You can contact our support team anytime at contact@cpchub.diu.edu.bd." },
     { q: "Is my payment information safe?", a: "All transactions are processed securely using industry-standard encryption and payment providers." },
   ];
   const [open, setOpen] = useState<number>(0);
