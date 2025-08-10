@@ -73,7 +73,7 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           className="text-5xl md:text-6xl font-extrabold max-w-4xl mx-auto text-[var(--foreground)] leading-tight"
         >
-          Hire Verified University Students for Real Development Jobs
+          Hire Talented University Students for Real Development Jobs
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -92,13 +92,13 @@ export default function LandingPage() {
           <Button asChild size="lg" className="px-10 py-5 text-xl bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90 shadow-md flex items-center gap-3 min-h-[56px] min-w-[220px]">
             <Link href="/register/student">
               <GraduationCap className="w-6 h-6 mr-2" />
-              Join as Student
+              Join as Freelancer
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="px-10 py-5 text-xl border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)]/10 flex items-center gap-3 min-h-[56px] min-w-[220px]">
             <Link href="/register/employer">
               <Briefcase className="w-6 h-6 mr-2" />
-              Post a Job
+              Join as Client
             </Link>
           </Button>
         </motion.div>
