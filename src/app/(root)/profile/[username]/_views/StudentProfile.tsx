@@ -55,11 +55,11 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
     
     // If it's a relative URL, prefix with base URL
     if (avatarUrl.startsWith('/')) {
-      return `${process.env.NEXT_PUBLIC_BASE_URL}${avatarUrl}`;
+      return `${process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443'}${avatarUrl}`;
     }
     
     // If it doesn't start with /, add it
-    return `${process.env.NEXT_PUBLIC_BASE_URL}/${avatarUrl}`;
+    return `${process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443'}/${avatarUrl}`;
   }
 
   // Helper to calculate duration between two dates
@@ -120,6 +120,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
     skills: user.skills || [],
     education: user.education || [],
     experience: user.experience || [],
+    projects: user.projects || [],
   });
 
   // Update form when user prop changes
@@ -139,6 +140,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
       skills: user.skills || [],
       education: user.education || [],
       experience: user.experience || [],
+      projects: user.projects || [],
     });
     setAvatarPreview(user.avatar || "");
   }, [user]);
@@ -161,6 +163,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
         skills: user.skills || [],
         education: user.education || [],
         experience: user.experience || [],
+        projects: user.projects || [],
       });
     }
   }, [editMode, user, originalForm]);
@@ -405,25 +408,35 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
           }
         } catch (error) {
           console.error('Failed to upload image:', error);
+          showToast({ type: 'error', message: 'Failed to upload image' });
           return; // Don't proceed with profile update if image upload fails
         }
       }
       
       const payload = transformFreelancerFormToPayload(updatedForm, userState);
+      console.log('Profile update payload:', payload);
       
-      await updateProfile(payload).unwrap();
+      const result = await updateProfile(payload).unwrap();
+      console.log('Profile update result:', result);
       
       // Refetch user data to update the profile instantly
       const freshUser = (await triggerMe()).data;
-      if (freshUser) dispatch(setUser(freshUser));
+      if (freshUser) {
+        dispatch(setUser(freshUser));
+        console.log('Updated user state:', freshUser);
+      }
       
       setEditMode(false);
+      showToast({ type: 'success', message: 'Profile updated successfully!' });
+      
+      // Call the profile update callback to trigger a refetch of the profile data
       if (onProfileUpdate) {
+        console.log('Calling onProfileUpdate callback to refetch profile data');
         onProfileUpdate();
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
-      showToast({ type: 'error', message: 'Failed to update profile' });
+      showToast({ type: 'error', message: 'Failed to update profile. Please try again.' });
     }
   }
   return (
@@ -457,6 +470,9 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
             <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start text-sm text-muted-foreground mt-2">
               {user.location && (
                 <span className="inline-flex items-center gap-1"><Icon icon={MapPin} size={16} /> {user.location}</span>
+              )}
+              {user.phone && (
+                <span className="inline-flex items-center gap-1"><Icon icon={MapPin} size={16} /> {user.phone}</span>
               )}
               {user.email && (
                 <a href={`mailto:${user.email}`} className="inline-flex items-center gap-1 hover:text-primary transition" aria-label="Email"><Icon icon={Mail} size={16} /> {user.email}</a>
@@ -639,7 +655,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                   <div key={idx} className="border border-border rounded-lg p-4 mb-2 flex flex-col gap-2 bg-muted/40 relative">
                     <button type="button" onClick={() => removeEducation(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border cursor-pointer" aria-label="Remove education"><Trash2 className="w-5 h-5" /></button>
                     <div className="flex flex-col gap-2">
-                      <input name="school" value={edu.school} onChange={e => handleEducationChange(idx, "school", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Institution Name" />
+                      <input name="institution_name" value={edu.school} onChange={e => handleEducationChange(idx, "school", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Institution Name" />
                       <input name="degree" value={edu.degree} onChange={e => handleEducationChange(idx, "degree", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Degree" />
                       <div className="flex gap-2">
                         <input type="date" name="start" value={edu.start || ""} onChange={e => handleEducationChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
@@ -668,8 +684,8 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                   <div key={idx} className="border border-border rounded-lg p-4 mb-2 flex flex-col gap-2 bg-muted/40 relative">
                     <button type="button" onClick={() => removeExperience(idx)} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border cursor-pointer" aria-label="Remove experience"><Trash2 className="w-5 h-5" /></button>
                     <div className="flex flex-col gap-2">
-                      <input name="company" value={exp.company} onChange={e => handleExperienceChange(idx, "company", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Company/Project Name" />
-                      <input name="title" value={exp.title} onChange={e => handleExperienceChange(idx, "title", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Title/Position" />
+                      <input name="company_name" value={exp.company} onChange={e => handleExperienceChange(idx, "company", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Company/Project Name" />
+                      <input name="job_title" value={exp.title} onChange={e => handleExperienceChange(idx, "title", e.target.value)} className="input rounded-md border px-3 py-2 bg-background" placeholder="Title/Position" />
                       <div className="flex gap-2">
                         <input type="date" name="start" value={exp.start || ""} onChange={e => handleExperienceChange(idx, "start", e.target.value)} className="input rounded-md border px-3 py-2 bg-background flex-1" placeholder="Start Date" />
                         <div className="flex-1">
@@ -694,6 +710,11 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                   </div>
                 ))}
               </div>
+              {/* Phone */}
+              <div className="flex flex-col gap-2">
+                <label className="font-semibold text-sm">Phone</label>
+                <input name="phone" value={form.phone} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Phone number" />
+              </div>
               {/* Location */}
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Location</label>
@@ -708,6 +729,41 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Website</label>
                 <input name="website" value={form.website} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Website URL" type="url" />
+              </div>
+              {/* Projects */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-sm">Projects</label>
+                  <button type="button" onClick={() => {
+                    const newProjects = [...(form.projects || []), { name: "", link: "", description: "" }];
+                    setForm({ ...form, projects: newProjects });
+                  }} className="rounded-full p-1.5 hover:bg-accent transition cursor-pointer" aria-label="Add project"><Plus className="w-5 h-5" /></button>
+                </div>
+                {(form.projects || []).map((project, idx) => (
+                  <div key={idx} className="border border-border rounded-lg p-4 mb-2 flex flex-col gap-2 bg-muted/40 relative">
+                    <button type="button" onClick={() => {
+                      const newProjects = form.projects?.filter((_, i) => i !== idx) || [];
+                      setForm({ ...form, projects: newProjects });
+                    }} className="absolute -top-3 -right-3 text-destructive hover:bg-destructive/10 rounded-full p-2 z-20 shadow bg-background border border-border cursor-pointer" aria-label="Remove project"><Trash2 className="w-5 h-5" /></button>
+                    <div className="flex flex-col gap-2">
+                      <input name="project_name" value={project.name || ""} onChange={e => {
+                        const newProjects = [...(form.projects || [])];
+                        newProjects[idx] = { ...newProjects[idx], name: e.target.value };
+                        setForm({ ...form, projects: newProjects });
+                      }} className="input rounded-md border px-3 py-2 bg-background" placeholder="Project Name" />
+                      <input name="project_link" value={project.link || ""} onChange={e => {
+                        const newProjects = [...(form.projects || [])];
+                        newProjects[idx] = { ...newProjects[idx], link: e.target.value };
+                        setForm({ ...form, projects: newProjects });
+                      }} className="input rounded-md border px-3 py-2 bg-background" placeholder="Project Link" />
+                      <textarea name="project_description" value={project.description || ""} onChange={e => {
+                        const newProjects = [...(form.projects || [])];
+                        newProjects[idx] = { ...newProjects[idx], description: e.target.value };
+                        setForm({ ...form, projects: newProjects });
+                      }} className="input rounded-md border px-3 py-2 bg-background min-h-[40px]" placeholder="Project Description" />
+                    </div>
+                  </div>
+                ))}
               </div>
               {/* Socials */}
               <div className="flex flex-col gap-2">

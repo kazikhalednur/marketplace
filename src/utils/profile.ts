@@ -14,7 +14,9 @@ interface ClientFormData {
 }
 
 interface FreelancerFormData {
-  name?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
   about?: string;
   location?: string;
   email?: string;
@@ -147,20 +149,19 @@ export function transformClientFormToPayload(form: ClientFormData, user: UserSta
 
 // Transform freelancer form data to API payload
 export function transformFreelancerFormToPayload(form: FreelancerFormData, user: UserState): FreelancerProfileUpdatePayload {
-  const [firstName, ...lastNameParts] = (form.name || '').trim().split(' ');
-  const lastName = lastNameParts.join(' ') || '';
-  
-  const subProfile = user.freelancer_sub_profiles?.[0];
-  
   const payload: FreelancerProfileUpdatePayload = {};
   
-  if (firstName || user.first_name) payload.first_name = firstName || user.first_name || '';
-  if (lastName || user.last_name) payload.last_name = lastName || user.last_name || '';
+  // Basic user fields
+  if (form.first_name || user.first_name) payload.first_name = form.first_name || user.first_name || '';
+  if (form.last_name || user.last_name) payload.last_name = form.last_name || user.last_name || '';
   if (user.username) payload.username = user.username;
-  if (user.phone) payload.phone = user.phone;
+  if (form.phone || user.phone) payload.phone = form.phone || user.phone || '';
   if (form.avatar || user.avatar) payload.avatar = form.avatar || user.avatar || null;
   
-  // Only include freelancer_sub_profiles if there are changes or existing data
+  // Get existing sub profile or create new one
+  const subProfile = user.freelancer_sub_profiles?.[0];
+  
+  // Always include freelancer_sub_profiles if there are any form changes
   if (subProfile || form.about || form.linkedin || form.github || form.website || form.experience?.length || form.education?.length || form.projects?.length) {
     payload.freelancer_sub_profiles = [{
       id: subProfile?.id || null,
@@ -173,13 +174,13 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
       portfolio: form.website || subProfile?.portfolio || '',
       skills: [], // Skills are handled separately, using IDs
       projects: form.projects?.map((project) => ({
-        id: project.id || null, // Use existing ID or null for new projects
+        id: project.id || null,
         title: project.name || '',
         link: project.link || '',
         description: project.description || '',
       })) || [],
       experiences: form.experience?.map((exp) => ({
-        id: exp.id || null, // Use existing ID or null for new experiences
+        id: exp.id || null,
         job_title: exp.title || '',
         company_name: exp.company || '',
         start_date: formatDateToFull(exp.start || ''),
@@ -188,11 +189,11 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
         description: exp.description || '',
       })) || [],
       educations: form.education?.map((edu) => ({
-        id: edu.id || null, // Use existing ID or null for new educations
+        id: edu.id || null,
         institution_name: edu.school || '',
         degree: edu.degree || '',
         start_date: formatDateToFull(edu.start || ''),
-        end_date: edu.is_present ? null : formatDateToFull(edu.end || ''),
+        end_date: edu.is_present ? null : (edu.end ? formatDateToFull(edu.end) : null),
       })) || [],
     }];
   }

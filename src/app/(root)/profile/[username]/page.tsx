@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const username = params.username as string;
 
   // Get profile data for the visited username
-  const { data: profileData, isLoading: profileLoading, error } = useGetProfileByUsernameQuery(username);
+  const { data: profileData, isLoading: profileLoading, error, refetch } = useGetProfileByUsernameQuery(username);
 
   // Show loader while checking authentication
   if (showLoader) {
@@ -62,7 +62,7 @@ export default function ProfilePage() {
     return (
       <ClientProfile 
         user={clientData} 
-        onProfileUpdate={() => {}} 
+        onProfileUpdate={() => refetch()} 
         isOwner={isOwner}
         onSendMessage={() => router.push('/messages')}
       />
@@ -72,7 +72,7 @@ export default function ProfilePage() {
     return (
       <StudentProfile 
         user={studentData} 
-        onProfileUpdate={() => {}} 
+        onProfileUpdate={() => refetch()} 
         isOwner={isOwner}
         onSendMessage={() => router.push('/messages')}
       />

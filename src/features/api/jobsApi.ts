@@ -165,7 +165,7 @@ export interface PaginatedBidsResponse {
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || '',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
       if (token) {

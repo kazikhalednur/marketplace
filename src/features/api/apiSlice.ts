@@ -180,7 +180,7 @@ export interface FreelancerProfileUpdatePayload {
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
@@ -227,7 +227,13 @@ export const apiSlice = createApi({
     getProfileByUsername: builder.query<UserInfo, string>({
       query: (username) => `accounts/info/${username}/`,
       transformResponse: (response: ProfileResponse) => response.data,
-      providesTags: (result, error, username) => [{ type: 'Profile', id: username }],
+      providesTags: (result, error, username) => [
+        { type: 'Profile', id: username },
+        // Also provide a general Profile tag that can be invalidated by profile updates
+        'Profile'
+      ],
+      // Force refetch when cache is invalidated
+      keepUnusedDataFor: 0,
     }),
     verifyEmail: builder.query<
       {
@@ -287,7 +293,7 @@ export const apiSlice = createApi({
       { email: string; code: string; new_password: string; confirm_password: string }
     >({
       query: (body) => ({
-        url: '/accounts/password-reset/',
+        url: 'accounts/password-reset/',
         method: 'POST',
         body,
       }),
@@ -298,7 +304,11 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['Me'],
+      invalidatesTags: (result, error, body) => [
+        'Me',
+        // Invalidate all Profile tags to ensure profile pages update immediately
+        'Profile'
+      ],
     }),
     updateClientProfile: builder.mutation<ProfileUpdateResponse, ClientProfileUpdatePayload>({
       query: (body) => ({
@@ -306,7 +316,7 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['ClientMe'],
+      invalidatesTags: ['ClientMe', 'Profile'],
     }),
     uploadImage: builder.mutation<ImageUploadResponse, FormData>({
       query: (body) => ({
