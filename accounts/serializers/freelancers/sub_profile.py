@@ -74,6 +74,12 @@ class FreelancerSubProfileEducationSerializer(serializers.ModelSerializer):
 
 class FreelancerSubProfileSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
+    username = serializers.CharField(
+        source="freelancer_profile.freelancer.username",
+        required=False,
+        allow_null=True,
+        read_only=True,
+    )
     projects = FreelancerSubProfileProjectSerializer(many=True, required=False)
     experiences = FreelancerSubProfileExperienceSerializer(many=True, required=False)
     educations = FreelancerSubProfileEducationSerializer(many=True, required=False)
@@ -85,6 +91,7 @@ class FreelancerSubProfileSerializer(serializers.ModelSerializer):
         model = FreelancerSubProfile
         fields = [
             "id",
+            "username",
             "hours_per_week",
             "is_more_available",
             "hour_rate",
