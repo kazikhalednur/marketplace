@@ -641,10 +641,10 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                 <textarea name="about" value={form.about} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted min-h-[60px]" placeholder="Short bio/about you" />
               </div>
               {/* Skills (Tags) */}
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Skills</label>
                 <TagsInput value={form.skills} onChange={handleSkillsChange} placeholder="Add a skill and press Enter" />
-              </div>
+              </div> */}
               {/* Education */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
@@ -716,10 +716,10 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
                 <input name="phone" value={form.phone} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Phone number" />
               </div>
               {/* Location */}
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Location</label>
                 <input name="location" value={form.location} onChange={handleChange} className="input rounded-md border px-3 py-2 bg-muted" placeholder="Location" />
-              </div>
+              </div> */}
               {/* Email */}
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-sm">Email</label>
