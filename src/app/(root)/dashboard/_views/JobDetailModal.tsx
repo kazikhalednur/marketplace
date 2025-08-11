@@ -51,7 +51,7 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
   const form = useForm({
     defaultValues: {
       cover_letter: "",
-      bid_amount: "",
+      bid_amount: job.is_fixed ? job.min_budget?.toString() || "" : "",
       attachments: [] as File[],
     },
   });
@@ -183,7 +183,11 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
       const formData = new FormData();
       formData.append('job', job.id);
       formData.append('cover_letter', data.cover_letter);
-      formData.append('bid_amount', data.bid_amount);
+      
+      // For fixed budget jobs, use the job's budget; for flexible jobs, use the user's bid
+      const bidAmount = job.is_fixed ? job.min_budget?.toString() || "" : data.bid_amount;
+      formData.append('bid_amount', bidAmount);
+      
       (data.attachments || []).forEach((file: File) => {
         formData.append('attachments', file);
       });
@@ -219,23 +223,45 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
           <FormField
             control={form.control}
             name="bid_amount"
-            rules={{ required: "Bid amount is required", min: { value: 1, message: "Bid must be positive" } }}
+            rules={{ 
+              required: !job.is_fixed ? "Bid amount is required" : false, 
+              min: { value: 1, message: "Bid must be positive" } 
+            }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-semibold">Bid Amount</FormLabel>
+                <FormLabel className="text-base font-semibold">
+                  {job.is_fixed ? "Fixed Budget" : "Bid Amount"}
+                </FormLabel>
                 <FormControl>
-                  <div className="relative flex items-center">
-                    <span className="absolute left-3 text-lg text-muted-foreground pointer-events-none">৳</span>
-                    <input
-                      type="number"
-                      min={1}
-                      placeholder="Enter your bid"
-                      {...field}
-                      className="pl-8 pr-3 py-2 w-full rounded-lg border border-border/30 bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-base transition-all outline-none shadow-xs"
-                    />
-                  </div>
+                  {job.is_fixed ? (
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 text-lg text-muted-foreground pointer-events-none">৳</span>
+                      <input
+                        type="text"
+                        value={job.min_budget}
+                        readOnly
+                        className="pl-8 pr-3 py-2 w-full rounded-lg border border-border/30 bg-muted/50 text-base transition-all outline-none shadow-xs cursor-not-allowed"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 text-lg text-muted-foreground pointer-events-none">৳</span>
+                      <input
+                        type="number"
+                        min={1}
+                        placeholder="Enter your bid"
+                        {...field}
+                        className="pl-8 pr-3 py-2 w-full rounded-lg border border-border/30 bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/20 text-base transition-all outline-none shadow-xs"
+                      />
+                    </div>
+                  )}
                 </FormControl>
                 <FormMessage />
+                {job.is_fixed && (
+                  <p className="text-sm text-muted-foreground">
+                    This job has a fixed budget of ৳{job.min_budget}
+                  </p>
+                )}
               </FormItem>
             )}
           />
