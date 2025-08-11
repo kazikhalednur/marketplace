@@ -2,7 +2,8 @@ import { UserState } from '@/features/userSlice';
 import { FreelancerEducation, FreelancerExperience, FreelancerProject, ClientProfileUpdatePayload, FreelancerProfileUpdatePayload } from '@/features/api/apiSlice';
 
 interface ClientFormData {
-  name?: string;
+  first_name?: string;
+  last_name?: string;
   bio?: string;
   email?: string;
   website?: string;
@@ -129,20 +130,36 @@ export function transformStudentData(user: UserState) {
 
 // Transform client form data to API payload
 export function transformClientFormToPayload(form: ClientFormData, user: UserState): ClientProfileUpdatePayload {
-  const [firstName, ...lastNameParts] = (form.name || '').trim().split(' ');
-  const lastName = lastNameParts.join(' ') || '';
-  
   const payload: ClientProfileUpdatePayload = {};
   
-  if (firstName || user.first_name) payload.first_name = firstName || user.first_name || '';
-  if (lastName || user.last_name) payload.last_name = lastName || user.last_name || '';
+  // Always send form values if they exist, even if empty
+  if (form.first_name !== undefined && form.first_name !== null) {
+    payload.first_name = form.first_name;
+  }
+  if (form.last_name !== undefined && form.last_name !== null) {
+    payload.last_name = form.last_name;
+  }
   if (user.username) payload.username = user.username;
-  if (user.phone) payload.phone = user.phone;
-  if (form.company_name || user.company_name) payload.company_name = form.company_name || user.company_name || '';
-  if (form.twitter) payload.twitter = form.twitter;
-  if (form.linkedin) payload.linkedin = form.linkedin;
-  if (form.bio) payload.bio = form.bio;
-  if (form.avatar || user.avatar) payload.avatar = form.avatar || user.avatar || null;
+  
+  // Always send form values if they exist, even if empty
+  if (form.phone !== undefined && form.phone !== null) {
+    payload.phone = form.phone;
+  }
+  if (form.company_name !== undefined && form.company_name !== null) {
+    payload.company_name = form.company_name;
+  }
+  if (form.twitter !== undefined && form.twitter !== null) {
+    payload.twitter = form.twitter;
+  }
+  if (form.linkedin !== undefined && form.linkedin !== null) {
+    payload.linkedin = form.linkedin;
+  }
+  if (form.bio !== undefined && form.bio !== null) {
+    payload.bio = form.bio;
+  }
+  if (form.avatar !== undefined && form.avatar !== null) {
+    payload.avatar = form.avatar;
+  }
   
   return payload;
 }
@@ -151,12 +168,30 @@ export function transformClientFormToPayload(form: ClientFormData, user: UserSta
 export function transformFreelancerFormToPayload(form: FreelancerFormData, user: UserState): FreelancerProfileUpdatePayload {
   const payload: FreelancerProfileUpdatePayload = {};
   
-  // Basic user fields
-  if (form.first_name || user.first_name) payload.first_name = form.first_name || user.first_name || '';
-  if (form.last_name || user.last_name) payload.last_name = form.last_name || user.last_name || '';
+  // Basic user fields - always send form values if they exist
+  if (form.first_name !== undefined && form.first_name !== null) {
+    payload.first_name = form.first_name;
+  }
+  if (form.last_name !== undefined && form.last_name !== null) {
+    payload.last_name = form.last_name;
+  }
   if (user.username) payload.username = user.username;
-  if (form.phone || user.phone) payload.phone = form.phone || user.phone || '';
-  if (form.avatar || user.avatar) payload.avatar = form.avatar || user.avatar || null;
+  if (form.phone && form.phone.trim() !== '') {
+    payload.phone = form.phone;
+  } else if (user.phone && user.phone.trim() !== '') {
+    payload.phone = user.phone;
+  }
+  if (form.avatar !== undefined && form.avatar !== null) {
+    if (form.avatar.trim() !== '') {
+      payload.avatar = form.avatar;
+    } else {
+      // Empty string means remove avatar
+      payload.avatar = null;
+    }
+  } else if (user.avatar && user.avatar.trim() !== '') {
+    // Keep existing avatar if no new one provided
+    payload.avatar = user.avatar;
+  }
   
   // Get existing sub profile or create new one
   const subProfile = user.freelancer_sub_profiles?.[0];
@@ -168,10 +203,18 @@ export function transformFreelancerFormToPayload(form: FreelancerFormData, user:
       hours_per_week: subProfile?.hours_per_week || 0,
       is_more_available: subProfile?.is_more_available || true,
       hour_rate: subProfile?.hour_rate || '0',
-      bio: form.about || subProfile?.bio || '',
-      linkedin: form.linkedin || subProfile?.linkedin || '',
-      github: form.github || subProfile?.github || '',
-      portfolio: form.website || subProfile?.portfolio || '',
+             bio: form.about !== undefined && form.about !== null && form.about.trim() !== '' 
+         ? form.about 
+         : (form.about === '' ? '' : (subProfile?.bio || '')),
+       linkedin: form.linkedin !== undefined && form.linkedin !== null && form.linkedin.trim() !== '' 
+         ? form.linkedin 
+         : (form.linkedin === '' ? '' : (subProfile?.linkedin || '')),
+       github: form.github !== undefined && form.github !== null && form.github.trim() !== '' 
+         ? form.github 
+         : (form.github === '' ? '' : (subProfile?.github || '')),
+       portfolio: form.website !== undefined && form.website !== null && form.website.trim() !== '' 
+         ? form.website 
+         : (form.website === '' ? '' : (subProfile?.portfolio || '')),
       skills: [], // Skills are handled separately, using IDs
       projects: form.projects?.map((project) => ({
         id: project.id || null,
