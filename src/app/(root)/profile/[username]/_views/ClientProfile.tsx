@@ -9,7 +9,7 @@ import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { setUser } from "@/features/userSlice";
 import { transformClientFormToPayload } from "@/utils/profile";
 import { getStatusBadge } from "@/utils/statusBadge";
-import { Briefcase, Building2, Calendar, Check, CheckCircle2, Edit, Globe, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
+import { Briefcase, Building2, Calendar, Check, CheckCircle2, Edit, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import type { User } from '@/types/user';
 
