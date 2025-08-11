@@ -18,7 +18,7 @@ import BidsList from './BidsList';
 
 
 // Utility for file validation
-const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "png", "jpg", "jpeg", "zip", "rar", "txt"];
+const ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"];
 const EXECUTABLE_EXTENSIONS = ["exe", "bat", "sh", "msi", "apk", "com", "scr", "pif", "gadget", "jar"];
 const MAX_FILE_SIZE_MB = 2;
 const MAX_FILES = 3;
@@ -27,17 +27,19 @@ function isExecutableFile(file: File) {
   const ext = file.name.split(".").pop()?.toLowerCase();
   return EXECUTABLE_EXTENSIONS.includes(ext || "");
 }
-function isAllowedFile(file: File) {
+
+function isImageFile(file: File) {
   const ext = file.name.split(".").pop()?.toLowerCase();
   return ALLOWED_EXTENSIONS.includes(ext || "");
 }
+
 function validateFiles(files: File[] | null) {
   if (!files) return "No files selected.";
   if (files.length > MAX_FILES) return `You can upload up to ${MAX_FILES} files.`;
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return `File ${file.name} exceeds ${MAX_FILE_SIZE_MB}MB.`;
-    if (!isAllowedFile(file)) return `File type not allowed: ${file.name}`;
+    if (!isImageFile(file)) return `Only image files are allowed. File type not allowed: ${file.name}`;
     if (isExecutableFile(file)) return `Executable files are not allowed: ${file.name}`;
   }
   return null;
@@ -61,22 +63,56 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
+    
+    // Check each file individually and show toast for invalid files
+    const validFiles: File[] = [];
+    const invalidFiles: File[] = [];
+    
+    Array.from(files).forEach(file => {
+      if (isImageFile(file)) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file);
+        showToast({ 
+          type: "error", 
+          message: `Only image files are allowed. File "${file.name}" was rejected.` 
+        });
+      }
+    });
+    
+    // Only proceed with valid files
+    if (validFiles.length === 0) {
+      e.target.value = '';
+      return;
+    }
+    
     const currentFiles = form.getValues("attachments") || [];
-    const combinedFiles = [...currentFiles, ...Array.from(files)]
+    const combinedFiles = [...currentFiles, ...validFiles]
       .filter((file, idx, arr) =>
         arr.findIndex(f => f.name === file.name && f.size === file.size) === idx
       );
+    
     if (combinedFiles.length > MAX_FILES) {
-      setFileError(`You can upload up to ${MAX_FILES} files.`);
+      showToast({ 
+        type: "error", 
+        message: `You can upload up to ${MAX_FILES} files. Only the first ${MAX_FILES} files were kept.` 
+      });
       // Only keep the first 3 files
       form.setValue("attachments", combinedFiles.slice(0, MAX_FILES));
       e.target.value = '';
       return;
     }
+    
     const fileValidationError = validateFiles(combinedFiles);
     setFileError(fileValidationError);
     if (!fileValidationError) {
       form.setValue("attachments", combinedFiles);
+      if (validFiles.length > 0) {
+        showToast({ 
+          type: "success", 
+          message: `${validFiles.length} image file(s) added successfully.` 
+        });
+      }
     }
     e.target.value = '';
   };
@@ -104,10 +140,37 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
     setDragActive(false);
     const files = e.dataTransfer.files;
     const newFiles = Array.from(files);
-    const error = validateFiles(newFiles);
+    
+    // Check each file individually and show toast for invalid files
+    const validFiles: File[] = [];
+    const invalidFiles: File[] = [];
+    
+    newFiles.forEach(file => {
+      if (isImageFile(file)) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file);
+        showToast({ 
+          type: "error", 
+          message: `Only image files are allowed. File "${file.name}" was rejected.` 
+        });
+      }
+    });
+    
+    if (validFiles.length === 0) {
+      setFileError("No valid image files were dropped.");
+      form.setValue("attachments", []);
+      return;
+    }
+    
+    const error = validateFiles(validFiles);
     setFileError(error);
-    if (!error && files) {
-      form.setValue("attachments", newFiles);
+    if (!error) {
+      form.setValue("attachments", validFiles);
+      showToast({ 
+        type: "success", 
+        message: `${validFiles.length} image file(s) added successfully.` 
+      });
     } else {
       form.setValue("attachments", []);
     }
@@ -177,7 +240,7 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
             )}
           />
           <FormItem>
-            <FormLabel className="text-base font-semibold">Attachments <span className="text-xs font-normal">(max {MAX_FILES}, {MAX_FILE_SIZE_MB}MB each)</span></FormLabel>
+            <FormLabel className="text-base font-semibold">Attachments <span className="text-xs font-normal">(max {MAX_FILES}, {MAX_FILE_SIZE_MB}MB each, images only)</span></FormLabel>
             <div
               className={`border-2 border-dashed rounded-xl p-6 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer select-none ${dragActive ? 'border-primary bg-primary/10' : 'border-border bg-muted/40 hover:border-primary/60 hover:bg-primary/5'}`}
               onDragOver={handleDragOver}
@@ -186,15 +249,16 @@ function ApplyJobForm({ job, onSuccess, onCancel }: { job: JobDetail, onSuccess:
               onClick={() => document.getElementById('apply-attachments-input')?.click()}
               tabIndex={0}
               role="button"
-              aria-label="Upload attachments"
+              aria-label="Upload image attachments"
             >
               <svg width="32" height="32" fill="none" viewBox="0 0 24 24" className="mb-1 text-primary"><path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><rect x="3" y="16" width="18" height="4" rx="2" fill="currentColor" fillOpacity=".05"/></svg>
-              <span className="text-sm text-muted-foreground">Drag & drop files here, or <span className="underline text-primary">click to select</span></span>
+              <span className="text-sm text-muted-foreground">Drag & drop image files here, or <span className="underline text-primary">click to select</span></span>
+              <span className="text-xs text-muted-foreground">Accepted formats: PNG, JPG, JPEG, GIF, WebP, BMP, SVG</span>
               <Input
                 id="apply-attachments-input"
                 type="file"
                 multiple
-                accept={ALLOWED_EXTENSIONS.map((e) => '.' + e).join(',')}
+                accept="image/*"
                 onChange={handleFileChange}
                 aria-invalid={!!fileError}
                 className="hidden"
