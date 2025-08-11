@@ -262,11 +262,11 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
                   <Icon icon={Phone} size={16} /> {user.phone}
                 </span>
               )}
-              {user.website && (
+              {/* {user.website && (
                 <a href={user.website} target="_blank" rel="noopener" className="inline-flex items-center gap-1 hover:text-primary transition" aria-label="Website">
                   <Icon icon={Globe} size={16} /> Website
                 </a>
-              )}
+              )} */}
             </div>
             
             {/* Social Links */}
