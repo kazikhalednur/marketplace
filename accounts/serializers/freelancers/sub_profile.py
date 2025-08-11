@@ -15,6 +15,7 @@ class FreelancerSubProfileProjectSerializer(serializers.ModelSerializer):
 
 class FreelancerSubProfileExperienceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
+    description = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Experience
