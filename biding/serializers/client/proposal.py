@@ -49,6 +49,11 @@ class ClientProposalSerializer(serializers.ModelSerializer):
                 message=f"Your proposal for {proposal.job.title} has been accepted.",
                 message_type=Notification.NotificationType.SUCCESS,
             )
+            Notification.objects.create(
+                user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,
+                message="You can chat with the client now.",
+                message_type=Notification.NotificationType.INFO,
+            )
             # Create a contract
             Contract.objects.create(
                 freelancer_profile=proposal.freelancer_sub_profile.freelancer_profile,
