@@ -26,7 +26,7 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-background px-6 py-20 text-foreground">
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
-        Join as a Student or Employer
+        Join as a Freelancer or Client
       </h1>
       <div className="flex gap-6">
         <Card
@@ -34,7 +34,7 @@ export default function RegisterPage() {
           className="cursor-pointer hover:shadow-lg transition-all p-8 w-64 text-center border border-blue-300"
         >
           <GraduationCap className="mx-auto text-blue-600 mb-4" size={44} />
-          <h2 className="font-semibold text-lg">I&apos;m a Student</h2>
+          <h2 className="font-semibold text-lg">I&apos;m a Freelancer</h2>
           <p className="text-sm text-muted-foreground mt-2">
             Verified students can earn by working on real-world projects.
           </p>
@@ -45,7 +45,7 @@ export default function RegisterPage() {
           className="cursor-pointer hover:shadow-lg transition-all p-8 w-64 text-center border border-green-300"
         >
           <Briefcase className="mx-auto text-green-600 mb-4" size={44} />
-          <h2 className="font-semibold text-lg">I&apos;m an Employer</h2>
+          <h2 className="font-semibold text-lg">I&apos;m a Client</h2>
           <p className="text-sm text-muted-foreground mt-2">
             Hire talented university students for remote dev jobs.
           </p>

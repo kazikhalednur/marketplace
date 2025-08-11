@@ -78,7 +78,7 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
           )}
-          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">Register as Employer</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">Register as Client</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-2 sm:px-8 px-4">
           <Form {...form}>
