@@ -9,6 +9,7 @@ import { useAppDispatch } from "@/hooks/useTypedDispatch";
 import { setUser } from "@/features/userSlice";
 import { transformClientFormToPayload } from "@/utils/profile";
 import { getStatusBadge } from "@/utils/statusBadge";
+import { useToast } from "@/components/ui/toast-provider";
 import { Briefcase, Building2, Calendar, Check, CheckCircle2, Edit, Key, Linkedin, Mail, Phone, Shield, Twitter, User as UserIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import type { User } from '@/types/user';
@@ -114,6 +115,7 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
   const modalRef = useRef<HTMLDivElement>(null);
   const [fieldErrors, setFieldErrors] = useState<{ first_name?: string; last_name?: string }>({});
   const [shake, setShake] = useState(false);
+  const { showToast } = useToast();
 
   // Close modal on outside click
   useEffect(() => {
@@ -137,6 +139,21 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (1.5MB = 1.5 * 1024 * 1024 bytes)
+      const maxSize = 1.5 * 1024 * 1024; // 1.5MB in bytes
+      
+      if (file.size > maxSize) {
+        // Show error toast for file too large
+        showToast({
+          message: `File size must be less than 1.5MB. Current size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+          type: 'error',
+          duration: 5000
+        });
+        // Clear the file input
+        e.target.value = '';
+        return;
+      }
+      
       setSelectedImage(file);
       setAvatarPreview(URL.createObjectURL(file));
     }
@@ -466,14 +483,15 @@ export default function ClientProfile({ user, onProfileUpdate, isOwner, onSendMe
             </button>
             <h2 className="font-bold text-2xl mb-2 text-center pt-8">Edit Profile</h2>
             <form onSubmit={handleSave} className={`flex flex-col gap-6 px-4 sm:px-8 pb-8 overflow-y-auto ${shake ? 'animate-shake' : ''}`} style={{ flex: 1, minHeight: 0 }}>
-              {/* Profile Image Upload */}
-              <div className="flex flex-col gap-2 items-center">
-                <label className="font-semibold text-sm mb-1">Profile Image</label>
-                <div className="relative w-24 h-24 mb-2">
-                  <Avatar src={avatarPreview} name={`${form.first_name || ""} ${form.last_name || ""}`.trim() || undefined} size={96} />
-                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
-                  <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
-                </div>
+                             {/* Profile Image Upload */}
+               <div className="flex flex-col gap-2 items-center">
+                 <label className="font-semibold text-sm mb-1">Profile Image</label>
+                 <div className="relative w-24 h-24 mb-2">
+                   <Avatar src={avatarPreview} name={`${form.first_name || ""} ${form.last_name || ""}`.trim() || undefined} size={96} />
+                   <input type="file" accept="image/*" onChange={handleAvatarChange} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Upload profile image" />
+                   <span className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 text-xs shadow">Edit</span>
+                 </div>
+                 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex flex-col gap-2 flex-1">
                     <label className="font-semibold text-sm">First Name <span className="text-destructive">*</span></label>
