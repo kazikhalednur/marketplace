@@ -9,16 +9,25 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
     email_verified = serializers.BooleanField(read_only=True)
     is_google_login = serializers.BooleanField(read_only=True)
     company_name = serializers.CharField(
-        source="client_profile.company_name", allow_null=True, required=False
+        source="client_profile.company_name",
+        allow_null=True,
+        required=False,
+        allow_blank=True,
     )
     twitter = serializers.URLField(
-        source="client_profile.twitter", allow_null=True, required=False
+        source="client_profile.twitter",
+        allow_null=True,
+        required=False,
+        allow_blank=True,
     )
     linkedin = serializers.URLField(
-        source="client_profile.linkedin", allow_null=True, required=False
+        source="client_profile.linkedin",
+        allow_null=True,
+        required=False,
+        allow_blank=True,
     )
     bio = serializers.CharField(
-        source="client_profile.bio", allow_null=True, required=False
+        source="client_profile.bio", allow_null=True, required=False, allow_blank=True
     )
     avatar = serializers.URLField(
         source="client_profile.avatar", allow_null=True, required=False
