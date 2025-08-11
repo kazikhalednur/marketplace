@@ -7,7 +7,9 @@ from ...models import Education, Experience, FreelancerSubProfile, Project
 
 class FreelancerSubProfileProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
-    description = serializers.CharField(required=False, allow_null=True)
+    description = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
 
     class Meta:
         model = Project
@@ -16,7 +18,9 @@ class FreelancerSubProfileProjectSerializer(serializers.ModelSerializer):
 
 class FreelancerSubProfileExperienceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, allow_null=True)
-    description = serializers.CharField(required=False, allow_null=True)
+    description = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
 
     class Meta:
         model = Experience
