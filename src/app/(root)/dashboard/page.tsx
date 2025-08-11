@@ -56,90 +56,11 @@ function DashboardContent() {
 
   const jobs = useMemo(() => jobsData?.jobs || [], [jobsData]);
   
-  // Filter jobs on the frontend based on search and other filters
-  const filteredJobs = useMemo(() => {
-    if (!jobs.length) return [];
-    
-    return jobs.filter(job => {
-      // Search text filter - simple word matching
-      if (search && search.trim()) {
-        const searchLower = search.toLowerCase().trim();
-        const titleMatch = job.title.toLowerCase().includes(searchLower);
-        const descriptionMatch = job.description.toLowerCase().includes(searchLower);
-        const tagsMatch = job.tags.some(tag => tag.toLowerCase().includes(searchLower));
-        const categoryMatch = job.category && typeof job.category === 'object' 
-          ? job.category.name.toLowerCase().includes(searchLower)
-          : job.category && typeof job.category === 'string'
-          ? job.category.toLowerCase().includes(searchLower)
-          : false;
-        const skillsMatch = job.skills 
-          ? job.skills.some(skill => skill.name.toLowerCase().includes(searchLower))
-          : false;
-        
-        if (!titleMatch && !descriptionMatch && !tagsMatch && !categoryMatch && !skillsMatch) {
-          return false;
-        }
-      }
-      
-      // Status filter
-      if (status && job.status !== status) {
-        return false;
-      }
-      
-      // Tags filter - simple word matching
-      if (tags && tags.length > 0) {
-        const hasMatchingTag = tags.some(tag => 
-          job.tags.some(jobTag => jobTag.toLowerCase().includes(tag.toLowerCase()))
-        );
-        if (!hasMatchingTag) {
-          return false;
-        }
-      }
-      
-      // Budget filter
-      if (min_budget && job.min_budget) {
-        const jobMinBudget = typeof job.min_budget === 'string' ? parseFloat(job.min_budget) : job.min_budget;
-        if (jobMinBudget < parseFloat(min_budget)) {
-          return false;
-        }
-      }
-      if (max_budget && job.max_budget) {
-        const jobMaxBudget = typeof job.max_budget === 'string' ? parseFloat(job.max_budget) : job.max_budget;
-        if (jobMaxBudget > parseFloat(max_budget)) {
-          return false;
-        }
-      }
-      
-      // Skills filter - simple word matching
-      if (skills && skills.length > 0 && job.skills) {
-        const hasMatchingSkill = skills.some(skill => 
-          job.skills!.some(jobSkill => jobSkill.name.toLowerCase().includes(skill.toLowerCase()))
-        );
-        if (!hasMatchingSkill) {
-          return false;
-        }
-      }
-      
-      // Category filter - simple word matching
-      if (category && job.category) {
-        const jobCategoryName = typeof job.category === 'object' ? job.category.name : job.category;
-        if (!jobCategoryName.toLowerCase().includes(category.toLowerCase())) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [jobs, search, status, tags, min_budget, max_budget, skills, category]);
-
-  // Calculate pagination for filtered results
-  const filteredTotalCount = filteredJobs.length;
-  const filteredTotalPages = Math.ceil(filteredTotalCount / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedFilteredJobs = filteredJobs.slice(startIndex, endIndex);
-  const hasNextFiltered = endIndex < filteredTotalCount;
-  const hasPreviousFiltered = currentPage > 1;
+  // Use server-side pagination data directly
+  const totalCount = jobsData?.count || 0;
+  const hasNext = jobsData?.next !== null;
+  const hasPrevious = jobsData?.previous !== null;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   // Handle URL parameters for job details and update selectedJob when jobs data changes
   useEffect(() => {
@@ -198,16 +119,16 @@ function DashboardContent() {
           <DashboardMainSection
             isLoading={isLoading}
             isError={isError}
-            filteredJobs={paginatedFilteredJobs}
+            filteredJobs={jobs}
             handleJobClick={handleJobClick}
-            totalPages={filteredTotalPages}
+            totalPages={totalPages}
             paginationProps={{
               currentPage,
-              totalPages: filteredTotalPages,
-              hasPrevious: hasPreviousFiltered,
-              hasNext: hasNextFiltered,
+              totalPages,
+              hasPrevious,
+              hasNext,
               pageSize,
-              totalCount: filteredTotalCount,
+              totalCount,
               onPageChange: handlePageChange,
             }}
           />
