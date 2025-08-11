@@ -2,7 +2,7 @@
 import Avatar from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/Icon";
-import { TagsInput } from "@/components/ui/tags-input";
+
 import { useToast } from "@/components/ui/toast-provider";
 import { useUpdateProfileMutation, useUploadImageMutation, useLazyGetMeQuery } from "@/features/api/apiSlice";
 import { setUser } from "@/features/userSlice";
@@ -188,9 +188,7 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
     setForm((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev) => ({ ...prev, [name]: undefined })); // Clear error on change
   }
-  function handleSkillsChange(skills: string[]) {
-    setForm({ ...form, skills });
-  }
+
   function handleEducationChange(idx: number, field: string, value: string | boolean) {
     const updated = [...form.education];
     const currentEdu = updated[idx];

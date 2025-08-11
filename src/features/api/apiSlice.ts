@@ -304,7 +304,7 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: (result, error, body) => [
+      invalidatesTags: [
         'Me',
         // Invalidate all Profile tags to ensure profile pages update immediately
         'Profile'
