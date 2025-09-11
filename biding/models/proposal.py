@@ -16,10 +16,12 @@ class Proposal(models.Model):
         REJECTED = "rejected", "Rejected"
 
     id = models.UUIDField(primary_key=True, editable=False, serialize=False)
-    freelancer_sub_profile = models.ForeignKey(
+    freelancer_sub_profile: FreelancerSubProfile = models.ForeignKey(
         FreelancerSubProfile, related_name="proposals", on_delete=models.CASCADE
     )
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="proposals")
+    job: Job = models.ForeignKey(
+        Job, on_delete=models.CASCADE, related_name="proposals"
+    )
     cover_letter = models.TextField()
     bid_amount = models.DecimalField(max_digits=10, decimal_places=2)
     used_connects = models.PositiveIntegerField(blank=True, null=True)

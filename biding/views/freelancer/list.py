@@ -15,8 +15,8 @@ class JobPagination(PageNumberPagination):
 
 
 @extend_schema_view(
-    get=extend_schema(tags=["Freelancer Proposals"]),
-    post=extend_schema(tags=["Freelancer Proposals"]),
+    get=extend_schema(tags=["freelancer_proposals"]),
+    post=extend_schema(tags=["freelancer_proposals"]),
 )
 class ProposalListCreateView(ListCreateAPIView):
     permission_classes = [IsFreelancer]

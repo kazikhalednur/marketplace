@@ -1,0 +1,76 @@
+from drf_spectacular.utils import extend_schema_field
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+
+from accounts.models import ClientProfile, FreelancerProfile
+from base.models import Settings as base_settings
+from jobs.models import Job
+
+from ...models import Contract
+
+
+class ClientContractJobSerializer(ModelSerializer):
+    job_link = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Job
+        fields = ("id", "title", "job_link")
+
+    @extend_schema_field(serializers.URLField)
+    def get_job_link(self, obj):
+        frontend_url = base_settings.FRONTEND_URL
+        return f"{frontend_url}/dashboard?jobId={obj.id}/"
+
+
+class ClientContractFreelancerProfileSerializer(ModelSerializer):
+    username = serializers.CharField(source="freelancer.username", read_only=True)
+    first_name = serializers.CharField(source="freelancer.first_name", read_only=True)
+    last_name = serializers.CharField(source="freelancer.last_name", read_only=True)
+
+    class Meta:
+        model = FreelancerProfile
+        fields = (
+            "username",
+            "avatar",
+            "first_name",
+            "last_name",
+        )
+
+
+class ClientContractClientProfileSerializer(ModelSerializer):
+    username = serializers.CharField(source="client.username", read_only=True)
+    first_name = serializers.CharField(source="client.first_name", read_only=True)
+    last_name = serializers.CharField(source="client.last_name", read_only=True)
+
+    class Meta:
+        model = ClientProfile
+        fields = (
+            "username",
+            "avatar",
+            "first_name",
+            "last_name",
+        )
+
+
+class ClientContractDetailSerializer(ModelSerializer):
+    job = ClientContractJobSerializer(read_only=True)
+    freelancer_profile = ClientContractFreelancerProfileSerializer(read_only=True)
+    client_profile = ClientContractClientProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Contract
+        fields = (
+            "id",
+            "job",
+            "freelancer_profile",
+            "client_profile",
+            "status",
+            "start_date",
+            "end_date",
+            "budget",
+        )
+        read_only_fields = (
+            "id",
+            "start_date",
+            "budget",
+        )

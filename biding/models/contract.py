@@ -18,19 +18,22 @@ class Contract(models.Model):
     id = models.UUIDField(
         primary_key=True, editable=False, serialize=False, unique=True
     )
-    freelancer_profile = models.ForeignKey(
+    freelancer_profile: FreelancerProfile = models.ForeignKey(
         FreelancerProfile, related_name="contracts", on_delete=models.CASCADE
     )
     freelancer_sub_profile = models.ForeignKey(
         FreelancerSubProfile, related_name="contracts", on_delete=models.CASCADE
     )
-    client_profile = models.ForeignKey(
+    client_profile: ClientProfile = models.ForeignKey(
         ClientProfile, related_name="contracts", on_delete=models.CASCADE
     )
     proposal = models.OneToOneField(
         Proposal, related_name="contract", on_delete=models.CASCADE
     )
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="contracts")
+    job: Job = models.ForeignKey(
+        Job, on_delete=models.CASCADE, related_name="contracts"
+    )
+    budget = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
@@ -39,7 +42,7 @@ class Contract(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"Contract for {self.job.title} between {self.client_profile.client.username} and {self.freelancer_sub_profile.freelancer_profile.freelancer.username}"  # noqa: E501
+        return f"Contract for {self.job.title} between {self.client_profile.client.username} and {self.freelancer_profile.freelancer.username}"  # noqa: E501
 
     def save(self, *args, **kwargs):
         if not self.id:

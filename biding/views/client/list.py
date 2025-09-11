@@ -14,7 +14,7 @@ class ProposalPagination(PageNumberPagination):
     max_page_size = 100
 
 
-@extend_schema(tags=["Client Proposals"])
+@extend_schema(tags=["client_proposals"])
 class ProposalListlView(ListAPIView):
     permission_classes = [IsClient]
     serializer_class = ClientProposalSerializer

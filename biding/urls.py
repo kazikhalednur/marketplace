@@ -1,7 +1,31 @@
-from django.urls import path
+from django.urls import include, path
 
 from .views import client as client_views
 from .views import freelancer as freelancer_views
+
+client_urls = [
+    path(
+        "proposals/update/<uuid:proposal_id>/",
+        client_views.ProposalUpdateView.as_view(),
+        name="client-proposal-update",
+    ),
+    path(
+        "proposals/<uuid:job_id>/",
+        client_views.ProposalListlView.as_view(),
+        name="client-proposal-list",
+    ),
+    path(
+        "contracts/",
+        client_views.ContractListView.as_view(),
+        name="client-contract-list",
+    ),
+    path(
+        "contracts/<uuid:contract_id>/",
+        client_views.ContractDetailView.as_view(),
+        name="client-contract-detail",
+    ),
+]
+
 
 urlpatterns = [
     path(
@@ -14,14 +38,5 @@ urlpatterns = [
         freelancer_views.ProposalDetailView.as_view(),
         name="proposal-detail",
     ),
-    path(
-        "client/proposals/update/<uuid:proposal_id>/",
-        client_views.ProposalUpdateView.as_view(),
-        name="client-proposal-update",
-    ),
-    path(
-        "client/proposals/<uuid:job_id>/",
-        client_views.ProposalListlView.as_view(),
-        name="client-proposal-list",
-    ),
+    path("client/", include(client_urls)),
 ]

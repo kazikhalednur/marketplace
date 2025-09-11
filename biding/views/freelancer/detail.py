@@ -8,8 +8,8 @@ from ...serializers.freelancer import ProposalSerializer
 
 
 @extend_schema_view(
-    get=extend_schema(tags=["Freelancer Proposals"]),
-    delete=extend_schema(tags=["Freelancer Proposals"]),
+    get=extend_schema(tags=["freelancer_proposals"]),
+    delete=extend_schema(tags=["freelancer_proposals"]),
 )
 class ProposalDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsFreelancer]

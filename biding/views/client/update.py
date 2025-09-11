@@ -7,7 +7,7 @@ from ...models import Proposal
 from ...serializers.client import ClientProposalSerializer
 
 
-@extend_schema(tags=["Client Proposals"])
+@extend_schema(tags=["client_proposals"])
 class ProposalUpdateView(UpdateAPIView):
     permission_classes = [IsClient]
     serializer_class = ClientProposalSerializer

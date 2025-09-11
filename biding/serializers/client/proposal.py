@@ -61,6 +61,7 @@ class ClientProposalSerializer(serializers.ModelSerializer):
                 client_profile=proposal.job.created_by.client_profile,
                 proposal=proposal,
                 job=proposal.job,
+                budget=proposal.bid_amount,
             )
 
             # Notify other freelancers
