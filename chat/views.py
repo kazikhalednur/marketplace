@@ -1,11 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import ClientProfile, FreelancerProfile
-from biding.models import Contract
 
 from .models import Conversation, Message
 from .serializers import (
@@ -162,23 +160,3 @@ class ConversationStatusView(generics.UpdateAPIView):
     def get_object(self):
         conversation_id = self.kwargs.get("conversation_id")
         return get_object_or_404(Conversation, conversation_id=conversation_id)
-
-
-@api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
-def create_conversation_from_contract(request, contract_id):
-    """Create a new conversation from a contract"""
-    contract = get_object_or_404(Contract, id=contract_id)
-
-    # Check if conversation already exists
-    if hasattr(contract, "conversation"):
-        return Response(
-            {"error": "Conversation already exists for this contract"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    # Create conversation
-    conversation = Conversation.objects.create(contract=contract)
-
-    serializer = ConversationSerializer(conversation, context={"request": request})
-    return Response(serializer.data, status=status.HTTP_201_CREATED)

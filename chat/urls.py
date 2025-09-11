@@ -34,10 +34,4 @@ urlpatterns = [
         views.MarkAllMessagesAsReadView.as_view(),
         name="mark-all-messages-read",
     ),
-    # Contract to conversation creation
-    path(
-        "contracts/<int:contract_id>/conversation/",
-        views.create_conversation_from_contract,
-        name="create-conversation-from-contract",
-    ),
 ]
