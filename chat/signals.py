@@ -9,6 +9,12 @@ from .models import Conversation
 @receiver(post_save, sender=Contract)
 def create_conversation_on_contract_creation(sender, instance, created, **kwargs):
     if created:
-        # Only create conversation if one doesn't already exist
-        if not hasattr(instance, "conversation"):
-            Conversation.objects.create(contract=instance)
+        conversation = Conversation.objects.filter(
+            freelancer_profile=instance.freelancer_profile,
+            client_profile=instance.client_profile,
+        ).first()
+        if not conversation:
+            Conversation.objects.create(
+                freelancer_profile=instance.freelancer_profile,
+                client_profile=instance.client_profile,
+            )

@@ -3,7 +3,6 @@ from uuid import uuid4
 from django.db import models
 
 from accounts.models import ClientProfile, FreelancerProfile
-from biding.models import Contract
 
 
 class Conversation(models.Model):
@@ -18,11 +17,18 @@ class Conversation(models.Model):
         ARCHIVED = "archived", "Archived"
         DELETED = "deleted", "Deleted"
 
-    contract = models.OneToOneField(
-        Contract, related_name="conversation", on_delete=models.CASCADE
-    )
     conversation_id = models.CharField(
         max_length=255, unique=True, blank=True, null=True
+    )
+    freelancer_profile = models.ForeignKey(
+        FreelancerProfile,
+        related_name="conversations",
+        on_delete=models.CASCADE,
+    )
+    client_profile = models.ForeignKey(
+        ClientProfile,
+        related_name="conversations",
+        on_delete=models.CASCADE,
     )
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.ACTIVE
