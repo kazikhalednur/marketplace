@@ -9,36 +9,21 @@ class ConversationAdmin(admin.ModelAdmin):
         "id",
         "conversation_id",
         "status",
-        "contract_title",
-        "participants",
         "message_count",
         "created_at",
     ]
     list_filter = ["status", "created_at"]
-    search_fields = ["conversation_id", "contract__job__title"]
-    readonly_fields = ["conversation_id", "created_at"]
-
-    def contract_title(self, obj):
-        return obj.contract.job.title if obj.contract and obj.contract.job else "N/A"
-
-    contract_title.short_description = "Contract Title"
-
-    def participants(self, obj):
-        if obj.contract:
-            freelancer = (
-                obj.contract.freelancer_sub_profile.freelancer_profile.freelancer.username  # noqa: E501
-                if obj.contract.freelancer_sub_profile
-                else "N/A"
-            )
-            client = (
-                obj.contract.proposal.job.created_by.username
-                if obj.contract.proposal
-                else "N/A"
-            )
-            return f"Freelancer: {freelancer} | Client: {client}"
-        return "N/A"
-
-    participants.short_description = "Participants"
+    search_fields = [
+        "conversation_id",
+        "freelancer_profile__freelancer__username",
+        "client_profile__client__username",
+    ]
+    readonly_fields = [
+        "conversation_id",
+        "created_at",
+        "freelancer_profile",
+        "client_profile",
+    ]
 
     def message_count(self, obj):
         return obj.messages.count()
