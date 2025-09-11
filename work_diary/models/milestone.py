@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from biding.models import Contract
 
@@ -22,6 +23,8 @@ class Milestone(models.Model):
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
+
+    history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -54,6 +57,8 @@ class MilestoneStep(models.Model):
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default="pending")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["step_number"]

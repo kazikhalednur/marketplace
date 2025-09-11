@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 from accounts.models import FreelancerProfile
 
@@ -30,6 +31,8 @@ class MilestoneStepSubmission(models.Model):
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"Submission for {self.milestone_step.title} - {self.status}"
