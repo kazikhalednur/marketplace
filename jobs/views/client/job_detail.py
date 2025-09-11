@@ -8,7 +8,7 @@ from ...models import Job
 from ...serializers.client import ClientJobSerializer
 
 
-@extend_schema(tags=["Client Jobs"])
+@extend_schema(tags=["client_jobs"])
 class JobDetailView(RetrieveUpdateDestroyAPIView):
     http_method_names = ["get", "patch", "delete"]
     permission_classes = [IsClient]

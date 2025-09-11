@@ -7,7 +7,7 @@ from utils.helpers import Response
 from ...serializers.client import DropdownSerializer
 
 
-@extend_schema(tags=["Client Jobs"])
+@extend_schema(tags=["client_jobs"])
 class DropdownView(APIView):
     permission_classes = [IsClient]
     serializer_class = DropdownSerializer

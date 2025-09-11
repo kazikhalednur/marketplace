@@ -16,7 +16,7 @@ class JobPagination(PageNumberPagination):
     max_page_size = 100
 
 
-@extend_schema(tags=["Client Jobs"])
+@extend_schema(tags=["client_jobs"])
 class JobListView(ListAPIView):
     permission_classes = [IsClient]
     serializer_class = ClientJobSerializer

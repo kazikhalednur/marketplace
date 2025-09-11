@@ -119,7 +119,7 @@ class Job(models.Model):
     max_proposal_count = models.PositiveIntegerField(
         help_text="Maximum number of proposals allowed for the job",
     )
-    created_by = models.ForeignKey(
+    created_by: Client = models.ForeignKey(
         Client,
         on_delete=models.CASCADE,
         related_name="created_jobs",

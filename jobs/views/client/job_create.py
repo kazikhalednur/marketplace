@@ -7,7 +7,7 @@ from ...models import Job
 from ...serializers.client import ClientJobSerializer
 
 
-@extend_schema(tags=["Client Jobs"])
+@extend_schema(tags=["client_jobs"])
 class JobCreateView(CreateAPIView):
     permission_classes = [IsClient]
     serializer_class = ClientJobSerializer
