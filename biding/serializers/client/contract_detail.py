@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from accounts.models import ClientProfile, FreelancerProfile
+from accounts.models import FreelancerProfile
 from base.models import Settings as base_settings
 from jobs.models import Job
 
@@ -37,25 +37,9 @@ class ClientContractFreelancerProfileSerializer(ModelSerializer):
         )
 
 
-class ClientContractClientProfileSerializer(ModelSerializer):
-    username = serializers.CharField(source="client.username", read_only=True)
-    first_name = serializers.CharField(source="client.first_name", read_only=True)
-    last_name = serializers.CharField(source="client.last_name", read_only=True)
-
-    class Meta:
-        model = ClientProfile
-        fields = (
-            "username",
-            "avatar",
-            "first_name",
-            "last_name",
-        )
-
-
 class ClientContractDetailSerializer(ModelSerializer):
     job = ClientContractJobSerializer(read_only=True)
     freelancer_profile = ClientContractFreelancerProfileSerializer(read_only=True)
-    client_profile = ClientContractClientProfileSerializer(read_only=True)
 
     class Meta:
         model = Contract
@@ -63,7 +47,6 @@ class ClientContractDetailSerializer(ModelSerializer):
             "id",
             "job",
             "freelancer_profile",
-            "client_profile",
             "status",
             "start_date",
             "end_date",

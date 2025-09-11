@@ -38,5 +38,15 @@ urlpatterns = [
         freelancer_views.ProposalDetailView.as_view(),
         name="proposal-detail",
     ),
+    path(
+        "contracts/",
+        freelancer_views.ContractListView.as_view(),
+        name="freelancer-contract-list",
+    ),
+    path(
+        "contracts/<uuid:contract_id>/",
+        freelancer_views.ContractDetailView.as_view(),
+        name="freelancer-contract-detail",
+    ),
     path("client/", include(client_urls)),
 ]
