@@ -8,7 +8,7 @@ from ..serializers import PasswordChangeSerializer
 
 
 @extend_schema(
-    tags=["password change"],
+    tags=["password_change"],
     responses={
         200: inline_serializer(
             name="PasswordChangeViewResponse",

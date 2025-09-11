@@ -13,7 +13,7 @@ from ..serializers import PasswordResetMailSerializer
 
 
 @extend_schema(
-    tags=["password reset"],
+    tags=["password_reset"],
     responses={
         200: inline_serializer(
             name="PasswordResetMailViewResponse",

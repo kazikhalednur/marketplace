@@ -5,7 +5,7 @@ from ..freelancer import FreelancerProfile
 
 
 class FreelancerSubProfile(models.Model):
-    freelancer_profile = models.ForeignKey(
+    freelancer_profile: FreelancerProfile = models.ForeignKey(
         FreelancerProfile,
         on_delete=models.CASCADE,
         related_name="freelancer_sub_profiles",

@@ -5,7 +5,7 @@ from ..user.freelancer import Freelancer
 
 
 class FreelancerProfile(models.Model):
-    freelancer = models.OneToOneField(
+    freelancer: Freelancer = models.OneToOneField(
         Freelancer,
         on_delete=models.CASCADE,
         related_name="freelancer_profile",

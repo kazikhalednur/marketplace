@@ -5,7 +5,7 @@ from ..user.client import Client
 
 
 class ClientProfile(models.Model):
-    client = models.OneToOneField(
+    client: Client = models.OneToOneField(
         Client,
         on_delete=models.CASCADE,
         related_name="client_profile",

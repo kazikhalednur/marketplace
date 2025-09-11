@@ -9,7 +9,7 @@ from ..serializers import OTPVerifySerializer
 
 
 @extend_schema(
-    tags=["password reset"],
+    tags=["password_reset"],
     responses={
         200: inline_serializer(
             name="OTPVerifyResponse",
