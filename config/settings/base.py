@@ -185,6 +185,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())
 
+ZOOM_ACCOUNT_ID = config("ZOOM_ACCOUNT_ID", cast=str)
+ZOOM_CLIENT_ID = config("ZOOM_CLIENT_ID", cast=str)
+ZOOM_CLIENT_SECRET = config("ZOOM_CLIENT_SECRET", cast=str)
+
 
 from .rest_framework import *
 from .simple_jwt import *
