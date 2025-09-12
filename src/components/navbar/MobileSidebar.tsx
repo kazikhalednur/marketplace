@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import { Briefcase, Home, LogOut, MessageSquare, UserCircle2 } from "lucide-react";
+import { Briefcase, Home, LogOut, MessageSquare, UserCircle2, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 
@@ -60,13 +60,29 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
             {isAuthenticated && (
               <>
                 {user?.role === "client" && (
-                  <Link
-                    href="/my-jobs"
-                    className="flex items-center gap-3 text-base font-medium hover:text-primary"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Briefcase className="w-5 h-5" /> My Jobs
-                  </Link>
+                  <>
+                    <Link
+                      href="/my-jobs"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                      onClick={() => setOpen(false)}
+                    >
+                      <Briefcase className="w-5 h-5" /> My Jobs
+                    </Link>
+                    <Link
+                      href="/manage-work"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                      onClick={() => setOpen(false)}
+                    >
+                      <Briefcase className="w-5 h-5" /> Manage Work
+                    </Link>
+                    <Link
+                      href="/contract"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary ml-6"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FileText className="w-5 h-5" /> Contract
+                    </Link>
+                  </>
                 )}
                 {user?.role === "freelancer" && (
                   <Link

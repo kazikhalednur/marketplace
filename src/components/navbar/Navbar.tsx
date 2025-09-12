@@ -8,7 +8,7 @@ import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/hooks/useAuth";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
-import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi } from "lucide-react";
+import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi, ChevronDown, FileText, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -23,14 +23,19 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [manageWorkDropdownOpen, setManageWorkDropdownOpen] = useState(false);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const manageWorkButtonRef = useRef<HTMLButtonElement>(null);
+  const manageWorkDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
   useEffect(() => {
-    if (!profileDropdownOpen) return;
+    if (!profileDropdownOpen && !manageWorkDropdownOpen) return;
     function handleClick(e: MouseEvent) {
+      // Close profile dropdown
       if (
+        profileDropdownOpen &&
         profileDropdownRef.current &&
         !profileDropdownRef.current.contains(e.target as Node) &&
         profileButtonRef.current &&
@@ -38,10 +43,21 @@ export default function Navbar() {
       ) {
         setProfileDropdownOpen(false);
       }
+      
+      // Close manage work dropdown
+      if (
+        manageWorkDropdownOpen &&
+        manageWorkDropdownRef.current &&
+        !manageWorkDropdownRef.current.contains(e.target as Node) &&
+        manageWorkButtonRef.current &&
+        !manageWorkButtonRef.current.contains(e.target as Node)
+      ) {
+        setManageWorkDropdownOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [profileDropdownOpen]);
+  }, [profileDropdownOpen, manageWorkDropdownOpen]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 4);
@@ -83,7 +99,49 @@ export default function Navbar() {
           <nav className="flex items-center gap-6">
             <Link href="/dashboard" className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
             {user?.role === "client" && (
-              <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>
+              <>
+                <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>
+                <div className="relative">
+                  <button
+                    ref={manageWorkButtonRef}
+                    className={cn(
+                      "flex items-center gap-1 hover:text-primary transition-colors",
+                      (isActive("/manage-work") || isActive("/contract")) && "text-primary font-medium"
+                    )}
+                    onClick={() => setManageWorkDropdownOpen((v) => !v)}
+                    aria-haspopup="true"
+                    aria-expanded={manageWorkDropdownOpen}
+                    aria-label="Open manage work menu"
+                    type="button"
+                  >
+                    Manage Work
+                    <ChevronDown className={cn("w-4 h-4 transition-transform", manageWorkDropdownOpen && "rotate-180")} />
+                  </button>
+                  {manageWorkDropdownOpen && (
+                    <div
+                      ref={manageWorkDropdownRef}
+                      className="absolute top-full left-0 mt-2 w-48 bg-popover border border-border shadow-xl rounded-lg py-2 z-50 transition-all duration-200 opacity-100 translate-y-0"
+                    >
+                      <Link
+                        href="/manage-work"
+                        className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary transition text-sm font-medium"
+                        onClick={() => setManageWorkDropdownOpen(false)}
+                      >
+                        <Icon icon={Briefcase} size={16} />
+                        Manage Work
+                      </Link>
+                      <Link
+                        href="/contract"
+                        className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary transition text-sm font-medium"
+                        onClick={() => setManageWorkDropdownOpen(false)}
+                      >
+                        <Icon icon={FileText} size={16} />
+                        Contract
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
             {user?.role === "freelancer" && (
               <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>

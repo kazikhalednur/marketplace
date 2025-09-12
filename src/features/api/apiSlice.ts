@@ -64,6 +64,99 @@ export interface ConversationsResponse {
   data: Conversation[];
 }
 
+// Contract Types
+export interface Contract {
+  id: string;
+  job_title: string;
+  job_description: string;
+  freelancer_profile: {
+    full_name: string;
+  };
+  start_date: string;
+  end_date: string;
+  is_fixed: boolean;
+  budget: string;
+  status: string;
+}
+
+// Contract Detail Types (for individual contract details)
+export interface ContractDetail {
+  id: string;
+  job: {
+    id: string;
+    title: string;
+    description: string;
+    job_link: string;
+  };
+  freelancer_profile: {
+    username: string;
+    avatar: string;
+    full_name: string;
+  };
+  status: string;
+  start_date: string;
+  end_date: string;
+  budget: string;
+}
+
+export interface ContractDetailResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: ContractDetail;
+}
+
+// Milestone Types
+export interface Milestone {
+  id: string;
+  step_number: number;
+  title: string;
+  description: string;
+  amount: string;
+  start_date: string;
+  due_date: string;
+  status: string;
+}
+
+export interface MilestonesResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Milestone[];
+  };
+}
+
+export interface CreateMilestonePayload {
+  title: string;
+  description: string;
+  amount: string;
+  start_date: string;
+  due_date: string;
+}
+
+export interface CreateMilestoneResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: Milestone;
+}
+
+export interface ContractsResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Contract[];
+  };
+}
+
 export interface FreelancerProject {
   id: number | null;
   title: string;
@@ -190,7 +283,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Me', 'ClientMe', 'Conversations', 'Profile'],
+  tagTypes: ['Me', 'ClientMe', 'Conversations', 'Profile', 'Contracts', 'Milestones'],
   endpoints: (builder) => ({
     studentSignup: builder.mutation<SignupResponse, StudentSignupPayload>({
       query: (body) => ({
@@ -330,6 +423,37 @@ export const apiSlice = createApi({
       transformResponse: (response: ConversationsResponse) => response,
       providesTags: ['Conversations'],
     }),
+    getContracts: builder.query<ContractsResponse, { page?: number; page_size?: number } | void>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params && params.page) searchParams.append('page', params.page.toString());
+        if (params && params.page_size) searchParams.append('page_size', params.page_size.toString());
+        
+        const queryString = searchParams.toString();
+        return `biding/client/contracts/${queryString ? `?${queryString}` : ''}`;
+      },
+      transformResponse: (response: ContractsResponse) => response,
+      providesTags: ['Contracts'],
+    }),
+    getContractById: builder.query<ContractDetailResponse, string>({
+      query: (id) => `biding/client/contracts/${id}/`,
+      transformResponse: (response: ContractDetailResponse) => response,
+      providesTags: (result, error, id) => [{ type: 'Contracts', id }],
+    }),
+    getMilestones: builder.query<MilestonesResponse, string>({
+      query: (contractId) => `work-diary/client/milestones/${contractId}/steps/`,
+      transformResponse: (response: MilestonesResponse) => response,
+      providesTags: (result, error, contractId) => [{ type: 'Milestones', id: contractId }],
+    }),
+    createMilestone: builder.mutation<CreateMilestoneResponse, { contractId: string; payload: CreateMilestonePayload }>({
+      query: ({ contractId, payload }) => ({
+        url: `work-diary/client/milestones/${contractId}/steps/create/`,
+        method: 'POST',
+        body: payload,
+      }),
+      transformResponse: (response: CreateMilestoneResponse) => response,
+      invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
+    }),
   }),
 });
 
@@ -350,5 +474,9 @@ export const {
   useUploadImageMutation, 
   useLazyGetMeQuery, 
   useLazyGetClientMeQuery, 
-  useGetConversationsQuery 
+  useGetConversationsQuery,
+  useGetContractsQuery,
+  useGetContractByIdQuery,
+  useGetMilestonesQuery,
+  useCreateMilestoneMutation
 } = apiSlice; 
