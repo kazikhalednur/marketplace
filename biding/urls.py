@@ -20,6 +20,11 @@ client_urls = [
         name="client-contract-list",
     ),
     path(
+        "contracts/stats/",
+        client_views.ContractStatsListView.as_view(),
+        name="client-contract-stats-list",
+    ),
+    path(
         "contracts/<uuid:contract_id>/",
         client_views.ContractDetailView.as_view(),
         name="client-contract-detail",
