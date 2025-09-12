@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "chat.apps.ChatConfig",
     "notifications.apps.NotificationsConfig",
     "work_diary.apps.WorkDiaryConfig",
+    "payments.apps.PaymentsConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",

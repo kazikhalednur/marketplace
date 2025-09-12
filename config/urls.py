@@ -33,6 +33,7 @@ urlpatterns = [
     path("notifications/", include("notifications.urls")),
     path("chat/", include("chat.urls")),
     path("work-diary/", include("work_diary.urls")),
+    path("payments/", include("payments.urls")),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -18,6 +18,11 @@ urlpatterns = [
         name="client_job_detail",
     ),
     path(
+        "my-jobs/<uuid:job_id>/payment/",
+        client_views.JobPaymentView.as_view(),
+        name="client_job_payment",
+    ),
+    path(
         "categories-skills/",
         views.CategorySkillListView.as_view(),
         name="category_skill_list",
