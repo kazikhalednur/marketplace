@@ -14,7 +14,7 @@ class ClientContractJobSerializer(ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ("id", "title", "job_link")
+        fields = ("id", "title", "description", "job_link")
 
     @extend_schema_field(serializers.URLField)
     def get_job_link(self, obj):
@@ -24,16 +24,14 @@ class ClientContractJobSerializer(ModelSerializer):
 
 class ClientContractFreelancerProfileSerializer(ModelSerializer):
     username = serializers.CharField(source="freelancer.username", read_only=True)
-    first_name = serializers.CharField(source="freelancer.first_name", read_only=True)
-    last_name = serializers.CharField(source="freelancer.last_name", read_only=True)
+    full_name = serializers.CharField(source="freelancer.get_full_name", read_only=True)
 
     class Meta:
         model = FreelancerProfile
         fields = (
             "username",
             "avatar",
-            "first_name",
-            "last_name",
+            "full_name",
         )
 
 
