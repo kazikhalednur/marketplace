@@ -20,12 +20,12 @@ class Conversation(models.Model):
     conversation_id = models.CharField(
         max_length=255, unique=True, blank=True, null=True
     )
-    freelancer_profile = models.ForeignKey(
+    freelancer_profile: FreelancerProfile = models.ForeignKey(
         FreelancerProfile,
         related_name="conversations",
         on_delete=models.CASCADE,
     )
-    client_profile = models.ForeignKey(
+    client_profile: ClientProfile = models.ForeignKey(
         ClientProfile,
         related_name="conversations",
         on_delete=models.CASCADE,
@@ -49,7 +49,7 @@ class Message(models.Model):
     Stores messages sent in a conversation.
     """
 
-    conversation = models.ForeignKey(
+    conversation: Conversation = models.ForeignKey(
         Conversation, related_name="messages", on_delete=models.CASCADE
     )
     freelancer_profile = models.ForeignKey(
@@ -123,7 +123,7 @@ class Message(models.Model):
         if self.seen_by_freelancer_at:
             seen_list.append(
                 {
-                    "username": self.conversation.contract.freelancer_profile.freelancer.username,  # noqa: E501
+                    "username": self.conversation.freelancer_profile.freelancer.username,  # noqa: E501
                     "seen_at": self.seen_by_freelancer_at.isoformat(),
                 }
             )
@@ -131,7 +131,7 @@ class Message(models.Model):
         if self.seen_by_client_at:
             seen_list.append(
                 {
-                    "username": self.conversation.contract.client_profile.client.username,  # noqa: E501
+                    "username": self.conversation.client_profile.client.username,
                     "seen_at": self.seen_by_client_at.isoformat(),
                 }
             )

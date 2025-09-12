@@ -28,14 +28,14 @@ class ConversationListView(generics.ListAPIView):
             freelancer_profile = FreelancerProfile.objects.get(freelancer=user)
             # Get conversations where user is freelancer
             return Conversation.objects.filter(
-                contract__freelancer_sub_profile__freelancer_profile=freelancer_profile
+                freelancer_profile=freelancer_profile
             ).order_by("-created_at")
         except FreelancerProfile.DoesNotExist:
             try:
-                ClientProfile.objects.get(client=user)
+                client_profile = ClientProfile.objects.get(client=user)
                 # Get conversations where user is client
                 return Conversation.objects.filter(
-                    contract__proposal__job__created_by=user
+                    client_profile=client_profile
                 ).order_by("-created_at")
             except ClientProfile.DoesNotExist:
                 return Conversation.objects.none()

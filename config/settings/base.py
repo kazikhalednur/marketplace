@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     "work_diary.apps.WorkDiaryConfig",
     "payments.apps.PaymentsConfig",
+    "meeting.apps.MeetingConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",
