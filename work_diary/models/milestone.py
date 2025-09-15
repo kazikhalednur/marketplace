@@ -16,7 +16,7 @@ class Milestone(models.Model):
     id = models.UUIDField(
         primary_key=True, editable=False, unique=True, serialize=False
     )
-    contract = models.ForeignKey(
+    contract: Contract = models.ForeignKey(
         Contract, on_delete=models.CASCADE, related_name="milestones"
     )
     number_of_steps = models.PositiveIntegerField(default=0)
@@ -47,7 +47,7 @@ class MilestoneStep(models.Model):
     id = models.UUIDField(
         primary_key=True, editable=False, unique=True, serialize=False
     )
-    milestone = models.ForeignKey(
+    milestone: Milestone = models.ForeignKey(
         Milestone, on_delete=models.CASCADE, related_name="steps"
     )
     step_number = models.PositiveIntegerField()

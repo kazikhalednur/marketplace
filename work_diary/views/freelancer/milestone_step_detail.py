@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import RetrieveAPIView
 
 from accounts.permissions import IsFreelancer
@@ -7,7 +7,13 @@ from ...models import MilestoneStep
 from ...serializers.freelancer import FreelancerMilestoneStepSerializer
 
 
-@extend_schema(tags=["freelancer_work_diary"])
+@extend_schema_view(
+    retrieve=extend_schema(
+        summary="Retrieve detailed milestone step information",
+        description="Retrieve detailed milestone step information",
+        tags=["freelancer_work_diary"],
+    ),
+)
 class MilestoneStepDetailView(RetrieveAPIView):
     """Retrieve detailed milestone step information (freelancer view)."""
 

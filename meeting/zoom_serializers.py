@@ -40,16 +40,21 @@ class ZoomMeetingSerializer(serializers.ModelSerializer):
         ]
 
 
-class ZoomMeetingCreateSerializer(serializers.Serializer):
+class ZoomMeetingCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Zoom meetings"""
 
-    topic = serializers.CharField(max_length=400)
-    duration = serializers.IntegerField(
-        min_value=1, max_value=1440
-    )  # 1 minute to 24 hours
-    start_time = serializers.DateTimeField()
-    join_url = serializers.URLField(max_length=10000, read_only=True)
-    start_url = serializers.URLField(max_length=10000, read_only=True)
+    class Meta:
+        model = ZoomMeeting
+        fields = ["topic", "duration", "start_time", "join_url", "start_url"]
+        extra_kwargs = {
+            "join_url": {"read_only": True},
+            "start_url": {"read_only": True},
+        }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["meeting_id"] = instance.id
+        return data
 
     def validate_start_time(self, value):
         """Validate that start time is in the future"""

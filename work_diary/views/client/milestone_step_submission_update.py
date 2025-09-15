@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.generics import UpdateAPIView
@@ -21,7 +21,13 @@ class StatusUpdateSerializer(drf_serializers.Serializer):
     )
 
 
-@extend_schema(tags=["client_work_diary"])
+@extend_schema_view(
+    update=extend_schema(
+        summary="Update milestone step submission status",
+        description="Update milestone step submission status",
+        tags=["client_work_diary"],
+    ),
+)
 class MilestoneStepSubmissionUpdateView(UpdateAPIView):
     """Update milestone step submission status (approve/reject) (client view)."""
 

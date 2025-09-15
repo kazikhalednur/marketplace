@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
+from accounts.models import FreelancerProfile
 from notifications.models import Notification
 from work_diary.models import MilestoneStep, MilestoneStepSubmission
 
@@ -12,8 +13,8 @@ class FreelancerMilestoneStepSubmissionSerializer(ModelSerializer):
     def save(self, **kwargs):
         """Save or update milestone step submission"""
         # Get milestone and freelancer_profile from kwargs
-        milestone = kwargs.get("milestone")
-        freelancer_profile = kwargs.get("freelancer_profile")
+        milestone: MilestoneStep = kwargs.get("milestone")
+        freelancer_profile: FreelancerProfile = kwargs.get("freelancer_profile")
 
         if not milestone or not freelancer_profile:
             raise ValueError("milestone and freelancer_profile are required")
@@ -49,6 +50,12 @@ class FreelancerMilestoneStepSubmissionSerializer(ModelSerializer):
                     message_type=Notification.NotificationType.SUCCESS,
                 )
 
+                Notification.objects.create(
+                    user=milestone.milestone.contract.client_profile.client,
+                    message=f"Your submission for {milestone.title} has been created.",
+                    message_type=Notification.NotificationType.SUCCESS,
+                )
+
                 return milestone_step_submission_new
             else:
                 # Update existing submission (only if not failed)
@@ -58,6 +65,12 @@ class FreelancerMilestoneStepSubmissionSerializer(ModelSerializer):
 
                 Notification.objects.create(
                     user=freelancer_profile.freelancer,
+                    message=f"Your submission for {milestone.title} has been updated.",
+                    message_type=Notification.NotificationType.SUCCESS,
+                )
+
+                Notification.objects.create(
+                    user=milestone.milestone.contract.client_profile.client,
                     message=f"Your submission for {milestone.title} has been updated.",
                     message_type=Notification.NotificationType.SUCCESS,
                 )

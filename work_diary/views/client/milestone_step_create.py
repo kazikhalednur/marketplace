@@ -1,5 +1,5 @@
 from django.db.models import Max
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
@@ -11,7 +11,13 @@ from ...models import Milestone, MilestoneStep
 from ...serializers.client import ClientMilestoneStepCreateSerializer
 
 
-@extend_schema(tags=["client_work_diary"])
+@extend_schema_view(
+    create=extend_schema(
+        summary="Create a new milestone step for a specific contract",
+        description="Create a new milestone step for a specific contract",
+        tags=["client_work_diary"],
+    ),
+)
 class MilestoneStepCreateView(CreateAPIView):
     """Create a new milestone step for a specific contract (client view)."""
 

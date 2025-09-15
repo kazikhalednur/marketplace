@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
@@ -10,7 +10,13 @@ from ...models import MilestoneStep
 from ...serializers.freelancer import FreelancerMilestoneStepSubmissionSerializer
 
 
-@extend_schema(tags=["freelancer_work_diary"])
+@extend_schema_view(
+    create=extend_schema(
+        summary="Create a milestone step submission",
+        description="Create a milestone step submission",
+        tags=["freelancer_work_diary"],
+    ),
+)
 class MilestoneStepSubmissionView(CreateAPIView):
     """Create or update a milestone step submission (freelancer view)."""
 

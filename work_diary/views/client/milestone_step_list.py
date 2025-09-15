@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 
@@ -16,7 +16,13 @@ class MilestoneStepPagination(PageNumberPagination):
     max_page_size = 100
 
 
-@extend_schema(tags=["client_work_diary"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="List all milestone steps for a specific contract",
+        description="List all milestone steps for a specific contract",
+        tags=["client_work_diary"],
+    ),
+)
 class MilestoneStepListView(ListAPIView):
     """List all milestone steps for a specific contract (client view)."""
 

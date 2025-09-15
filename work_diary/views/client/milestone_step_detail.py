@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import RetrieveAPIView
 
 from accounts.permissions import IsClient
@@ -7,7 +7,13 @@ from ...models import MilestoneStep
 from ...serializers.client import ClientMilestoneStepDetailSerializer
 
 
-@extend_schema(tags=["client_work_diary"])
+@extend_schema_view(
+    retrieve=extend_schema(
+        summary="Retrieve detailed milestone step information",
+        description="Retrieve detailed milestone step information",
+        tags=["client_work_diary"],
+    ),
+)
 class MilestoneStepDetailView(RetrieveAPIView):
     """Retrieve detailed milestone step information (client view)."""
 

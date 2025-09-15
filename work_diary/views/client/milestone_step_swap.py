@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema_view
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from accounts.permissions import IsClient
 from ...models import Milestone, MilestoneStep
 
 
-@extend_schema(
+@extend_schema_view(
     tags=["client_work_diary"],
     parameters=[
         OpenApiParameter(
