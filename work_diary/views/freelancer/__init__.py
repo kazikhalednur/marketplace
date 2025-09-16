@@ -1,4 +1,5 @@
 from .milestone_detail import MilestoneDetailView
+from .milestone_stats import MilestoneStatsView
 from .milestone_step_detail import MilestoneStepDetailView
 from .milestone_step_list import MilestoneStepListView
 from .milestone_step_submission import (
@@ -10,4 +11,5 @@ __all__ = [
     "MilestoneDetailView",
     "MilestoneStepListView",
     "MilestoneStepDetailView",
+    "MilestoneStatsView",
 ]

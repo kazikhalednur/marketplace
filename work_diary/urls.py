@@ -37,6 +37,11 @@ client_urls = [
         client_views.MilestoneStepSubmissionUpdateView.as_view(),
         name="client-milestone-step-submission-update",
     ),
+    path(
+        "milestones/<uuid:contract_id>/stats/",
+        client_views.MilestoneStatsView.as_view(),
+        name="client-milestone-stats",
+    ),
 ]
 
 # Freelancer URLs
@@ -60,6 +65,11 @@ freelancer_urls = [
         "milestones/<uuid:contract_id>/steps/<uuid:step_id>/submissions/",
         freelancer_views.MilestoneStepSubmissionView.as_view(),
         name="freelancer-milestone-step-submission",
+    ),
+    path(
+        "milestones/<uuid:contract_id>/stats/",
+        freelancer_views.MilestoneStatsView.as_view(),
+        name="freelancer-milestone-stats",
     ),
 ]
 

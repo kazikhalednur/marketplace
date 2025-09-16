@@ -20,7 +20,7 @@ class MilestoneStepSubmission(models.Model):
     milestone_step: MilestoneStep = models.ForeignKey(
         MilestoneStep, on_delete=models.CASCADE, related_name="submissions"
     )
-    freelancer_profile = models.ForeignKey(
+    freelancer_profile: FreelancerProfile = models.ForeignKey(
         FreelancerProfile,
         on_delete=models.CASCADE,
         related_name="milestone_submissions",

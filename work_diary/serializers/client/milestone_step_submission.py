@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
+from notifications.models import Notification
 from work_diary.models import MilestoneStep, MilestoneStepSubmission
 
 
@@ -16,4 +17,8 @@ class ClientMilestoneStepSubmissionSerializer(ModelSerializer):
                 MilestoneStep.Status.ACCEPTED
             )
             milestone_step_submission.milestone_step.save(update_fields=["status"])
+            Notification.objects.create(
+                user=milestone_step_submission.freelancer_profile.freelancer,
+                message=f"Milestone step {milestone_step_submission.milestone_step.title} has been accepted",  # noqa: E501
+            )
         return milestone_step_submission
