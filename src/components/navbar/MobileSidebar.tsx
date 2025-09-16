@@ -85,13 +85,29 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
                   </>
                 )}
                 {user?.role === "freelancer" && (
-                  <Link
-                    href="/my-bids"
-                    className="flex items-center gap-3 text-base font-medium hover:text-primary"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Briefcase className="w-5 h-5" /> My Bids
-                  </Link>
+                  <>
+                    <Link
+                      href="/my-bids"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                      onClick={() => setOpen(false)}
+                    >
+                      <Briefcase className="w-5 h-5" /> My Bids
+                    </Link>
+                    <Link
+                      href="/manage-work"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                      onClick={() => setOpen(false)}
+                    >
+                      <Briefcase className="w-5 h-5" /> Manage Work
+                    </Link>
+                    <Link
+                      href="/contract"
+                      className="flex items-center gap-3 text-base font-medium hover:text-primary ml-6"
+                      onClick={() => setOpen(false)}
+                    >
+                      <FileText className="w-5 h-5" /> Contract
+                    </Link>
+                  </>
                 )}
                 <Link
                   href="/messages"

@@ -144,7 +144,49 @@ export default function Navbar() {
               </>
             )}
             {user?.role === "freelancer" && (
-              <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>
+              <>
+                <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>
+                <div className="relative">
+                  <button
+                    ref={manageWorkButtonRef}
+                    className={cn(
+                      "flex items-center gap-1 hover:text-primary transition-colors",
+                      (isActive("/manage-work") || isActive("/contract")) && "text-primary font-medium"
+                    )}
+                    onClick={() => setManageWorkDropdownOpen((v) => !v)}
+                    aria-haspopup="true"
+                    aria-expanded={manageWorkDropdownOpen}
+                    aria-label="Open manage work menu"
+                    type="button"
+                  >
+                    Manage Work
+                    <ChevronDown className={cn("w-4 h-4 transition-transform", manageWorkDropdownOpen && "rotate-180")} />
+                  </button>
+                  {manageWorkDropdownOpen && (
+                    <div
+                      ref={manageWorkDropdownRef}
+                      className="absolute top-full left-0 mt-2 w-48 bg-popover border border-border shadow-xl rounded-lg py-2 z-50 transition-all duration-200 opacity-100 translate-y-0"
+                    >
+                      <Link
+                        href="/manage-work"
+                        className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary transition text-sm font-medium"
+                        onClick={() => setManageWorkDropdownOpen(false)}
+                      >
+                        <Icon icon={Briefcase} size={16} />
+                        Manage Work
+                      </Link>
+                      <Link
+                        href="/contract"
+                        className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary transition text-sm font-medium"
+                        onClick={() => setManageWorkDropdownOpen(false)}
+                      >
+                        <Icon icon={FileText} size={16} />
+                        Contract
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
 
             {/* {isAuthenticated && (

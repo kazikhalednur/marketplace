@@ -22,7 +22,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import UnauthorizedPage from "@/app/unauthorized/page";
-import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload } from "@/features/api/apiSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload, useGetFreelancerContractByIdQuery, useGetFreelancerMilestonesQuery, useSubmitMilestoneWorkMutation, FreelancerMilestone, Milestone, ContractDetail, FreelancerContractDetail, FreelancerMilestoneSubmissionItem } from "@/features/api/apiSlice";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,17 +42,30 @@ export default function ContractDetailPage() {
     start_date: '',
     due_date: ''
   });
+  // Freelancer submission state
+  const [submissionModalOpen, setSubmissionModalOpen] = useState(false);
+  const [submissionMessage, setSubmissionMessage] = useState('');
+  const [selectedStep, setSelectedStep] = useState<FreelancerMilestone | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  // Fetch contract from API
-  const { data: contractResponse, isLoading, error } = useGetContractByIdQuery(params.id as string);
-  const contract = contractResponse?.data;
+  const isClient = user?.role === "client";
+  const isFreelancer = user?.role === "freelancer";
 
-  // Fetch milestones from API
-  const { data: milestonesResponse, isLoading: milestonesLoading, error: milestonesError } = useGetMilestonesQuery(params.id as string);
-  const milestones = milestonesResponse?.data?.results || [];
+  // Client contract and milestones
+  const { data: clientContractResponse, isLoading: clientLoading, error: clientError } = useGetContractByIdQuery(isClient ? (params.id as string) : skipToken);
+  const { data: clientMilestonesResponse, isLoading: clientMilestonesLoading, error: clientMilestonesError } = useGetMilestonesQuery(isClient ? (params.id as string) : skipToken);
+  const clientContract = clientContractResponse?.data;
+  const clientMilestones = clientMilestonesResponse?.data?.results || [];
 
-  // Create milestone mutation
+  // Freelancer contract and milestones
+  const { data: freelancerContractResponse, isLoading: freelancerLoading, error: freelancerError } = useGetFreelancerContractByIdQuery(isFreelancer ? (params.id as string) : skipToken);
+  const { data: freelancerMilestonesResponse, isLoading: freelancerMilestonesLoading, error: freelancerMilestonesError } = useGetFreelancerMilestonesQuery(isFreelancer ? (params.id as string) : skipToken);
+  const freelancerContract = freelancerContractResponse?.data;
+  const freelancerMilestones = freelancerMilestonesResponse?.data || [];
+
+  // Mutations
   const [createMilestone, { isLoading: isCreatingMilestone }] = useCreateMilestoneMutation();
+  const [submitMilestoneWork, { isLoading: isSubmitting }] = useSubmitMilestoneWorkMutation();
 
   useEffect(() => {
     setMounted(true);
@@ -84,13 +98,13 @@ export default function ContractDetailPage() {
     );
   }
 
-  // Redirect non-clients or unauthenticated users
-  if (!isAuthenticated || user?.role !== "client") {
+  // Redirect unauthenticated users
+  if (!isAuthenticated || (!isClient && !isFreelancer)) {
     return <UnauthorizedPage />;
   }
 
   // Handle API error
-  if (error) {
+  if (clientError || freelancerError) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
         <div className="max-w-5xl mx-auto">
@@ -108,7 +122,7 @@ export default function ContractDetailPage() {
     );
   }
 
-  if (isLoading) {
+  if (clientLoading || freelancerLoading) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
         <div className="max-w-5xl mx-auto">
@@ -121,6 +135,7 @@ export default function ContractDetailPage() {
     );
   }
 
+  const contract: ContractDetail | FreelancerContractDetail | undefined = (isClient ? clientContract : freelancerContract);
   if (!contract) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
@@ -168,6 +183,7 @@ export default function ContractDetailPage() {
   const StatusIcon = getStatusIcon(contract.status);
 
   const handleCreateMilestone = () => {
+    if (!isClient) return;
     setMilestoneModalOpen(true);
   };
 
@@ -210,6 +226,36 @@ export default function ContractDetailPage() {
     }
   };
 
+  // Freelancer submission handlers
+  const openSubmissionModal = (step: FreelancerMilestone) => {
+    if (!isFreelancer) return;
+    setSelectedStep(step);
+    setSubmissionMessage('');
+    setSubmissionModalOpen(true);
+  };
+  const closeSubmissionModal = () => {
+    setSelectedStep(null);
+    setSubmissionMessage('');
+    setSubmissionModalOpen(false);
+    setFile(null);
+  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    setFile(f);
+  };
+  const handleSubmitWork = async () => {
+    if (!isFreelancer || !selectedStep || !file) return;
+    const form = new FormData();
+    if (submissionMessage) form.append('message', submissionMessage);
+    form.append('code_zip', file);
+    try {
+      await submitMilestoneWork({ contractId: contract.id, stepId: selectedStep.id, formData: form }).unwrap();
+      closeSubmissionModal();
+    } catch (e) {
+      console.error('Failed to submit work:', e);
+    }
+  };
+
   return (
     <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
       <div className="max-w-6xl mx-auto">
@@ -240,20 +286,30 @@ export default function ContractDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Contract Overview */}
+            {/* Contract Overview */
+            }
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-6">Contract Overview</h2>
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">Description</h3>
-                  <p className="text-sm leading-relaxed">{contract.job.description}</p>
+                  {isClient && (
+                    <p className="text-sm leading-relaxed">{(contract as ContractDetail).job.description}</p>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-medium text-muted-foreground">Freelancer</h3>
-                    <p className="text-sm font-semibold">{contract.freelancer_profile?.full_name || 'Unknown'}</p>
-                  </div>
+                  {isClient ? (
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-medium text-muted-foreground">Freelancer</h3>
+                      <p className="text-sm font-semibold">{(contract as ContractDetail).freelancer_profile?.full_name || 'Unknown'}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-medium text-muted-foreground">Client</h3>
+                      <p className="text-sm font-semibold">{(contract as FreelancerContractDetail).client_profile?.first_name} {(contract as FreelancerContractDetail).client_profile?.last_name}</p>
+                    </div>
+                  )}
                   <div className="space-y-1">
                     <h3 className="text-sm font-medium text-muted-foreground">Budget</h3>
                     <p className="text-sm font-semibold text-green-600">৳{contract.budget || 'Not specified'}</p>
@@ -276,18 +332,18 @@ export default function ContractDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Project Status</span>
                     <span className="text-sm font-semibold text-primary">
-                      {milestones.length > 0 ? `${milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length}/${milestones.length} Milestones Completed` : 'No Milestones Yet'}
+                      {(isClient ? clientMilestones : freelancerMilestones).length > 0 ? `${(isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length}/${(isClient ? clientMilestones : freelancerMilestones).length} Milestones Completed` : 'No Milestones Yet'}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-3">
                     <div 
                       className="bg-primary h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.round((milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max(milestones.length, 1)) * 100)}%` }}
+                      style={{ width: `${Math.round(((isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max((isClient ? clientMilestones : freelancerMilestones).length, 1)) * 100)}%` }}
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Progress: {Math.round((milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max(milestones.length, 1)) * 100)}%</span>
-                    <span>{milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length} of {milestones.length} completed</span>
+                    <span>Progress: {Math.round(((isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max((isClient ? clientMilestones : freelancerMilestones).length, 1)) * 100)}%</span>
+                    <span>{(isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length} of {(isClient ? clientMilestones : freelancerMilestones).length} completed</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>Started: {new Date(contract.start_date).toLocaleDateString()}</span>
@@ -301,28 +357,30 @@ export default function ContractDetailPage() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Project Milestones</h2>
-                <Button size="sm" onClick={handleCreateMilestone}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Milestone
-                </Button>
+                {isClient && (
+                  <Button size="sm" onClick={handleCreateMilestone}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Milestone
+                  </Button>
+                )}
               </div>
-              {milestonesLoading ? (
+              {(isClient ? clientMilestonesLoading : freelancerMilestonesLoading) ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   <span className="ml-2 text-sm text-muted-foreground">Loading milestones...</span>
                 </div>
-              ) : milestonesError ? (
+              ) : (isClient ? clientMilestonesError : freelancerMilestonesError) ? (
                 <div className="text-center py-8">
                   <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium mb-2">Error Loading Milestones</h3>
                   <p className="text-muted-foreground">There was an error loading the milestones.</p>
                 </div>
-              ) : milestones.length > 0 ? (
+              ) : (isClient ? clientMilestones : freelancerMilestones).length > 0 ? (
                 <div className="space-y-4">
-                  {milestones.map((milestone, index) => (
+                  {(isClient ? clientMilestones : freelancerMilestones).map((milestone: Milestone | FreelancerMilestone, index: number) => (
                     <div key={milestone.id} className="relative">
                       {/* Connection line */}
-                      {index < milestones.length - 1 && (
+                      {index < (isClient ? clientMilestones : freelancerMilestones).length - 1 && (
                         <div className="absolute left-3 top-8 w-0.5 h-8 bg-muted"></div>
                       )}
                       <div className="flex items-start gap-4 p-4 border rounded-lg bg-card">
@@ -348,8 +406,8 @@ export default function ContractDetailPage() {
                           <div className="flex items-center justify-between mt-3">
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <span>Step {milestone.step_number}</span>
-                              <span>Start: {new Date(milestone.start_date).toLocaleDateString()}</span>
-                              <span>Due: {new Date(milestone.due_date).toLocaleDateString()}</span>
+                              <span>Start: {milestone.start_date ? new Date(milestone.start_date).toLocaleDateString() : '—'}</span>
+                              <span>Due: {milestone.due_date ? new Date(milestone.due_date).toLocaleDateString() : '—'}</span>
                             </div>
                             <Badge className={`text-xs ${
                               milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
@@ -361,6 +419,27 @@ export default function ContractDetailPage() {
                               {milestone.status.charAt(0).toUpperCase() + milestone.status.slice(1)}
                             </Badge>
                           </div>
+                          {/* Freelancer submissions */}
+                          {isFreelancer && 'submissions' in milestone && Array.isArray(milestone.submissions) && milestone.submissions.length > 0 && (
+                            <div className="mt-3">
+                              <p className="text-xs font-medium mb-2">Submissions</p>
+                              <ul className="text-xs space-y-1">
+                                {milestone.submissions.map((sub: FreelancerMilestoneSubmissionItem, idx: number) => (
+                                  <li key={idx} className="flex items-center gap-2">
+                                    <a href={sub.code_zip} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Download {idx + 1}</a>
+                                    {sub.message && <span className="text-muted-foreground">— {sub.message}</span>}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {isFreelancer && (milestone.status === 'pending' || milestone.status === 'active' || milestone.status === 'submitted') && (
+                            <div className="mt-3">
+                              <Button size="sm" variant="outline" onClick={() => openSubmissionModal(milestone)}>
+                                Submit Work
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -371,10 +450,12 @@ export default function ContractDetailPage() {
                   <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-medium mb-2">No Milestones Yet</h3>
                   <p className="text-muted-foreground mb-4">No milestones have been created for this contract yet.</p>
-                  <Button onClick={handleCreateMilestone}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create First Milestone
-                  </Button>
+                  {isClient && (
+                    <Button onClick={handleCreateMilestone}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create First Milestone
+                    </Button>
+                  )}
                 </div>
               )}
             </Card>
@@ -407,51 +488,81 @@ export default function ContractDetailPage() {
                     <p className="text-sm font-semibold text-green-600 mt-1">৳{contract.budget}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Freelancer</p>
-                    <p className="text-sm font-semibold mt-1">{contract.freelancer_profile?.full_name || 'Unknown'}</p>
+                {isClient && (
+                  <div className="flex items-start gap-3">
+                    <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Freelancer</p>
+                      <p className="text-sm font-semibold mt-1">{(contract as ContractDetail).freelancer_profile?.full_name || 'Unknown'}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </Card>
 
-            {/* Freelancer Profile */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Freelancer Profile</h3>
-              <div className="flex items-center gap-4">
-                {contract.freelancer_profile?.avatar ? (
-                  <Image 
-                    src={contract.freelancer_profile.avatar} 
-                    alt={contract.freelancer_profile.full_name}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                    <User className="w-8 h-8 text-muted-foreground" />
+            {/* Role-specific profile card */}
+            {isClient ? (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Freelancer Profile</h3>
+                <div className="flex items-center gap-4">
+                  {(contract as ContractDetail).freelancer_profile?.avatar ? (
+                    <Image 
+                      src={(contract as ContractDetail).freelancer_profile.avatar} 
+                      alt={(contract as ContractDetail).freelancer_profile.full_name}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                      <User className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="font-semibold">
+                      {(contract as ContractDetail).freelancer_profile?.full_name || 'Unknown Freelancer'}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      @{(contract as ContractDetail).freelancer_profile?.username || 'unknown'}
+                    </p>
                   </div>
-                )}
-                <div>
-                  <h4 className="font-semibold">
-                    {contract.freelancer_profile?.full_name || 'Unknown Freelancer'}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    @{contract.freelancer_profile?.username || 'unknown'}
-                  </p>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            ) : (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Client</h3>
+                <div className="flex items-center gap-4">
+                  {(contract as FreelancerContractDetail).client_profile?.avatar ? (
+                    <Image 
+                      src={(contract as FreelancerContractDetail).client_profile.avatar} 
+                      alt={(contract as FreelancerContractDetail).client_profile.username}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                      <User className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="font-semibold">
+                      {(contract as FreelancerContractDetail).client_profile?.first_name} {(contract as FreelancerContractDetail).client_profile?.last_name}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      @{(contract as FreelancerContractDetail).client_profile?.username}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
 
             {/* Actions */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-6">Actions</h3>
               <div className="space-y-3">
                 <Button className="w-full justify-start">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Contact Freelancer
+                  <MessageCircle className="w-4 h-4 mr-2" /> {isClient ? 'Contact Freelancer' : 'Message Client'}
                 </Button>
                 {contract.job.job_link && (
                   <Button 
@@ -493,8 +604,8 @@ export default function ContractDetailPage() {
           </div>
         </div>
 
-        {/* Create Milestone Modal */}
-        {milestoneModalOpen && (
+        {/* Create Milestone Modal (Client) */}
+        {isClient && milestoneModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <Card className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
               <div className="p-6">
@@ -602,6 +713,65 @@ export default function ContractDetailPage() {
                       ) : (
                         'Create Milestone'
                       )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Submit Work Modal (Freelancer) */}
+        {isFreelancer && submissionModalOpen && selectedStep && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <Card className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Submit Work — Step {selectedStep.step_number}</h2>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={closeSubmissionModal}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Message</Label>
+                    <Textarea
+                      id="message"
+                      placeholder="Add an optional note for your client"
+                      rows={3}
+                      value={submissionMessage}
+                      onChange={(e) => setSubmissionMessage(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="file">Upload ZIP file *</Label>
+                    <Input
+                      id="file"
+                      type="file"
+                      accept=".zip,application/zip,application/x-zip-compressed"
+                      onChange={handleFileChange}
+                    />
+                    <p className="text-xs text-muted-foreground">Attach your code or deliverables as a .zip file.</p>
+                  </div>
+                  <div className="flex gap-3 pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={closeSubmissionModal}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      className="flex-1"
+                      onClick={handleSubmitWork}
+                      disabled={!file || isSubmitting}
+                    >
+                      {isSubmitting ? 'Submitting...' : 'Submit'}
                     </Button>
                   </div>
                 </div>

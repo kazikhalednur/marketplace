@@ -19,7 +19,8 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UnauthorizedPage from "@/app/unauthorized/page";
-import { useGetContractsQuery, Contract } from "@/features/api/apiSlice";
+import { useGetContractsQuery, Contract, useGetFreelancerContractsQuery, FreelancerContractListItem } from "@/features/api/apiSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function ContractPage() {
   const { user, isAuthenticated, showLoader } = useAuth();
@@ -28,11 +29,14 @@ export default function ContractPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   
-  // Fetch contracts from API with pagination
-  const { data: contractsResponse, isLoading, error } = useGetContractsQuery({
-    page: currentPage,
-    page_size: pageSize
-  });
+  // Client contracts
+  const { data: clientContractsResponse, isLoading: isClientLoading, error: clientError } = useGetContractsQuery(
+    user?.role === 'client' ? { page: currentPage, page_size: pageSize } : skipToken
+  );
+  // Freelancer contracts
+  const { data: freelancerContractsResponse, isLoading: isFreelancerLoading, error: freelancerError } = useGetFreelancerContractsQuery(
+    user?.role === 'freelancer' ? { page: currentPage, page_size: pageSize } : skipToken
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -43,13 +47,18 @@ export default function ContractPage() {
     setCurrentPage(1);
   }, [pageSize]);
 
-  const contracts = contractsResponse?.data?.results || [];
-  const totalCount = contractsResponse?.data?.count || 0;
-  const hasNext = !!contractsResponse?.data?.next;
-  const hasPrevious = !!contractsResponse?.data?.previous;
+  const isClient = user?.role === 'client';
+  const isFreelancer = user?.role === 'freelancer';
+
+  const clientContracts = clientContractsResponse?.data?.results || [];
+  const freelancerContracts = freelancerContractsResponse?.data?.results || [];
+  const contracts = (isClient ? clientContracts : freelancerContracts) as (Contract | FreelancerContractListItem)[];
+  const totalCount = (isClient ? clientContractsResponse?.data?.count : freelancerContractsResponse?.data?.count) || 0;
+  const hasNext = !!(isClient ? clientContractsResponse?.data?.next : freelancerContractsResponse?.data?.next);
+  const hasPrevious = !!(isClient ? clientContractsResponse?.data?.previous : freelancerContractsResponse?.data?.previous);
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const handleContractClick = (contract: Contract) => {
+  const handleContractClick = (contract: Contract | FreelancerContractListItem) => {
     router.push(`/contract/${contract.id}`);
   };
 
@@ -87,7 +96,7 @@ export default function ContractPage() {
     );
   }
 
-  if (showLoader || isLoading) {
+  if (showLoader || isClientLoading || isFreelancerLoading) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
         <div className="max-w-5xl mx-auto">
@@ -100,13 +109,13 @@ export default function ContractPage() {
     );
   }
 
-  // Redirect non-clients or unauthenticated users
-  if (!isAuthenticated || user?.role !== "client") {
+  // Redirect unauthenticated users
+  if (!isAuthenticated || (!isClient && !isFreelancer)) {
     return <UnauthorizedPage />;
   }
 
   // Handle API error
-  if (error) {
+  if (clientError || freelancerError) {
     return (
       <main className="min-h-screen w-full bg-background text-foreground px-4 py-8">
         <div className="max-w-5xl mx-auto">
@@ -161,10 +170,12 @@ export default function ContractPage() {
               Manage your contracts and track project progress.
             </p>
           </div>
-          <Button className="mt-4 sm:mt-0">
-            <FileText className="w-4 h-4 mr-2" />
-            Create New Contract
-          </Button>
+          {isClient && (
+            <Button className="mt-4 sm:mt-0">
+              <FileText className="w-4 h-4 mr-2" />
+              Create New Contract
+            </Button>
+          )}
         </div>
 
         {/* Contract Stats */}
@@ -196,14 +207,15 @@ export default function ContractPage() {
               <CheckCircle className="h-8 w-8 text-blue-600" />
             </div>
           </Card>
+          {isClient && (
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Value</p>
                 <p className="text-2xl font-bold">
-                  ${contracts.reduce((total, contract) => {
-                    if (!contract.budget) return total;
-                    const amount = parseFloat(contract.budget.replace(/[^0-9.-]+/g, ''));
+                  ${clientContracts.reduce((total: number, c: Contract) => {
+                    if (!c.budget) return total;
+                    const amount = parseFloat(c.budget.replace(/[^0-9.-]+/g, ''));
                     return total + (isNaN(amount) ? 0 : amount);
                   }, 0).toLocaleString()}
                 </p>
@@ -211,67 +223,99 @@ export default function ContractPage() {
               <DollarSign className="h-8 w-8 text-green-600" />
             </div>
           </Card>
+          )}
         </div>
 
         {/* Contracts List */}
         <div className="space-y-6">
           {contracts.map((contract) => {
-            const StatusIcon = getStatusIcon(contract.status);
             const startDate = new Date(contract.start_date).toLocaleDateString();
             const endDate = new Date(contract.end_date).toLocaleDateString();
             const daysRemaining = Math.ceil((new Date(contract.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-            
+            const StatusIcon = getStatusIcon(contract.status);
+
+            if (isClient) {
+              const c = contract as Contract;
+              return (
+                <Card 
+                  key={c.id} 
+                  className="p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/20 group"
+                  onClick={() => handleContractClick(c)}
+                >
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                          {c.job_title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {c.job_description}
+                        </p>
+                      </div>
+                      <Badge className={`${getStatusColor(c.status)} shrink-0`}>
+                        <StatusIcon className="w-3 h-3 mr-1" />
+                        {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{c.freelancer_profile?.full_name || 'Unknown'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">{startDate} - {endDate}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-semibold text-green-600">{c.budget || 'Not specified'}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-muted/50">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>Duration: {Math.ceil((new Date(c.end_date).getTime() - new Date(c.start_date).getTime()) / (1000 * 60 * 60 * 24))} days</span>
+                        {c.status === 'active' && (
+                          <span className={daysRemaining > 0 ? 'text-orange-600' : 'text-red-600'}>
+                            {daysRemaining > 0 ? `${daysRemaining} days left` : 'Overdue'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Contract ID: #{c.id.slice(-8)}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            }
+
+            const f = contract as FreelancerContractListItem;
             return (
-              <Card 
-                key={contract.id} 
+              <Card
+                key={f.id}
                 className="p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/20 group"
-                onClick={() => handleContractClick(contract)}
+                onClick={() => handleContractClick(f)}
               >
                 <div className="space-y-4">
-                  {/* Header with title and status */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                        {contract.job_title}
+                        {f.job_title}
                       </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {contract.job_description}
-                      </p>
                     </div>
-                    <Badge className={`${getStatusColor(contract.status)} shrink-0`}>
+                    <Badge className={`${getStatusColor(f.status)} shrink-0`}>
                       <StatusIcon className="w-3 h-3 mr-1" />
-                      {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
+                      {f.status.charAt(0).toUpperCase() + f.status.slice(1)}
                     </Badge>
                   </div>
-                  
-                  {/* Contract details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{contract.freelancer_profile?.full_name || 'Unknown'}</span>
-                    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm">{startDate} - {endDate}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold text-green-600">{contract.budget || 'Not specified'}</span>
-                    </div>
-                  </div>
-
-                  {/* Contract duration and status info */}
-                  <div className="flex items-center justify-between pt-2 border-t border-muted/50">
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>Duration: {Math.ceil((new Date(contract.end_date).getTime() - new Date(contract.start_date).getTime()) / (1000 * 60 * 60 * 24))} days</span>
-                      {contract.status === 'active' && (
-                        <span className={daysRemaining > 0 ? 'text-orange-600' : 'text-red-600'}>
-                          {daysRemaining > 0 ? `${daysRemaining} days left` : 'Overdue'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Contract ID: #{contract.id.slice(-8)}
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{daysRemaining > 0 ? `${daysRemaining} days left` : 'Overdue'}</span>
                     </div>
                   </div>
                 </div>
@@ -365,13 +409,17 @@ export default function ContractPage() {
           <Card className="p-12 text-center">
             <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Contracts Yet</h3>
-            <p className="text-muted-foreground mb-4">
-              You haven&apos;t created any contracts yet. Start by creating your first contract.
-            </p>
-            <Button>
-              <FileText className="w-4 h-4 mr-2" />
-              Create Your First Contract
-            </Button>
+            {isClient ? (
+              <>
+                <p className="text-muted-foreground mb-4">You haven&apos;t created any contracts yet. Start by creating your first contract.</p>
+                <Button>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Create Your First Contract
+                </Button>
+              </>
+            ) : (
+              <p className="text-muted-foreground mb-4">You don&apos;t have any contracts yet.</p>
+            )}
           </Card>
         )}
 

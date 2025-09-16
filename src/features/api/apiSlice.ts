@@ -130,6 +130,89 @@ export interface MilestonesResponse {
   };
 }
 
+// Freelancer contract list (different, slimmer shape)
+export interface FreelancerContractListItem {
+  id: string;
+  job_title: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface FreelancerContractsResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: FreelancerContractListItem[];
+  };
+}
+
+// Freelancer contract detail (client_profile instead of freelancer_profile)
+export interface FreelancerContractDetail {
+  id: string;
+  job: {
+    id: string;
+    title: string;
+    job_link: string;
+  };
+  client_profile: {
+    username: string;
+    avatar: string;
+    first_name: string;
+    last_name: string;
+  };
+  budget: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface FreelancerContractDetailResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: FreelancerContractDetail;
+}
+
+// Freelancer milestones list returns an array directly in data
+export interface FreelancerMilestoneSubmissionItem {
+  message?: string;
+  code_zip: string;
+}
+
+export interface FreelancerMilestone extends Omit<Milestone, 'start_date' | 'due_date'> {
+  start_date: string | null;
+  due_date: string | null;
+  submissions?: FreelancerMilestoneSubmissionItem[];
+}
+
+export interface FreelancerMilestonesResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: FreelancerMilestone[];
+}
+
+export interface FreelancerMilestoneDetailResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: FreelancerMilestone;
+}
+
+export interface MilestoneSubmissionResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    code_zip: string;
+  };
+}
+
 export interface CreateMilestonePayload {
   title: string;
   description: string;
@@ -454,6 +537,49 @@ export const apiSlice = createApi({
       transformResponse: (response: CreateMilestoneResponse) => response,
       invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
     }),
+
+    // Freelancer side endpoints
+    getFreelancerContracts: builder.query<FreelancerContractsResponse, { page?: number; page_size?: number } | void>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params && params.page) searchParams.append('page', params.page.toString());
+        if (params && params.page_size) searchParams.append('page_size', params.page_size.toString());
+        const queryString = searchParams.toString();
+        return `biding/contracts/${queryString ? `?${queryString}` : ''}`;
+      },
+      transformResponse: (response: FreelancerContractsResponse) => response,
+      providesTags: ['Contracts'],
+    }),
+    getFreelancerContractById: builder.query<FreelancerContractDetailResponse, string>({
+      query: (id) => `biding/contracts/${id}/`,
+      transformResponse: (response: FreelancerContractDetailResponse) => response,
+      providesTags: (result, error, id) => [{ type: 'Contracts', id }],
+    }),
+    getFreelancerMilestones: builder.query<FreelancerMilestonesResponse, string>({
+      query: (contractId) => `work-diary/milestones/${contractId}/steps/`,
+      transformResponse: (response: FreelancerMilestonesResponse) => response,
+      providesTags: (result, error, contractId) => [{ type: 'Milestones', id: contractId }],
+    }),
+    getFreelancerMilestoneDetail: builder.query<FreelancerMilestoneDetailResponse, { contractId: string; stepId: string }>(
+      {
+        query: ({ contractId, stepId }) => `work-diary/milestones/${contractId}/steps/${stepId}/`,
+        transformResponse: (response: FreelancerMilestoneDetailResponse) => response,
+        providesTags: (result, error, { contractId, stepId }) => [
+          { type: 'Milestones', id: `${contractId}-${stepId}` },
+        ],
+      }
+    ),
+    submitMilestoneWork: builder.mutation<MilestoneSubmissionResponse, { contractId: string; stepId: string; formData: FormData }>(
+      {
+        query: ({ contractId, stepId, formData }) => ({
+          url: `work-diary/milestones/${contractId}/steps/${stepId}/submissions/`,
+          method: 'POST',
+          body: formData,
+        }),
+        transformResponse: (response: MilestoneSubmissionResponse) => response,
+        invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
+      }
+    ),
   }),
 });
 
@@ -480,3 +606,11 @@ export const {
   useGetMilestonesQuery,
   useCreateMilestoneMutation
 } = apiSlice; 
+
+export const {
+  useGetFreelancerContractsQuery,
+  useGetFreelancerContractByIdQuery,
+  useGetFreelancerMilestonesQuery,
+  useGetFreelancerMilestoneDetailQuery,
+  useSubmitMilestoneWorkMutation,
+} = apiSlice;
