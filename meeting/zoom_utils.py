@@ -83,10 +83,13 @@ class ZoomUtility:
             response.raise_for_status()
 
             meeting_data = response.json()
+            print(meeting_data)
 
             return {
                 "success": True,
                 "zoom_id": str(meeting_data["id"]),
+                "password": meeting_data["password"],
+                "role": payload["type"],
                 "topic": meeting_data["topic"],
                 "duration": meeting_data["duration"],
                 "start_time": meeting_data["start_time"],

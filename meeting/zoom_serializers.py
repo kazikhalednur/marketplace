@@ -1,8 +1,11 @@
+import time
+
+import jwt
 from django.utils import timezone
 from rest_framework import serializers
 
 from .models import ZoomMeeting
-from .zoom_utils import ZoomUtility
+from .zoom_utils import ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZoomUtility
 
 
 class ZoomMeetingSerializer(serializers.ModelSerializer):
@@ -53,8 +56,40 @@ class ZoomMeetingCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["meeting_id"] = instance.id
-        return data
+
+        # Compose SDK payload
+        meeting_number = str(instance.zoom_id)
+        role = 1  # host by default; set 0 for attendee when needed
+
+        now = int(time.time())
+        exp = now + 120  # short-lived
+        token_exp = exp
+
+        signature = jwt.encode(
+            {
+                "sdkKey": ZOOM_CLIENT_ID,
+                "mn": meeting_number,
+                "role": role,
+                "iat": now,
+                "exp": exp,
+                "tokenExp": token_exp,
+            },
+            ZOOM_CLIENT_SECRET,
+            algorithm="HS256",
+        )
+
+        # Fetch password from Zoom API to include in response
+        zoom_details = ZoomUtility().get_meeting(meeting_number)
+        zoom_details.get("password", "") if zoom_details.get("success") else ""
+
+        return {
+            "meetingNumber": meeting_number,
+            "signature": signature,
+            "sdkKey": ZOOM_CLIENT_ID,
+            "password": instance.password,
+            "topic": data.get("topic"),
+            "role": role,
+        }
 
     def validate_start_time(self, value):
         """Validate that start time is in the future"""
@@ -92,11 +127,12 @@ class ZoomMeetingCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"Failed to create Zoom meeting: {zoom_result['error']}"
                 )
-
             # Create meeting in database
             meeting_data = {
                 "zoom_id": zoom_result["zoom_id"],
                 "topic": zoom_result["topic"],
+                "password": zoom_result["password"],
+                "role": zoom_result["role"],
                 "duration": zoom_result["duration"],
                 "start_time": validated_data[
                     "start_time"

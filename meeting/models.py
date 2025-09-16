@@ -42,6 +42,8 @@ class ZoomMeeting(models.Model):
     )
     zoom_id = models.CharField(max_length=50, unique=True)
     topic = models.CharField(max_length=400)
+    password = models.CharField(max_length=10, null=True, blank=True)
+    role = models.IntegerField(default=0)
     duration = models.IntegerField(default=30)
     start_time = models.DateTimeField(null=True, blank=True)
     join_url = models.URLField(max_length=10000)
