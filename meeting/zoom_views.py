@@ -54,7 +54,7 @@ class ZoomMeetingCreateView(CreateAPIView):
 
 
 @extend_schema(tags=["zoom_meetings"])
-class ZoomMeetingListView(ListAPIView):
+class ZoomMeetingConversationListView(ListAPIView):
     """
     List all Zoom meetings for the authenticated user
     """
@@ -328,3 +328,20 @@ class ZoomMeetingSyncView(APIView):
             return CustomResponse(
                 status_code=500, message=f"Error syncing meeting: {str(e)}", data={}
             )
+
+
+@extend_schema(tags=["zoom_meetings"])
+class ZoomMeetingListView(ListAPIView):
+    """
+    List all Zoom meetings for the authenticated user
+    """
+
+    serializer_class = ZoomMeetingListSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = ZoomMeetingPagination
+
+    def get_queryset(self):
+        """Return meetings for the authenticated user"""
+        queryset = ZoomMeeting.objects.filter(created_by__id=self.request.user.id)
+
+        return queryset.order_by("-created_at")

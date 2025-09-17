@@ -8,11 +8,12 @@ from rest_framework.views import APIView
 
 from chat.models import Conversation
 
-from .models import GoogleMeeting
+from .models import GoogleMeeting, ZoomMeeting
 from .serializers import (
     GoogleMeetingCreateSerializer,
     GoogleMeetingListSerializer,
 )
+from .zoom_serializers import ZoomMeetingListSerializer
 
 
 class MeetingPagination(PageNumberPagination):
@@ -115,3 +116,66 @@ class GoogleMeetingStatsView(APIView):
         }
 
         return Response({"success": True, "stats": stats})
+
+
+class AllMeetingsListView(APIView):
+    """
+    List all Zoom meetings created by the authenticated user
+    """
+
+    permission_classes = [IsAuthenticated]
+    pagination_class = MeetingPagination
+
+    def get(self, request):
+        """Return Zoom meetings created by the user across all conversations"""
+        user = request.user
+        now = timezone.now()
+
+        # Base queryset: only Zoom meetings created by the user
+        zoom_meetings = ZoomMeeting.objects.filter(created_by=user).select_related(
+            "conversation",
+            "conversation__client_profile",
+            "conversation__freelancer_profile",
+        )
+
+        # Filters
+        upcoming = request.query_params.get("upcoming")
+        conversation_id = request.query_params.get("conversation_id")
+
+        if conversation_id:
+            zoom_meetings = zoom_meetings.filter(
+                conversation__conversation_id=conversation_id
+            )
+
+        if upcoming and upcoming.lower() == "true":
+            zoom_meetings = zoom_meetings.filter(start_time__gt=now)
+
+        # Serialize and annotate meeting type
+        zoom_data = ZoomMeetingListSerializer(zoom_meetings, many=True).data
+        for meeting in zoom_data:
+            meeting["meeting_type"] = "zoom"
+
+        # Sort by start time
+        zoom_data.sort(key=lambda x: x.get("start_time", ""))
+
+        # Paginate
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(zoom_data, request)
+
+        if page is not None:
+            return paginator.get_paginated_response(
+                {
+                    "meetings": page,
+                    "total_count": len(zoom_data),
+                    "zoom_count": len(zoom_data),
+                }
+            )
+
+        return Response(
+            {
+                "success": True,
+                "meetings": zoom_data,
+                "total_count": len(zoom_data),
+                "zoom_count": len(zoom_data),
+            }
+        )

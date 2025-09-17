@@ -34,7 +34,7 @@ urlpatterns = [
     ),
     path(
         "zoom/list/<str:conversation_id>/",
-        zoom_views.ZoomMeetingListView.as_view(),
+        zoom_views.ZoomMeetingConversationListView.as_view(),
         name="zoom_list_meetings",
     ),
     path(
@@ -61,5 +61,16 @@ urlpatterns = [
         "zoom/sync/<str:conversation_id>/<uuid:meeting_id>/",
         zoom_views.ZoomMeetingSyncView.as_view(),
         name="zoom_meeting_sync",
+    ),
+    path(
+        "zoom/list/",
+        zoom_views.ZoomMeetingListView.as_view(),
+        name="zoom_list_meetings",
+    ),
+    # All meetings (Google + Zoom) for authenticated user
+    path(
+        "all/",
+        views.AllMeetingsListView.as_view(),
+        name="all_meetings",
     ),
 ]
