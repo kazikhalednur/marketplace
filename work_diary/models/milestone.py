@@ -41,7 +41,7 @@ class MilestoneStep(models.Model):
         SUBMITTED = "submitted", "Submitted"
         IN_REVIEW = "in_review", "In Review"
         ACCEPTED = "accepted", "Accepted"
-        FAILED = "failed", "Failed"
+        REJECTED = "rejected", "Rejected"
         PAID = "paid", "Paid"
 
     id = models.UUIDField(
