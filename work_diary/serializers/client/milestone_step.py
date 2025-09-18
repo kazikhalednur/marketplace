@@ -1,4 +1,3 @@
-from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from work_diary.models import MilestoneStep
@@ -22,9 +21,9 @@ class ClientMilestoneStepSerializer(ModelSerializer):
         )
         read_only_fields = ("id", "step_number", "uploaded_at", "code_zip", "message")
 
-    def save(self, **kwargs):
-        if self.instance and self.instance.status == MilestoneStep.Status.SUBMITTED:
-            raise serializers.ValidationError(
-                {"status": "Cannot modify a submitted milestone step."}
-            )
-        return super().save(**kwargs)
+    # def save(self, **kwargs):
+    #     if self.instance and self.instance.status == MilestoneStep.Status.SUBMITTED:
+    #         raise serializers.ValidationError(
+    #             {"status": "Cannot modify a submitted milestone step."}
+    #         )
+    #     return super().save(**kwargs)
