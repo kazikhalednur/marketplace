@@ -180,8 +180,10 @@ export interface FreelancerContractDetailResponse {
 
 // Freelancer milestones list returns an array directly in data
 export interface FreelancerMilestoneSubmissionItem {
+  id: string;
   message?: string;
   code_zip: string;
+  status?: string;
 }
 
 export interface FreelancerMilestone extends Omit<Milestone, 'start_date' | 'due_date'> {
@@ -204,12 +206,33 @@ export interface FreelancerMilestoneDetailResponse {
   data: FreelancerMilestone;
 }
 
+// Client milestone detail (same shape but accessible via client endpoint)
+export interface ClientMilestoneDetailResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: FreelancerMilestone;
+}
+
 export interface MilestoneSubmissionResponse {
   success: boolean;
   status_code: number;
   message: string;
   data: {
     code_zip: string;
+  };
+}
+
+export interface UpdateSubmissionStatusPayload {
+  status: string;
+}
+
+export interface UpdateSubmissionStatusResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    status: string;
   };
 }
 
@@ -227,6 +250,23 @@ export interface CreateMilestoneResponse {
   message: string;
   data: Milestone;
 }
+
+  // Update milestone (client)
+  export interface UpdateClientMilestonePayload {
+    title?: string;
+    description?: string;
+    amount?: string;
+    start_date?: string;
+    due_date?: string;
+    status?: string;
+  }
+
+  export interface UpdateClientMilestoneResponse {
+    success: boolean;
+    status_code: number;
+    message: string;
+    data: Milestone;
+  }
 
 export interface ContractsResponse {
   success: boolean;
@@ -547,6 +587,24 @@ export const apiSlice = createApi({
       invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
     }),
 
+    // (removed) client milestone detail - use list data instead
+
+    // Client: update milestone (edit fields or change status)
+    updateClientMilestone: builder.mutation<UpdateClientMilestoneResponse, { contractId: string; stepId: string; payload: UpdateClientMilestonePayload }>(
+      {
+        query: ({ contractId, stepId, payload }) => ({
+          url: `work-diary/client/milestones/${contractId}/steps/${stepId}/`,
+          method: 'PATCH',
+          body: payload,
+        }),
+        transformResponse: (response: UpdateClientMilestoneResponse) => response,
+        invalidatesTags: (result, error, { contractId, stepId }) => [
+          { type: 'Milestones', id: contractId },
+          { type: 'Milestones', id: `${contractId}:${stepId}` },
+        ],
+      }
+    ),
+
     // Freelancer side endpoints
     getFreelancerContracts: builder.query<FreelancerContractsResponse, { page?: number; page_size?: number } | void>({
       query: (params) => {
@@ -578,6 +636,16 @@ export const apiSlice = createApi({
       transformResponse: (response: FreelancerMilestonesResponse) => response,
       providesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
     }),
+    getFreelancerMilestoneDetail: builder.query<FreelancerMilestoneDetailResponse, { contractId: string; stepId: string }>(
+      {
+        query: ({ contractId, stepId }) => `work-diary/milestones/${contractId}/steps/${stepId}/`,
+        transformResponse: (response: FreelancerMilestoneDetailResponse) => response,
+        providesTags: (result, error, { contractId, stepId }) => [
+          { type: 'Milestones', id: `${contractId}-${stepId}` },
+        ],
+      }
+    ),
+    // (removed duplicate) getClientMilestoneDetail defined above
     submitMilestoneWork: builder.mutation<MilestoneSubmissionResponse, { contractId: string; stepId: string; formData: FormData }>(
       {
         query: ({ contractId, stepId, formData }) => ({
@@ -589,6 +657,18 @@ export const apiSlice = createApi({
         invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
       }
     ),
+    updateSubmissionStatus: builder.mutation<
+      UpdateSubmissionStatusResponse,
+      { contractId: string; stepId: string; submissionId: string; payload: UpdateSubmissionStatusPayload }
+    >({
+      query: ({ contractId, stepId, submissionId, payload }) => ({
+        url: `work-diary/client/milestones/${contractId}/steps/${stepId}/submissions/${submissionId}/update/`,
+        method: 'PATCH',
+        body: payload,
+      }),
+      transformResponse: (response: UpdateSubmissionStatusResponse) => response,
+      invalidatesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
+    }),
   }),
 });
 
@@ -621,4 +701,6 @@ export const {
   useGetFreelancerContractByIdQuery,
   useGetFreelancerMilestonesQuery,
   useSubmitMilestoneWorkMutation,
+  useUpdateSubmissionStatusMutation,
+  useUpdateClientMilestoneMutation,
 } = apiSlice;

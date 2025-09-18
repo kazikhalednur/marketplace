@@ -24,7 +24,7 @@ import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import UnauthorizedPage from "@/app/unauthorized/page";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload, useGetFreelancerContractByIdQuery, useGetFreelancerMilestonesQuery, useSubmitMilestoneWorkMutation, FreelancerMilestone, Milestone, ContractDetail, FreelancerContractDetail, FreelancerMilestoneSubmissionItem } from "@/features/api/apiSlice";
+import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload, useGetFreelancerContractByIdQuery, useGetFreelancerMilestonesQuery, useSubmitMilestoneWorkMutation, FreelancerMilestone, Milestone, ContractDetail, FreelancerContractDetail, FreelancerMilestoneSubmissionItem, useUpdateClientMilestoneMutation } from "@/features/api/apiSlice";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -94,6 +94,9 @@ export default function ContractDetailPage() {
   // Mutations
   const [createMilestone, { isLoading: isCreatingMilestone }] = useCreateMilestoneMutation();
   const [submitMilestoneWork, { isLoading: isSubmitting }] = useSubmitMilestoneWorkMutation();
+  const [updateClientMilestone, { isLoading: isUpdatingClient }] = useUpdateClientMilestoneMutation();
+  const [milestoneDetailModalOpen, setMilestoneDetailModalOpen] = useState(false);
+  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -199,6 +202,44 @@ export default function ContractDetailPage() {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  // Milestone statuses mapping
+  const MILESTONE_STATUSES: { value: string; label: string }[] = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'submitted', label: 'Submitted' },
+    { value: 'in_review', label: 'In Review' },
+    { value: 'accepted', label: 'Accepted' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'paid', label: 'Paid' },
+  ];
+
+  const getMilestoneStatusLabel = (value: string): string => {
+    return MILESTONE_STATUSES.find(s => s.value === value)?.label || (value?.charAt(0).toUpperCase() + value?.slice(1));
+  };
+
+  const getMilestoneStatusStyle = (status: string): string => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'submitted':
+      case 'in_review':
+        return 'bg-blue-100 text-blue-800';
+      case 'accepted':
+      case 'paid':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'active':
+        return 'bg-sky-100 text-sky-800';
+      case 'completed':
+        return 'bg-emerald-100 text-emerald-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Dropdown should only allow these transitions
+  const DROPDOWN_STATUS_VALUES = ['in_review', 'accepted', 'rejected'] as const;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -455,25 +496,19 @@ export default function ContractDetailPage() {
                               <span>Start: {milestone.start_date ? new Date(milestone.start_date).toLocaleDateString() : '—'}</span>
                               <span>Due: {milestone.due_date ? new Date(milestone.due_date).toLocaleDateString() : '—'}</span>
                             </div>
-                            <Badge className={`text-xs ${
-                              milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
-                              milestone.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                              milestone.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              milestone.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {milestone.status.charAt(0).toUpperCase() + milestone.status.slice(1)}
-                            </Badge>
+                        <Badge className={`text-xs ${getMilestoneStatusStyle(milestone.status)}`}>
+                              {getMilestoneStatusLabel(milestone.status)}
+                        </Badge>
                           </div>
-                          {/* Freelancer submissions */}
-                          {isFreelancer && 'submissions' in milestone && Array.isArray(milestone.submissions) && milestone.submissions.length > 0 && (
+                          {/* Submissions list (no inline status changes; open modal for details) */}
+                          {'submissions' in milestone && Array.isArray(milestone.submissions) && milestone.submissions.length > 0 && (
                             <div className="mt-3">
                               <p className="text-xs font-medium mb-2">Submissions</p>
-                              <ul className="text-xs space-y-1">
+                              <ul className="text-xs space-y-2">
                                 {milestone.submissions.map((sub: FreelancerMilestoneSubmissionItem, idx: number) => (
-                                  <li key={idx} className="flex items-center gap-2">
-                                    <a href={sub.code_zip} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Download {idx + 1}</a>
-                                    {sub.message && <span className="text-muted-foreground">— {sub.message}</span>}
+                                  <li key={sub.id ?? idx} className="flex items-center gap-2 min-w-0">
+                                    <a href={sub.code_zip} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">Download {idx + 1}</a>
+                                    {sub.message && <span className="text-muted-foreground truncate">— {sub.message}</span>}
                                   </li>
                                 ))}
                               </ul>
@@ -496,6 +531,14 @@ export default function ContractDetailPage() {
                                   </Button>
                                 </>
                               )}
+                            </div>
+                          )}
+                          {/* View details (client) */}
+                           {isClient && (
+                            <div className="mt-3">
+                               <Button size="sm" variant="outline" onClick={() => { setSelectedMilestoneId(milestone.id); setMilestoneDetailModalOpen(true); }}>
+                                View Details
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -920,6 +963,96 @@ export default function ContractDetailPage() {
         )}
 
       </div>
+
+      {/* Milestone Detail Modal (Client) */}
+      {isClient && milestoneDetailModalOpen && selectedMilestoneId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <Card className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Milestone Details</h2>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => { setMilestoneDetailModalOpen(false); setSelectedMilestoneId(null); }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {selectedMilestoneId ? (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Title</h3>
+                    <p className="text-sm font-semibold">{(milestones.find(m => m.id === selectedMilestoneId) as Milestone | FreelancerMilestone)?.title}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Description</h3>
+                    <p className="text-sm">{(milestones.find(m => m.id === selectedMilestoneId) as Milestone | FreelancerMilestone)?.description}</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Amount</h3>
+                      <p className="text-sm font-semibold text-green-600">৳{(milestones.find(m => m.id === selectedMilestoneId) as Milestone | FreelancerMilestone)?.amount}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                      <div className="flex items-center gap-3">
+                         <Badge className={`text-xs ${getMilestoneStatusStyle((milestones.find(m => m.id === selectedMilestoneId) as Milestone | FreelancerMilestone)?.status || '')}`}>
+                           {getMilestoneStatusLabel((milestones.find(m => m.id === selectedMilestoneId) as Milestone | FreelancerMilestone)?.status || '')}
+                         </Badge>
+                         <select
+                          className="px-2 py-1 border rounded text-xs bg-background"
+                          defaultValue=""
+                          onChange={async (e) => {
+                            const newStatus = e.target.value;
+                            if (!newStatus) return;
+                            const ok = window.confirm(`Are you sure you want to mark this milestone as "${newStatus}"?`);
+                            if (!ok) return;
+                            try {
+                              await updateClientMilestone({ contractId: contract.id, stepId: selectedMilestoneId!, payload: { status: newStatus } }).unwrap();
+                            } catch (err) {
+                              console.error('Failed to update milestone status', err);
+                            }
+                          }}
+                           disabled={isUpdatingClient}
+                         >
+                           <option value="">Change status…</option>
+                           {MILESTONE_STATUSES.filter(s => DROPDOWN_STATUS_VALUES.includes(s.value as typeof DROPDOWN_STATUS_VALUES[number])).map((s) => (
+                             <option key={s.value} value={s.value}>{s.label}</option>
+                           ))}
+                         </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Submissions */}
+                  {(() => {
+                    const ms = milestones.find(m => m.id === selectedMilestoneId) as FreelancerMilestone | undefined;
+                    return Array.isArray(ms?.submissions) && ms.submissions.length > 0;
+                  })() && (
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground mb-2">Submissions</h3>
+                      <ul className="text-xs space-y-2">
+                        {(milestones.find(m => m.id === selectedMilestoneId) as FreelancerMilestone).submissions!.map((sub: FreelancerMilestoneSubmissionItem, idx: number) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <a href={sub.code_zip} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Download {idx + 1}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-sm text-muted-foreground">Loading milestone details…</span>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
     </main>
   );
 }
