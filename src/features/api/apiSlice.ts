@@ -523,14 +523,23 @@ export const apiSlice = createApi({
       transformResponse: (response: ContractDetailResponse) => response,
       providesTags: (result, error, id) => [{ type: 'Contracts', id }],
     }),
-    getMilestones: builder.query<MilestonesResponse, string>({
-      query: (contractId) => `work-diary/client/milestones/${contractId}/steps/`,
+    getMilestones: builder.query<
+      MilestonesResponse,
+      { contractId: string; page?: number; page_size?: number }
+    >({
+      query: ({ contractId, page, page_size }) => {
+        const searchParams = new URLSearchParams();
+        if (page) searchParams.append('page', page.toString());
+        if (page_size) searchParams.append('page_size', page_size.toString());
+        const queryString = searchParams.toString();
+        return `work-diary/client/milestones/${contractId}/steps/${queryString ? `?${queryString}` : ''}`;
+      },
       transformResponse: (response: MilestonesResponse) => response,
-      providesTags: (result, error, contractId) => [{ type: 'Milestones', id: contractId }],
+      providesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
     }),
     createMilestone: builder.mutation<CreateMilestoneResponse, { contractId: string; payload: CreateMilestonePayload }>({
       query: ({ contractId, payload }) => ({
-        url: `work-diary/client/milestones/${contractId}/steps/create/`,
+        url: `work-diary/client/milestones/${contractId}/steps/`,
         method: 'POST',
         body: payload,
       }),
@@ -555,25 +564,25 @@ export const apiSlice = createApi({
       transformResponse: (response: FreelancerContractDetailResponse) => response,
       providesTags: (result, error, id) => [{ type: 'Contracts', id }],
     }),
-    getFreelancerMilestones: builder.query<FreelancerMilestonesResponse, string>({
-      query: (contractId) => `work-diary/milestones/${contractId}/steps/`,
+    getFreelancerMilestones: builder.query<
+      FreelancerMilestonesResponse,
+      { contractId: string; page?: number; page_size?: number }
+    >({
+      query: ({ contractId, page, page_size }) => {
+        const searchParams = new URLSearchParams();
+        if (page) searchParams.append('page', page.toString());
+        if (page_size) searchParams.append('page_size', page_size.toString());
+        const queryString = searchParams.toString();
+        return `work-diary/milestones/${contractId}/steps/${queryString ? `?${queryString}` : ''}`;
+      },
       transformResponse: (response: FreelancerMilestonesResponse) => response,
-      providesTags: (result, error, contractId) => [{ type: 'Milestones', id: contractId }],
+      providesTags: (result, error, { contractId }) => [{ type: 'Milestones', id: contractId }],
     }),
-    getFreelancerMilestoneDetail: builder.query<FreelancerMilestoneDetailResponse, { contractId: string; stepId: string }>(
-      {
-        query: ({ contractId, stepId }) => `work-diary/milestones/${contractId}/steps/${stepId}/`,
-        transformResponse: (response: FreelancerMilestoneDetailResponse) => response,
-        providesTags: (result, error, { contractId, stepId }) => [
-          { type: 'Milestones', id: `${contractId}-${stepId}` },
-        ],
-      }
-    ),
     submitMilestoneWork: builder.mutation<MilestoneSubmissionResponse, { contractId: string; stepId: string; formData: FormData }>(
       {
         query: ({ contractId, stepId, formData }) => ({
-          url: `work-diary/milestones/${contractId}/steps/${stepId}/submissions/`,
-          method: 'POST',
+          url: `work-diary/milestones/${contractId}/steps/${stepId}/`,
+          method: 'PATCH',
           body: formData,
         }),
         transformResponse: (response: MilestoneSubmissionResponse) => response,
@@ -611,6 +620,5 @@ export const {
   useGetFreelancerContractsQuery,
   useGetFreelancerContractByIdQuery,
   useGetFreelancerMilestonesQuery,
-  useGetFreelancerMilestoneDetailQuery,
   useSubmitMilestoneWorkMutation,
 } = apiSlice;

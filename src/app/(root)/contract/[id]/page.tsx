@@ -18,6 +18,7 @@ import {
   X,
   CalendarDays
 } from "lucide-react";
+import DashboardPagination from "../../dashboard/_views/DashboardPagination";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
@@ -44,6 +45,7 @@ export default function ContractDetailPage() {
   });
   // Freelancer submission state
   const [submissionModalOpen, setSubmissionModalOpen] = useState(false);
+  const [viewSubmissionModalOpen, setViewSubmissionModalOpen] = useState(false);
   const [submissionMessage, setSubmissionMessage] = useState('');
   const [selectedStep, setSelectedStep] = useState<FreelancerMilestone | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -51,17 +53,43 @@ export default function ContractDetailPage() {
   const isClient = user?.role === "client";
   const isFreelancer = user?.role === "freelancer";
 
-  // Client contract and milestones
+  // Pagination state (shared UI for both roles)
+  // Server-side pagination (freelancer milestones)
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  // Client contract and milestones (with pagination)
   const { data: clientContractResponse, isLoading: clientLoading, error: clientError } = useGetContractByIdQuery(isClient ? (params.id as string) : skipToken);
-  const { data: clientMilestonesResponse, isLoading: clientMilestonesLoading, error: clientMilestonesError } = useGetMilestonesQuery(isClient ? (params.id as string) : skipToken);
+  const { data: clientMilestonesResponse, isLoading: clientMilestonesLoading, error: clientMilestonesError } = useGetMilestonesQuery(
+    isClient ? { contractId: params.id as string, page, page_size: pageSize } : (skipToken as unknown as { contractId: string })
+  );
   const clientContract = clientContractResponse?.data;
   const clientMilestones = clientMilestonesResponse?.data?.results || [];
+  const clientCount = clientMilestonesResponse?.data?.count || 0;
+  const hasClientNext = Boolean(clientMilestonesResponse?.data?.next);
+  const hasClientPrev = Boolean(clientMilestonesResponse?.data?.previous);
+  const clientTotalPages = Math.max(1, Math.ceil(clientCount / Math.max(pageSize, 1)));
 
   // Freelancer contract and milestones
   const { data: freelancerContractResponse, isLoading: freelancerLoading, error: freelancerError } = useGetFreelancerContractByIdQuery(isFreelancer ? (params.id as string) : skipToken);
-  const { data: freelancerMilestonesResponse, isLoading: freelancerMilestonesLoading, error: freelancerMilestonesError } = useGetFreelancerMilestonesQuery(isFreelancer ? (params.id as string) : skipToken);
+  const { data: freelancerMilestonesResponse, isLoading: freelancerMilestonesLoading, error: freelancerMilestonesError } = useGetFreelancerMilestonesQuery(
+    isFreelancer ? { contractId: params.id as string, page, page_size: pageSize } : (skipToken as unknown as { contractId: string })
+  );
   const freelancerContract = freelancerContractResponse?.data;
-  const freelancerMilestones = freelancerMilestonesResponse?.data || [];
+  const freelancerData = freelancerMilestonesResponse?.data as unknown;
+  const freelancerMilestones: FreelancerMilestone[] = Array.isArray(freelancerData)
+    ? (freelancerData as FreelancerMilestone[])
+    : ((freelancerData as { results?: FreelancerMilestone[] } | undefined)?.results || []);
+  const freelancerCount: number = Array.isArray(freelancerData)
+    ? (freelancerData as FreelancerMilestone[]).length
+    : ((freelancerData as { count?: number } | undefined)?.count || 0);
+  const hasFreelancerNext: boolean = Array.isArray(freelancerData)
+    ? (page * pageSize) < freelancerCount
+    : Boolean((freelancerData as { next?: string | null } | undefined)?.next);
+  const hasFreelancerPrev: boolean = Array.isArray(freelancerData)
+    ? page > 1
+    : Boolean((freelancerData as { previous?: string | null } | undefined)?.previous);
+  const freelancerTotalPages = Math.max(1, Math.ceil(freelancerCount / Math.max(pageSize, 1)));
 
   // Mutations
   const [createMilestone, { isLoading: isCreatingMilestone }] = useCreateMilestoneMutation();
@@ -154,6 +182,11 @@ export default function ContractDetailPage() {
     );
   }
 
+  // Ensure milestones is always an array to avoid runtime errors when using .filter/.map
+  const milestones: Array<Milestone | FreelancerMilestone> = isClient
+    ? (Array.isArray(clientMilestones) ? clientMilestones : [])
+    : (Array.isArray(freelancerMilestones) ? freelancerMilestones : []);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -230,7 +263,11 @@ export default function ContractDetailPage() {
   const openSubmissionModal = (step: FreelancerMilestone) => {
     if (!isFreelancer) return;
     setSelectedStep(step);
-    setSubmissionMessage('');
+    // Prefill message if exists (edit flow)
+    const existingMessage = Array.isArray(step.submissions) && step.submissions.length > 0
+      ? (step.submissions[step.submissions.length - 1]?.message || '')
+      : '';
+    setSubmissionMessage(existingMessage);
     setSubmissionModalOpen(true);
   };
   const closeSubmissionModal = () => {
@@ -238,6 +275,15 @@ export default function ContractDetailPage() {
     setSubmissionMessage('');
     setSubmissionModalOpen(false);
     setFile(null);
+  };
+  const openViewSubmission = (step: FreelancerMilestone) => {
+    if (!isFreelancer) return;
+    setSelectedStep(step);
+    setViewSubmissionModalOpen(true);
+  };
+  const closeViewSubmission = () => {
+    setSelectedStep(null);
+    setViewSubmissionModalOpen(false);
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] || null;
@@ -332,18 +378,18 @@ export default function ContractDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Project Status</span>
                     <span className="text-sm font-semibold text-primary">
-                      {(isClient ? clientMilestones : freelancerMilestones).length > 0 ? `${(isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length}/${(isClient ? clientMilestones : freelancerMilestones).length} Milestones Completed` : 'No Milestones Yet'}
+                      {milestones.length > 0 ? `${milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length}/${milestones.length} Milestones Completed` : 'No Milestones Yet'}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-3">
                     <div 
                       className="bg-primary h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.round(((isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max((isClient ? clientMilestones : freelancerMilestones).length, 1)) * 100)}%` }}
+                      style={{ width: `${Math.round((milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max(milestones.length, 1)) * 100)}%` }}
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Progress: {Math.round(((isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max((isClient ? clientMilestones : freelancerMilestones).length, 1)) * 100)}%</span>
-                    <span>{(isClient ? clientMilestones : freelancerMilestones).filter(m => m.status === 'completed' || m.status === 'accepted').length} of {(isClient ? clientMilestones : freelancerMilestones).length} completed</span>
+                    <span>Progress: {Math.round((milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length / Math.max(milestones.length, 1)) * 100)}%</span>
+                    <span>{milestones.filter(m => m.status === 'completed' || m.status === 'accepted').length} of {milestones.length} completed</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>Started: {new Date(contract.start_date).toLocaleDateString()}</span>
@@ -375,12 +421,12 @@ export default function ContractDetailPage() {
                   <h3 className="text-lg font-medium mb-2">Error Loading Milestones</h3>
                   <p className="text-muted-foreground">There was an error loading the milestones.</p>
                 </div>
-              ) : (isClient ? clientMilestones : freelancerMilestones).length > 0 ? (
+              ) : milestones.length > 0 ? (
                 <div className="space-y-4">
-                  {(isClient ? clientMilestones : freelancerMilestones).map((milestone: Milestone | FreelancerMilestone, index: number) => (
+                  {milestones.map((milestone: Milestone | FreelancerMilestone, index: number) => (
                     <div key={milestone.id} className="relative">
                       {/* Connection line */}
-                      {index < (isClient ? clientMilestones : freelancerMilestones).length - 1 && (
+                      {index < milestones.length - 1 && (
                         <div className="absolute left-3 top-8 w-0.5 h-8 bg-muted"></div>
                       )}
                       <div className="flex items-start gap-4 p-4 border rounded-lg bg-card">
@@ -433,17 +479,69 @@ export default function ContractDetailPage() {
                               </ul>
                             </div>
                           )}
-                          {isFreelancer && (milestone.status === 'pending' || milestone.status === 'active' || milestone.status === 'submitted') && (
-                            <div className="mt-3">
-                              <Button size="sm" variant="outline" onClick={() => openSubmissionModal(milestone)}>
-                                Submit Work
-                              </Button>
+                          {isFreelancer && (
+                            <div className="mt-3 flex gap-2">
+                              {(milestone.status === 'pending' || milestone.status === 'active') && (
+                                <Button size="sm" variant="outline" onClick={() => openSubmissionModal(milestone as FreelancerMilestone)}>
+                                  Submit Work
+                                </Button>
+                              )}
+                              {milestone.status === 'submitted' && (
+                                <>
+                                  <Button size="sm" variant="outline" onClick={() => openViewSubmission(milestone as FreelancerMilestone)}>
+                                    View Details
+                                  </Button>
+                                  <Button size="sm" onClick={() => openSubmissionModal(milestone as FreelancerMilestone)}>
+                                    Edit Submission
+                                  </Button>
+                                </>
+                              )}
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
                   ))}
+                  {/* Pagination (only for freelancer list which is paginated server-side) */}
+                  {(isFreelancer || isClient) && (
+                    <div className="pt-2">
+                      {isFreelancer ? (
+                        <>
+                          <DashboardPagination
+                            currentPage={page}
+                            totalPages={freelancerTotalPages}
+                            hasPrevious={!!hasFreelancerPrev && page > 1}
+                            hasNext={!!hasFreelancerNext && page < freelancerTotalPages}
+                            pageSize={pageSize}
+                            totalCount={freelancerCount}
+                            onPageChange={(p) => setPage(p)}
+                          />
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">Page size</span>
+                            <select
+                              value={pageSize}
+                              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                              className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                            >
+                              <option value={5}>5</option>
+                              <option value={10}>10</option>
+                              <option value={20}>20</option>
+                            </select>
+                          </div>
+                        </>
+                      ) : (
+                        <DashboardPagination
+                          currentPage={page}
+                          totalPages={clientTotalPages}
+                          hasPrevious={!!hasClientPrev && page > 1}
+                          hasNext={!!hasClientNext && page < clientTotalPages}
+                          pageSize={pageSize}
+                          totalCount={clientCount}
+                          onPageChange={(p) => setPage(p)}
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -727,7 +825,7 @@ export default function ContractDetailPage() {
             <Card className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Submit Work — Step {selectedStep.step_number}</h2>
+                  <h2 className="text-2xl font-bold">{selectedStep.status === 'submitted' ? 'Edit Submission' : 'Submit Work'} — Step {selectedStep.step_number}</h2>
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -771,9 +869,50 @@ export default function ContractDetailPage() {
                       onClick={handleSubmitWork}
                       disabled={!file || isSubmitting}
                     >
-                      {isSubmitting ? 'Submitting...' : 'Submit'}
+                      {isSubmitting ? 'Submitting...' : (selectedStep.status === 'submitted' ? 'Update Submission' : 'Submit')}
                     </Button>
                   </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {isFreelancer && viewSubmissionModalOpen && selectedStep && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <Card className="w-full max-w-lg mx-4">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold">Submission Details — Step {selectedStep.step_number}</h2>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={closeViewSubmission}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Message</p>
+                    <p className="mt-1">{(Array.isArray(selectedStep.submissions) && selectedStep.submissions.length > 0 ? (selectedStep.submissions[selectedStep.submissions.length - 1]?.message || '—') : '—')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Attachment</p>
+                    {Array.isArray(selectedStep.submissions) && selectedStep.submissions.length > 0 && selectedStep.submissions[selectedStep.submissions.length - 1]?.code_zip ? (
+                      <a href={selectedStep.submissions[selectedStep.submissions.length - 1].code_zip} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Download ZIP</a>
+                    ) : (
+                      <p>—</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Uploaded At</p>
+                    <p className="mt-1">—</p>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button variant="outline" onClick={closeViewSubmission}>Close</Button>
+                  <Button onClick={() => { closeViewSubmission(); openSubmissionModal(selectedStep); }}>Edit Submission</Button>
                 </div>
               </div>
             </Card>
