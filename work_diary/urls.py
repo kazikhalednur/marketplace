@@ -14,13 +14,8 @@ client_urls = [
     ),
     path(
         "milestones/<uuid:contract_id>/steps/",
-        client_views.MilestoneStepListView.as_view(),
-        name="client-milestone-step-list",
-    ),
-    path(
-        "milestones/<uuid:contract_id>/steps/create/",
-        client_views.MilestoneStepCreateView.as_view(),
-        name="client-milestone-step-create",
+        client_views.MilestoneStepListCreateView.as_view(),
+        name="client-milestone-step-list-create",
     ),
     path(
         "milestones/<uuid:contract_id>/steps/swap/",
@@ -31,16 +26,6 @@ client_urls = [
         "milestones/<uuid:contract_id>/steps/<uuid:step_id>/",
         client_views.MilestoneStepDetailView.as_view(),
         name="client-milestone-step-detail",
-    ),
-    path(
-        "milestones/<uuid:contract_id>/steps/<uuid:step_id>/submissions/<uuid:submission_id>/update/",  # noqa: E501
-        client_views.MilestoneStepSubmissionUpdateView.as_view(),
-        name="client-milestone-step-submission-update",
-    ),
-    path(
-        "milestones/<uuid:contract_id>/stats/",
-        client_views.MilestoneStatsView.as_view(),
-        name="client-milestone-stats",
     ),
 ]
 
@@ -58,18 +43,8 @@ freelancer_urls = [
     ),
     path(
         "milestones/<uuid:contract_id>/steps/<uuid:step_id>/",
-        freelancer_views.MilestoneStepDetailView.as_view(),
-        name="freelancer-milestone-step-detail",
-    ),
-    path(
-        "milestones/<uuid:contract_id>/steps/<uuid:step_id>/submissions/",
-        freelancer_views.MilestoneStepSubmissionView.as_view(),
-        name="freelancer-milestone-step-submission",
-    ),
-    path(
-        "milestones/<uuid:contract_id>/stats/",
-        freelancer_views.MilestoneStatsView.as_view(),
-        name="freelancer-milestone-stats",
+        freelancer_views.MilestoneStepUpdateView.as_view(),
+        name="freelancer-milestone-step",
     ),
 ]
 

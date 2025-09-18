@@ -56,6 +56,11 @@ class MilestoneStep(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
+    message = models.TextField(blank=True, null=True)
+    code_zip = models.FileField(
+        upload_to="milestone_submissions/zips/", blank=True, null=True
+    )
+    uploaded_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default="pending")
 
     history = HistoricalRecords()

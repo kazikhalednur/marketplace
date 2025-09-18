@@ -1,9 +1,9 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
 from biding.models import Contract
 
-from .models import Milestone, MilestoneStep, MilestoneStepSubmission
+from .models import Milestone, MilestoneStep
 
 
 @receiver(post_save, sender=Contract)
@@ -12,17 +12,22 @@ def create_milestone_on_contract_creation(sender, instance, created, **kwargs):
         Milestone.objects.create(contract=instance)
 
 
-@receiver(pre_save, sender=MilestoneStepSubmission)
-def delete_old_file_on_change(sender, instance, **kwargs):
+@receiver(pre_save, sender=MilestoneStep)
+def delete_old_file_on_change(sender, instance: MilestoneStep, **kwargs):
     if instance.pk:
         try:
-            old_instance = MilestoneStepSubmission.objects.get(pk=instance.pk)
+            old_instance = MilestoneStep.objects.get(pk=instance.pk)
             if old_instance.code_zip != instance.code_zip:
                 old_instance.code_zip.delete(save=False)
-        except MilestoneStepSubmission.DoesNotExist:
+        except MilestoneStep.DoesNotExist:
             pass
     else:
         pass
+
+
+@receiver(pre_delete, sender=MilestoneStep)
+def delete_file_on_delete(sender, instance: MilestoneStep, **kwargs):
+    instance.code_zip.delete(save=False)
 
 
 @receiver(post_save, sender=MilestoneStep)

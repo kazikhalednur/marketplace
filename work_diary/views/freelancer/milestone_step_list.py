@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 
 from accounts.permissions import IsFreelancer
 
@@ -7,11 +8,19 @@ from ...models import MilestoneStep
 from ...serializers.freelancer import FreelancerMilestoneStepSerializer
 
 
+class MilestoneStepPagination(PageNumberPagination):
+    """Custom pagination class for milestone step lists with configurable page size."""
+
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
+@extend_schema(tags=["freelancer_work_diary"])
 @extend_schema_view(
     list=extend_schema(
         summary="List all milestone steps for a specific contract",
         description="List all milestone steps for a specific contract",
-        tags=["freelancer_work_diary"],
     ),
 )
 class MilestoneStepListView(ListAPIView):
@@ -19,6 +28,7 @@ class MilestoneStepListView(ListAPIView):
 
     serializer_class = FreelancerMilestoneStepSerializer
     permission_classes = [IsFreelancer]
+    pagination_class = MilestoneStepPagination
 
     def get_queryset(self):
         """Filter milestone steps to contracts owned by the authenticated freelancer."""

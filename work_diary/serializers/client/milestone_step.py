@@ -1,11 +1,10 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from work_diary.models import MilestoneStep
 
-from .milestone_step_submission import ClientMilestoneStepSubmissionSerializer
 
-
-class ClientMilestoneStepListSerializer(ModelSerializer):
+class ClientMilestoneStepSerializer(ModelSerializer):
     class Meta:
         model = MilestoneStep
         fields = (
@@ -16,47 +15,16 @@ class ClientMilestoneStepListSerializer(ModelSerializer):
             "amount",
             "start_date",
             "due_date",
+            "message",
+            "code_zip",
+            "uploaded_at",
             "status",
         )
-        read_only_fields = ("id", "step_number")
+        read_only_fields = ("id", "step_number", "uploaded_at", "code_zip", "message")
 
-
-class ClientMilestoneStepDetailSerializer(ModelSerializer):
-    submissions = ClientMilestoneStepSubmissionSerializer(
-        many=True, read_only=True, source="submissions.all"
-    )
-
-    class Meta:
-        model = MilestoneStep
-        fields = (
-            "id",
-            "step_number",
-            "title",
-            "description",
-            "amount",
-            "start_date",
-            "due_date",
-            "submissions",
-            "status",
-        )
-        read_only_fields = (
-            "id",
-            "step_number",
-            "title",
-            "description",
-            "amount",
-            "start_date",
-            "due_date",
-        )
-
-
-class ClientMilestoneStepCreateSerializer(ModelSerializer):
-    class Meta:
-        model = MilestoneStep
-        fields = (
-            "title",
-            "description",
-            "amount",
-            "start_date",
-            "due_date",
-        )
+    def save(self, **kwargs):
+        if self.instance and self.instance.status == MilestoneStep.Status.SUBMITTED:
+            raise serializers.ValidationError(
+                {"status": "Cannot modify a submitted milestone step."}
+            )
+        return super().save(**kwargs)

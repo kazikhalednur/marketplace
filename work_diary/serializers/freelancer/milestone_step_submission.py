@@ -13,65 +13,36 @@ class FreelancerMilestoneStepSubmissionSerializer(ModelSerializer):
     def save(self, **kwargs):
         """Save or update milestone step submission"""
         # Get milestone and freelancer_profile from kwargs
-        milestone: MilestoneStep = kwargs.get("milestone")
+        milestone_step: MilestoneStep = kwargs.get("milestone_step")
         freelancer_profile: FreelancerProfile = kwargs.get("freelancer_profile")
 
-        if not milestone or not freelancer_profile:
-            raise ValueError("milestone and freelancer_profile are required")
+        if not milestone_step or not freelancer_profile:
+            raise ("milestone and freelancer_profile are required")
 
         # Check if submission already exists for this milestone step and freelancer
         try:
             existing_submission = (
                 MilestoneStepSubmission.objects.filter(
-                    milestone_step=milestone, freelancer_profile=freelancer_profile
+                    milestone_step=milestone_step, freelancer_profile=freelancer_profile
                 )
                 .order_by("-submitted_at")
                 .first()
             )
-
-            # If existing submission has failed status, create a new one
-            if existing_submission.status == MilestoneStepSubmission.Status.REJECTED:
-                milestone_step_submission_new = MilestoneStepSubmission.objects.create(
-                    milestone_step=milestone,
-                    freelancer_profile=freelancer_profile,
-                    **self.validated_data,
-                )
-
-                milestone_step_submission_new.milestone_step.status = (
-                    MilestoneStep.Status.SUBMITTED
-                )
-                milestone_step_submission_new.milestone_step.save(
-                    update_fields=["status"]
-                )
-
-                Notification.objects.create(
-                    user=freelancer_profile.freelancer,
-                    message=f"Your submission for {milestone.title} has been created.",
-                    message_type=Notification.NotificationType.SUCCESS,
-                )
-
-                Notification.objects.create(
-                    user=milestone.milestone.contract.client_profile.client,
-                    message=f"Your submission for {milestone.title} has been created.",
-                    message_type=Notification.NotificationType.SUCCESS,
-                )
-
-                return milestone_step_submission_new
-            else:
-                # Update existing submission (only if not failed)
+            # Update existing submission
+            if existing_submission:
                 for attr, value in self.validated_data.items():
                     setattr(existing_submission, attr, value)
                 existing_submission.save()
 
                 Notification.objects.create(
                     user=freelancer_profile.freelancer,
-                    message=f"Your submission for {milestone.title} has been updated.",
+                    message=f"Your submission for {milestone_step.title} has been updated.",  # noqa: E501
                     message_type=Notification.NotificationType.SUCCESS,
                 )
 
                 Notification.objects.create(
-                    user=milestone.milestone.contract.client_profile.client,
-                    message=f"Your submission for {milestone.title} has been updated.",
+                    user=milestone_step.milestone.contract.client_profile.client,
+                    message=f"Your submission for {milestone_step.title} has been updated.",  # noqa: E501
                     message_type=Notification.NotificationType.SUCCESS,
                 )
 
@@ -79,19 +50,14 @@ class FreelancerMilestoneStepSubmissionSerializer(ModelSerializer):
         except (MilestoneStepSubmission.DoesNotExist, AttributeError):
             # Create new submission
             milestone_step_submission = MilestoneStepSubmission.objects.create(
-                milestone_step=milestone,
+                milestone_step=milestone_step,
                 freelancer_profile=freelancer_profile,
                 **self.validated_data,
             )
 
-            milestone_step_submission.milestone_step.status = (
-                MilestoneStep.Status.SUBMITTED
-            )
-            milestone_step_submission.milestone_step.save(update_fields=["status"])
-
             Notification.objects.create(
                 user=freelancer_profile.freelancer,
-                message=f"Your submission for {milestone.title} has been created.",
+                message=f"Your submission for {milestone_step.title} has been created.",
                 message_type=Notification.NotificationType.SUCCESS,
             )
 

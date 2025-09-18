@@ -7,11 +7,11 @@ from ...models import Milestone
 from ...serializers.freelancer import FreelancerMilestoneSerializer
 
 
+@extend_schema(tags=["freelancer_work_diary"])
 @extend_schema_view(
     retrieve=extend_schema(
         summary="Retrieve detailed milestone information",
         description="Retrieve detailed milestone information",
-        tags=["freelancer_work_diary"],
     ),
 )
 class MilestoneDetailView(RetrieveAPIView):
