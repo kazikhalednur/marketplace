@@ -8,6 +8,11 @@ app_name = "work_diary"
 # Client URLs
 client_urls = [
     path(
+        "milestones/stats/",
+        client_views.MilestoneStatsView.as_view(),
+        name="client-milestone-stats",
+    ),
+    path(
         "milestones/<uuid:contract_id>/",
         client_views.MilestoneDetailView.as_view(),
         name="client-milestone-detail",
