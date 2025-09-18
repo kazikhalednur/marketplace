@@ -20,6 +20,7 @@ from work_diary.serializers.client import ClientMilestoneStatsSerializer
 )
 class MilestoneStatsView(APIView):
     permission_classes = [IsAuthenticated, IsClient]
+    serializer_class = ClientMilestoneStatsSerializer
 
     def get(self, request):
         user = request.user
