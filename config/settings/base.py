@@ -166,8 +166,6 @@ STAICFILES_DIRS = [BASE_DIR / "staticfiles"]
 STATIC_ROOT = BASE_DIR / "static"
 
 # MEDIA configuration
-# Allow overriding MEDIA_URL with a fully-qualified public URL (including port)
-# e.g., PUBLIC_MEDIA_URL=https://cpchub.diu.edu.bd:8433/uploads/
 MEDIA_URL = "uploads/"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
@@ -189,10 +187,6 @@ CORS_ALLOW_CREDENTIALS = True
 # ]
 
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())
-
-# Honor proxy headers for correct host and scheme (so absolute URLs keep the port)
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 ZOOM_ACCOUNT_ID = config("ZOOM_ACCOUNT_ID", cast=str)
 ZOOM_CLIENT_ID = config("ZOOM_CLIENT_ID", cast=str)
