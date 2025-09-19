@@ -168,13 +168,8 @@ STATIC_ROOT = BASE_DIR / "static"
 # MEDIA configuration
 # Allow overriding MEDIA_URL with a fully-qualified public URL (including port)
 # e.g., PUBLIC_MEDIA_URL=https://cpchub.diu.edu.bd:8433/uploads/
-PUBLIC_MEDIA_URL = config("PUBLIC_MEDIA_URL", default=None, cast=str)
-if PUBLIC_MEDIA_URL:
-    MEDIA_URL = (
-        PUBLIC_MEDIA_URL if PUBLIC_MEDIA_URL.endswith("/") else f"{PUBLIC_MEDIA_URL}/"
-    )
-else:
-    MEDIA_URL = "uploads/"
+MEDIA_URL = "uploads/"
+MEDIA_ROOT = BASE_DIR / "uploads"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
