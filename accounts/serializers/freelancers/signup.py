@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from ...helpers import match_email_domain
-from ...mails import send_signup_verification_email
 from ...models import Freelancer, FreelancerProfile
+from ...tasks import send_signup_verification_email_task
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -48,5 +48,5 @@ class SignupSerializer(serializers.ModelSerializer):
         student_id = validated_data.pop("student_id", "")
         instance = Freelancer.objects.create_user(**validated_data, is_active=False)
         FreelancerProfile.objects.create(freelancer=instance, student_id=student_id)
-        send_signup_verification_email(instance)
+        send_signup_verification_email_task.delay(instance.id)
         return instance

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from ...mails import send_signup_verification_email
 from ...models import Client, ClientProfile
+from ...tasks import send_signup_verification_email_task
 
 
 class ClientSignupSerializer(serializers.ModelSerializer):
@@ -38,5 +38,5 @@ class ClientSignupSerializer(serializers.ModelSerializer):
         company_name = validated_data.pop("company_name", "")
         instance = Client.objects.create_user(**validated_data, is_active=False)
         ClientProfile.objects.create(client=instance, company_name=company_name)
-        send_signup_verification_email(instance)
+        send_signup_verification_email_task.delay(instance.id)
         return instance

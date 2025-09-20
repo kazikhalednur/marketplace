@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 
 from utils.helpers import Response
 
-from ..mails import send_signup_verification_email
 from ..models import User
+from ..tasks import send_signup_verification_email_task
 
 
 @extend_schema(
@@ -53,7 +53,7 @@ class EmailResendView(APIView):
             and not user.is_resent_email
             and not user.email_verified
         ):
-            send_signup_verification_email(user)
+            send_signup_verification_email_task.delay(user.id)
             user.is_resent_email = True
             user.save(update_fields=["is_resent_email"])
             return Response(
