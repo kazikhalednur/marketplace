@@ -193,6 +193,7 @@ ZOOM_CLIENT_ID = config("ZOOM_CLIENT_ID", cast=str)
 ZOOM_CLIENT_SECRET = config("ZOOM_CLIENT_SECRET", cast=str)
 
 
+from .celery import *
 from .rest_framework import *
 from .simple_jwt import *
 from .spectacular import *
