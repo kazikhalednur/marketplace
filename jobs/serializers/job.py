@@ -13,9 +13,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class JobSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    skills = SkillSerializer(many=True, read_only=True)
-    created_by = ClientSerializer(read_only=True)
+    category = CategorySerializer()
+    skills = SkillSerializer(many=True)
+    created_by = ClientSerializer()
     is_applied = serializers.SerializerMethodField()
 
     class Meta:
@@ -30,8 +30,6 @@ class JobSerializer(serializers.ModelSerializer):
             "min_budget",
             "max_budget",
             "is_fixed",
-            "min_hourly_rate",
-            "max_hourly_rate",
             "duration",
             "experience_level",
             "min_proposal_count",

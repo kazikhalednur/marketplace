@@ -21,8 +21,6 @@ class ClientJobSerializer(serializers.ModelSerializer):
             "min_budget",
             "max_budget",
             "is_fixed",
-            "min_hourly_rate",
-            "max_hourly_rate",
             "duration",
             "experience_level",
             "min_proposal_count",
@@ -41,7 +39,14 @@ class ClientJobSerializer(serializers.ModelSerializer):
         return representation
 
     def validate(self, attrs):
+        super().validate(attrs)
+
         min_budget = attrs.get("min_budget")
+        if min_budget is not None and min_budget <= 0:
+            raise serializers.ValidationError(
+                {"min_budget": "Minimum budget cannot be less than or equal to 0"}
+            )
+
         max_budget = attrs.get("max_budget")
         if (
             min_budget is not None
@@ -49,21 +54,18 @@ class ClientJobSerializer(serializers.ModelSerializer):
             and min_budget > max_budget
         ):
             raise serializers.ValidationError(
-                "Minimum budget cannot be greater than maximum budget"
-            )
-
-        min_hourly_rate = attrs.get("min_hourly_rate")
-        max_hourly_rate = attrs.get("max_hourly_rate")
-        if (
-            min_hourly_rate is not None
-            and max_hourly_rate is not None
-            and min_hourly_rate > max_hourly_rate
-        ):
-            raise serializers.ValidationError(
-                "Minimum hourly rate cannot be greater than maximum hourly rate"
+                {"max_budget": "Maximum budget cannot be less than minimum budget"}
             )
 
         min_proposal_count = attrs.get("min_proposal_count")
+        if min_proposal_count is not None and min_proposal_count <= 0:
+            raise serializers.ValidationError(
+                {
+                    "min_proposal_count": ("Minimum proposal count cannot")
+                    + (" be less than or equal to 0")
+                }
+            )
+
         max_proposal_count = attrs.get("max_proposal_count")
         if (
             min_proposal_count is not None
@@ -71,7 +73,34 @@ class ClientJobSerializer(serializers.ModelSerializer):
             and min_proposal_count > max_proposal_count
         ):
             raise serializers.ValidationError(
-                "Minimum proposal count cannot be greater than maximum proposal count"
+                {
+                    "max_proposal_count": ("Maximum proposal count cannot")
+                    + (" be less than minimum proposal count")
+                }
+            )
+
+        if self.instance and self.instance.status in [
+            Job.JobStatus.DRAFT,
+            Job.JobStatus.OPEN,
+        ]:
+            if attrs.get("status") not in [Job.JobStatus.DRAFT, Job.JobStatus.OPEN]:
+                raise serializers.ValidationError(
+                    {
+                        "status": ("Cannot modify status of a job to ")
+                        + (f"{attrs.get('status')} that is in draft or open")
+                    }
+                )
+
+        if self.instance and self.instance.status in [
+            Job.JobStatus.IN_PROGRESS,
+            Job.JobStatus.COMPLETED,
+            Job.JobStatus.CLOSED,
+        ]:
+            raise serializers.ValidationError(
+                {
+                    "status": ("Cannot modify status of a job that is in progress,")
+                    + (" completed or closed")
+                }
             )
 
         return attrs
