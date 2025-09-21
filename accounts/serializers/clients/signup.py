@@ -28,6 +28,12 @@ class ClientSignupSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        if Client.objects.filter(email=attrs["email"]).exists():
+            raise serializers.ValidationError({"email": "Email already exists"})
+
+        if Client.objects.filter(username=attrs["username"]).exists():
+            raise serializers.ValidationError({"username": "Username already exists"})
+
         if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError({"password": "Password doesn't matched"})
         attrs.pop("confirm_password")

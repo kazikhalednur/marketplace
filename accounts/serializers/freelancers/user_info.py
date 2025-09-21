@@ -41,6 +41,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "notification_id",
             "freelancer_sub_profiles",
         ]
+        extra_kwargs = {"email": {"read_only": True}, "role": {"read_only": True}}
 
     def update(self, instance, validated_data):
         freelancer_data = validated_data.get("freelancer_profile", {})

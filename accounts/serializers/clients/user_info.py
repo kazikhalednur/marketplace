@@ -62,6 +62,7 @@ class ClientUserInfoSerializer(serializers.ModelSerializer):
             "is_phone_verified",
             "notification_id",
         ]
+        extra_kwargs = {"email": {"read_only": True}, "role": {"read_only": True}}
 
     def update(self, instance, validated_data):
         # Extract client_profile data
