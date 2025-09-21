@@ -31,6 +31,11 @@ class MilestoneStepUpdateView(UpdateAPIView):
             milestone__contract__freelancer_profile__freelancer__id=self.request.user.id,  # noqa: E501
         )
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["contract_id"] = self.kwargs.get("contract_id")
+        return context
+
     def update(self, request, *args, **kwargs):
         super().update(request, *args, **kwargs)
         return Response(

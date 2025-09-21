@@ -1,6 +1,8 @@
 from django.utils import timezone
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from biding.models import Contract
 from work_diary.models import MilestoneStep
 
 
@@ -38,3 +40,14 @@ class FreelancerMilestoneStepSerializer(ModelSerializer):
             obj.uploaded_at = timezone.now()
             obj.save(update_fields=["uploaded_at"])
         return obj
+
+    def validate(self, attrs):
+        if self.context.get("contract_id"):
+            try:
+                Contract.objects.get(id=self.context.get("contract_id"))
+            except Contract.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"detail": "No Contract matches the given query."}
+                )
+
+        return super().validate(attrs)
