@@ -44,28 +44,6 @@ class ProposalSerializer(serializers.ModelSerializer):
             "uploaded_attachments",
         )
 
-    def create(self, validated_data):
-        attachments = validated_data.pop("attachments", [])
-        proposal = Proposal.objects.create(**validated_data)
-
-        for file in attachments:
-            Attachment.objects.create(proposal=proposal, file=file)
-
-        return proposal
-
-    def delete(self, instance):
-        if instance.status != Proposal.BidStatus.PENDING:
-            raise serializers.ValidationError(
-                {"status": "Only pending proposals can be deleted."}
-            )
-
-        super().delete(instance)
-
-    @extend_schema_field(serializers.URLField)
-    def get_job_link(self, obj):
-        frontend_url = base_settings.FRONTEND_URL
-        return f"{frontend_url}/dashboard?jobId={obj.job.id}/"
-
     def validate(self, attrs):
         if "job" not in attrs:
             raise serializers.ValidationError({"job": "This field is required."})
@@ -92,3 +70,25 @@ class ProposalSerializer(serializers.ModelSerializer):
             )
 
         return super().validate(attrs)
+
+    def create(self, validated_data):
+        attachments = validated_data.pop("attachments", [])
+        proposal = Proposal.objects.create(**validated_data)
+
+        for file in attachments:
+            Attachment.objects.create(proposal=proposal, file=file)
+
+        return proposal
+
+    def delete(self, instance):
+        if instance.status != Proposal.BidStatus.PENDING:
+            raise serializers.ValidationError(
+                {"status": "Only pending proposals can be deleted."}
+            )
+
+        super().delete(instance)
+
+    @extend_schema_field(serializers.URLField)
+    def get_job_link(self, obj):
+        frontend_url = base_settings.FRONTEND_URL
+        return f"{frontend_url}/dashboard?jobId={obj.job.id}/"
