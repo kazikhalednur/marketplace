@@ -1,169 +1,114 @@
+from django.utils import timezone
 from rest_framework import serializers
 
-from .models import GoogleMeeting
-from .utils import create_google_meeting
+from accounts.models import User
+from utils.helpers import extract_query_param
+
+from .models import Meeting
+from .tasks import create_zoom_meeting_task
 
 
-class GoogleMeetingSerializer(serializers.ModelSerializer):
-    """Serializer for GoogleMeeting model"""
-
-    created_by = serializers.StringRelatedField(read_only=True)
-    created_by_id = serializers.IntegerField(write_only=True)
-    conversation = serializers.PrimaryKeyRelatedField(read_only=True)
+class MeetingSerializer(serializers.ModelSerializer):
+    signature = serializers.CharField(required=False, read_only=True)
+    meeting_number = serializers.CharField(source="meeting_id", read_only=True)
+    user_name = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
+    zak = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = GoogleMeeting
+        model = Meeting
         fields = [
             "id",
-            "conversation",
-            "url",
-            "summary",
-            "description",
+            "topic",
+            "signature",
+            "meeting_number",
+            "password",
+            "user_name",
+            "user_email",
+            "zak",
             "start_time",
-            "end_time",
-            "attendees",
-            "created_by",
-            "created_by_id",
-            "created_at",
-            "updated_at",
-        ]
-        read_only_fields = [
-            "id",
-            "created_by",
-            "conversation",
+            "duration",
+            # "join_url",
+            # "start_url",
             "created_at",
             "updated_at",
         ]
 
-    def validate_attendees(self, value):
-        """Validate that attendees list has at least 2 emails and max 2 emails"""
-        if len(value) < 2:
-            raise serializers.ValidationError("At least 2 attendees are required")
-        if len(value) > 2:
-            raise serializers.ValidationError("Maximum 2 attendees allowed")
-
-        # Validate email format
-        for email in value:
-            if not email or "@" not in email:
-                raise serializers.ValidationError(f"Invalid email format: {email}")
-
+    def validate_start_time(self, value):
+        """Validate that start time is in the future"""
+        now = timezone.now()
+        if value <= now:
+            raise serializers.ValidationError("Start time must be in the future")
         return value
 
-    def validate_end_time(self, value):
-        """Validate that end time is after start time"""
-        start_time = self.initial_data.get("start_time")
-        if start_time and value <= start_time:
-            raise serializers.ValidationError("End time must be after start time")
+    def validate_duration(self, value):
+        """Validate duration is reasonable"""
+        if value < 1:
+            raise serializers.ValidationError("Duration must be at least 1 minute")
+        if value > 60:  # 2 hours
+            raise serializers.ValidationError("Duration cannot exceed 2 hours")
         return value
-
-
-class GoogleMeetingCreateSerializer(serializers.Serializer):
-    summary = serializers.CharField(max_length=255)
-    description = serializers.CharField()
-    start_time = serializers.DateTimeField()
-    end_time = serializers.DateTimeField()
-
-    def validate(self, data):
-        start_time = data.get("start_time")
-        end_time = data.get("end_time")
-
-        if start_time and end_time and end_time <= start_time:
-            raise serializers.ValidationError("End time must be after start time")
-
-        return data
 
     def create(self, validated_data):
-        """
-        Create a Google Calendar meeting and save to database
-        """
-        conversation = self.context.get("conversation")
-        if not conversation:
-            raise serializers.ValidationError("Conversation is required")
+        """Create a Zoom meeting asynchronously"""
+        conversation_id = self.context.get("conversation_id")
+        created_by_email = self.context.get("created_by_email")
 
-        # Get attendees from conversation participants
-        attendees = [
-            conversation.freelancer_profile.freelancer.email,
-            conversation.client_profile.client.email,
-        ]
+        if not conversation_id:
+            raise serializers.ValidationError("Conversation ID is required")
+        if not created_by_email:
+            raise serializers.ValidationError("Created by user email is required")
 
-        try:
-            # Create Google Calendar meeting
-            google_result = create_google_meeting(
-                summary=validated_data["summary"],
-                description=validated_data["description"],
-                start_time=validated_data["start_time"],
-                end_time=validated_data["end_time"],
-                attendees=attendees,
-                timezone="Asia/Dhaka",  # Default timezone
+        # Start the async task with IDs instead of objects
+        create_zoom_meeting_task.delay(
+            conversation_id=conversation_id,
+            created_by_email=created_by_email,
+            topic=validated_data["topic"],
+            start_time=validated_data["start_time"],
+            duration=validated_data["duration"],
+        )
+
+        # Return a placeholder meeting object
+        # The actual meeting will be created by the Celery task
+        return Meeting(
+            topic=validated_data["topic"],
+            duration=validated_data["duration"],
+            start_time=validated_data["start_time"],
+        )
+
+    def get_user_name(self, obj):
+        return User.objects.get(email=self.context["created_by_email"]).get_full_name()
+
+    def get_user_email(self, obj):
+        return self.context["created_by_email"]
+
+    def get_zak(self, obj):
+        return extract_query_param(obj.start_url, "zak")
+
+
+class ZoomMeetingSDKAuthSerializer(serializers.Serializer):
+    """Serializer for Zoom Meeting SDK authentication"""
+
+    meetingNumber = serializers.CharField(required=True, write_only=True)
+    role = serializers.IntegerField(required=True, write_only=True)
+    expirationSeconds = serializers.IntegerField(
+        required=False, min_value=1800, max_value=172800, write_only=True
+    )
+    videoWebRtcMode = serializers.IntegerField(
+        required=False, min_value=0, max_value=1, write_only=True
+    )
+    signature = serializers.CharField(required=False, read_only=True)
+
+    def validate_role(self, value):
+        """Validate role is 0 (participant) or 1 (host)"""
+        if value not in [0, 1]:
+            raise serializers.ValidationError(
+                "Role must be 0 (participant) or 1 (host)"
             )
-
-            if not google_result["success"]:
-                raise serializers.ValidationError(
-                    f"Failed to create Google Calendar meeting: {google_result['error']}"  # noqa: E501
-                )
-
-            # Create meeting in database
-            meeting_data = {
-                "url": google_result["meeting_url"],
-                "summary": google_result["meeting_summary"],
-                "description": google_result["meeting_description"],
-                "start_time": google_result["meeting_start_time"],
-                "end_time": google_result["meeting_end_time"],
-                "attendees": google_result["meeting_attendees"],
-                "conversation": conversation,
-                "created_by": self.context.get("created_by"),
-            }
-
-            return GoogleMeeting.objects.create(**meeting_data)
-
-        except Exception as e:
-            raise serializers.ValidationError(f"Error creating meeting: {str(e)}")
-
-
-class GoogleMeetingUpdateSerializer(serializers.Serializer):
-    summary = serializers.CharField(max_length=255, required=False)
-    description = serializers.CharField(required=False)
-    start_time = serializers.DateTimeField(required=False)
-    end_time = serializers.DateTimeField(required=False)
-    attendees = serializers.ListField(
-        child=serializers.EmailField(), min_length=1, max_length=1, required=False
-    )
-    timezone = serializers.CharField(
-        default="Asia/Dhaka", max_length=50, required=False
-    )
-
-    def validate_attendees(self, value):
-        """Validate attendees list if provided"""
-        if value and len(value) != 1:
-            raise serializers.ValidationError("Exactly 1 attendee is required")
         return value
 
-    def validate(self, data):
-        """Validate that end time is after start time if both are provided"""
-        start_time = data.get("start_time")
-        end_time = data.get("end_time")
-
-        if start_time and end_time and end_time <= start_time:
-            raise serializers.ValidationError("End time must be after start time")
-
-        return data
-
-
-class GoogleMeetingListSerializer(serializers.ModelSerializer):
-    """Simplified serializer for listing meetings"""
-
-    created_by = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = GoogleMeeting
-        fields = [
-            "id",
-            "url",
-            "summary",
-            "description",
-            "start_time",
-            "end_time",
-            "created_by",
-            "created_at",
-        ]
-        read_only_fields = fields
+    def validate_meetingNumber(self, value):
+        """Validate meeting number is not empty"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Meeting number is required")
+        return value.strip()

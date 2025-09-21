@@ -1,181 +1,122 @@
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
-from rest_framework.generics import CreateAPIView, ListAPIView
+import time
+
+import jwt
+from django.conf import settings
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from chat.models import Conversation
-
-from .models import GoogleMeeting, ZoomMeeting
-from .serializers import (
-    GoogleMeetingCreateSerializer,
-    GoogleMeetingListSerializer,
-)
-from .zoom_serializers import ZoomMeetingListSerializer
+from .models import Meeting
+from .serializers import MeetingSerializer, ZoomMeetingSDKAuthSerializer
 
 
 class MeetingPagination(PageNumberPagination):
-    """Custom pagination for meetings"""
+    """Custom pagination for Zoom meetings"""
 
     page_size = 10
     page_size_query_param = "page_size"
     max_page_size = 100
 
 
-class GoogleMeetingCreateView(CreateAPIView):
-    """
-    Create a new Google Calendar meeting
-    """
+@extend_schema(tags=["zoom_meetings"])
+class MeetingListCreateView(ListCreateAPIView):
+    """Create a new meeting and list all meetings for a conversation"""
 
-    serializer_class = GoogleMeetingCreateSerializer
+    serializer_class = MeetingSerializer
+    pagination_class = MeetingPagination
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Meeting.objects.filter(
+            conversation__conversation_id=self.kwargs["conversation_id"]
+        ).order_by("-created_at")
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        conversation = get_object_or_404(
-            Conversation, conversation_id=self.kwargs["conversation_id"]
+        context["conversation_id"] = self.kwargs["conversation_id"]
+        context["created_by_email"] = self.request.user.email  # Use email instead of ID
+        return context
+
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response(
+            {"message": "Meeting creation initiated successfully"},
+            status=status.HTTP_201_CREATED,
         )
-        context["conversation"] = conversation
-        context["created_by"] = self.request.user
+
+
+@extend_schema(tags=["zoom_meetings"])
+class MeetingListView(ListAPIView):
+    serializer_class = MeetingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Meeting.objects.filter(created_by=self.request.user)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["created_by_email"] = self.request.user.email  # Use email instead of ID
         return context
 
 
-class GoogleMeetingListView(ListAPIView):
-    """
-    List all meetings for the authenticated user
-    """
+@extend_schema(
+    tags=["zoom_meetings"],
+    summary="Generate Zoom Meeting SDK JWT token",
+    description="Generate a JWT token for Zoom Meeting SDK authentication",
+)
+class ZoomMeetingSDKAuthView(APIView):
+    """Generate JWT token for Zoom Meeting SDK authentication"""
 
-    serializer_class = GoogleMeetingListSerializer
-    permission_classes = [IsAuthenticated]
-    pagination_class = MeetingPagination
+    permission_classes = [AllowAny]  # Allow unauthenticated access for SDK auth
+    serializer_class = ZoomMeetingSDKAuthSerializer
 
-    def get_queryset(self):
-        """Return meetings for the authenticated user"""
-        queryset = GoogleMeeting.objects.filter(
-            created_by=self.request.user,
-            conversation__conversation_id=self.kwargs["conversation_id"],
-        )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
 
-        # Filter upcoming meetings if requested
-        upcoming = self.request.query_params.get("upcoming")
-        if upcoming and upcoming.lower() == "true":
-            now = timezone.now()
-            queryset = queryset.filter(start_time__gt=now)
+        if not serializer.is_valid():
+            return Response(
+                {"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # Order by start time (upcoming first)
-        return queryset.order_by("start_time")
+        validated_data = serializer.validated_data
 
+        # Extract validated data
+        meeting_number = validated_data["meetingNumber"]
+        role = validated_data["role"]
+        expiration_seconds = validated_data.get("expirationSeconds")
+        video_webrtc_mode = validated_data.get("videoWebRtcMode", 0)
 
-class GoogleMeetingUpcomingView(APIView):
-    """
-    Get upcoming meetings for the authenticated user
-    """
+        # Calculate timestamps
+        iat = int(time.time())
+        exp = iat + (
+            expiration_seconds if expiration_seconds else 7200
+        )  # Default 2 hours
 
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        limit = int(request.query_params.get("limit", 5))
-        now = timezone.now()
-
-        meetings = GoogleMeeting.objects.filter(
-            created_by=request.user,
-            start_time__gt=now,
-            conversation__conversation_id=self.kwargs["conversation_id"],
-        ).order_by("start_time")[:limit]
-
-        serializer = GoogleMeetingListSerializer(meetings, many=True)
-        return Response(
-            {
-                "success": True,
-                "upcoming_meetings": serializer.data,
-                "count": len(serializer.data),
-            }
-        )
-
-
-class GoogleMeetingStatsView(APIView):
-    """
-    Get meeting statistics for the authenticated user
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user_meetings = GoogleMeeting.objects.filter(
-            created_by=request.user,
-            conversation__conversation_id=self.kwargs["conversation_id"],
-        )
-        now = timezone.now()
-
-        stats = {
-            "total_meetings": user_meetings.count(),
-            "upcoming_meetings": user_meetings.filter(start_time__gt=now).count(),
-            "past_meetings": user_meetings.filter(start_time__lt=now).count(),
+        # Create JWT payload
+        payload = {
+            "appKey": settings.ZOOM_CLIENT_ID,
+            "mn": meeting_number,
+            "role": role,
+            "iat": iat,
+            "exp": exp,
+            "tokenExp": exp,
+            "video_webrtc_mode": video_webrtc_mode,
         }
 
-        return Response({"success": True, "stats": stats})
-
-
-class AllMeetingsListView(APIView):
-    """
-    List all Zoom meetings created by the authenticated user
-    """
-
-    permission_classes = [IsAuthenticated]
-    pagination_class = MeetingPagination
-
-    def get(self, request):
-        """Return Zoom meetings created by the user across all conversations"""
-        user = request.user
-        now = timezone.now()
-
-        # Base queryset: only Zoom meetings created by the user
-        zoom_meetings = ZoomMeeting.objects.filter(created_by=user).select_related(
-            "conversation",
-            "conversation__client_profile",
-            "conversation__freelancer_profile",
-        )
-
-        # Filters
-        upcoming = request.query_params.get("upcoming")
-        conversation_id = request.query_params.get("conversation_id")
-
-        if conversation_id:
-            zoom_meetings = zoom_meetings.filter(
-                conversation__conversation_id=conversation_id
+        # Generate JWT token
+        try:
+            jwt_token = jwt.encode(
+                payload, settings.ZOOM_CLIENT_SECRET, algorithm="HS256"
             )
 
-        if upcoming and upcoming.lower() == "true":
-            zoom_meetings = zoom_meetings.filter(start_time__gt=now)
+            return Response({"signature": jwt_token})
 
-        # Serialize and annotate meeting type
-        zoom_data = ZoomMeetingListSerializer(zoom_meetings, many=True).data
-        for meeting in zoom_data:
-            meeting["meeting_type"] = "zoom"
-
-        # Sort by start time
-        zoom_data.sort(key=lambda x: x.get("start_time", ""))
-
-        # Paginate
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(zoom_data, request)
-
-        if page is not None:
-            return paginator.get_paginated_response(
-                {
-                    "meetings": page,
-                    "total_count": len(zoom_data),
-                    "zoom_count": len(zoom_data),
-                }
+        except Exception:
+            return Response(
+                {"error": "Failed to generate JWT token"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-        return Response(
-            {
-                "success": True,
-                "meetings": zoom_data,
-                "total_count": len(zoom_data),
-                "zoom_count": len(zoom_data),
-            }
-        )

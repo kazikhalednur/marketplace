@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 from rest_framework.renderers import JSONRenderer as DRFJSONRenderer
 from rest_framework.response import Response as DRFResponse
 
@@ -274,3 +276,19 @@ def custom_schema_postprocessing(result, generator, request, public):
                         ] = response_schema
 
     return result
+
+
+def extract_query_param(url: str, key: str) -> str | None:
+    """
+    Extract any query parameter dynamically from a URL.
+
+    Args:
+        url (str): Full URL
+        key (str): Query parameter name (e.g. "zak", "id", etc.)
+
+    Returns:
+        str | None: Value of the query parameter, or None if not found
+    """
+    parsed = urlparse(url)
+    qs = parse_qs(parsed.query)
+    return qs.get(key, [None])[0]

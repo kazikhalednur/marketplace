@@ -1,39 +1,15 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 
-from .models import GoogleMeeting, ZoomMeeting
+from .models import Meeting
 
 
-@admin.register(GoogleMeeting)
-class GoogleMeetingAdmin(admin.ModelAdmin):
+@admin.register(Meeting)
+class MeetingAdmin(SimpleHistoryAdmin):
     list_display = (
         "id",
-        "conversation",
-        "url",
-        "summary",
-        "description",
-        "start_time",
-        "end_time",
-        "attendees",
-        "created_by",
-        "created_at",
-        "updated_at",
-    )
-    readonly_fields = ("id", "created_at", "updated_at")
-
-
-@admin.register(ZoomMeeting)
-class ZoomMeetingAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "conversation",
-        "zoom_id",
         "topic",
-        "duration",
-        "start_time",
-        "join_url",
-        "start_url",
+        "conversation",
+        "meeting_id",
         "created_by",
-        "created_at",
-        "updated_at",
     )
-    readonly_fields = ("id", "created_at", "updated_at")
