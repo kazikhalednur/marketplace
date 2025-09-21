@@ -39,7 +39,9 @@ class MilestoneStepDetailView(UpdateAPIView):
                 "milestone__contract__client_profile",
             ).filter(milestone__contract=contract)
         except Contract.DoesNotExist:
-            raise serializers.ValidationError({"contract": "Contract not found"})
+            raise serializers.ValidationError(
+                {"detail": "No Contract matches the given query."}
+            )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

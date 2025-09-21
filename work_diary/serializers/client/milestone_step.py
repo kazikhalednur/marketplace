@@ -38,7 +38,9 @@ class ClientMilestoneStepSerializer(ModelSerializer):
                         {"contract": "Cannot modify a completed contract."}
                     )
             except Contract.DoesNotExist:
-                raise serializers.ValidationError({"contract": "Contract not found"})
+                raise serializers.ValidationError(
+                    {"detail": "No Contract matches the given query."}
+                )
 
         if attrs.get("start_date") and attrs.get("start_date") < timezone.now().date():
             raise serializers.ValidationError(
@@ -78,12 +80,6 @@ class ClientMilestoneStepSerializer(ModelSerializer):
         contract: Contract = Contract.objects.get(id=self.context["contract_id"])
 
         milestone: Milestone = Milestone.objects.get(contract=contract)
-
-        # Check if contract has a budget
-        if not contract.budget:
-            raise serializers.ValidationError(
-                {"amount": "Contract does not have a budget set"}
-            )
 
         contract_budget = contract.budget
 
