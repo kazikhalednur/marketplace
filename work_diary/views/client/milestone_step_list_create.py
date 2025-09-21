@@ -1,6 +1,7 @@
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import serializers
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
@@ -40,19 +41,29 @@ class MilestoneStepListCreateView(ListCreateAPIView):
     def get_queryset(self):
         """Filter milestone steps to contracts owned by the authenticated client."""
         user = self.request.user
-        contract_id = self.kwargs.get("contract_id")
-        return (
-            MilestoneStep.objects.select_related(
-                "milestone",
-                "milestone__contract",
-                "milestone__contract__client_profile",
+        try:
+            contract_id = self.kwargs.get("contract_id")
+            contract: Contract = Contract.objects.select_related("client_profile").get(
+                id=contract_id,
+                client_profile__client=user,
             )
-            .filter(
-                milestone__contract__id=contract_id,
-                milestone__contract__client_profile__client=user,
+
+            return (
+                MilestoneStep.objects.select_related(
+                    "milestone",
+                    "milestone__contract",
+                    "milestone__contract__client_profile",
+                )
+                .filter(milestone__contract=contract)
+                .order_by("step_number")
             )
-            .order_by("step_number")
-        )
+        except Contract.DoesNotExist:
+            raise serializers.ValidationError({"contract": "Contract not found"})
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["contract_id"] = self.kwargs.get("contract_id")
+        return context
 
     def perform_create(self, serializer):
         """Create milestone step with auto-assigned step number if not provided."""

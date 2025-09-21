@@ -9,7 +9,7 @@ class ClientMilestoneSerializer(ModelSerializer):
     pending = serializers.SerializerMethodField()
     submitted = serializers.SerializerMethodField()
     in_review = serializers.SerializerMethodField()
-    failed = serializers.SerializerMethodField()
+    rejected = serializers.SerializerMethodField()
     paid = serializers.SerializerMethodField()
 
     class Meta:
@@ -23,7 +23,7 @@ class ClientMilestoneSerializer(ModelSerializer):
             "pending",
             "submitted",
             "in_review",
-            "failed",
+            "rejected",
             "paid",
         )
         read_only_fields = ("id",)
@@ -40,8 +40,8 @@ class ClientMilestoneSerializer(ModelSerializer):
     def get_in_review(self, obj):
         return obj.steps.filter(status=MilestoneStep.Status.IN_REVIEW).count()
 
-    def get_failed(self, obj):
-        return obj.steps.filter(status=MilestoneStep.Status.FAILED).count()
+    def get_rejected(self, obj):
+        return obj.steps.filter(status=MilestoneStep.Status.REJECTED).count()
 
     def get_paid(self, obj):
         return obj.steps.filter(status=MilestoneStep.Status.PAID).count()
