@@ -1,8 +1,16 @@
+from drf_spectacular.utils import extend_schema_serializer
 from rest_framework import serializers
 
 from accounts.models import ClientProfile, FreelancerProfile
 
 from .models import Conversation, Message
+
+
+class LastMessageSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    timestamp = serializers.DateTimeField()
+    sender_type = serializers.CharField()
+    sender_name = serializers.CharField()
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -31,6 +39,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             "unread_count",
         ]
 
+    @extend_schema_serializer(LastMessageSerializer)
     def get_last_message(self, obj):
         last_message = obj.messages.order_by("-timestamp").first()
         if last_message:
@@ -48,6 +57,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             }
         return None
 
+    @extend_schema_serializer(serializers.IntegerField)
     def get_unread_count(self, obj):
         user = self.context["request"].user
         try:
@@ -81,14 +91,17 @@ class MessageSerializer(serializers.ModelSerializer):
             "is_own_message",
         ]
 
+    @extend_schema_serializer(serializers.CharField)
     def get_sender_type(self, obj):
         return "freelancer" if obj.freelancer_profile else "client"
 
+    @extend_schema_serializer(serializers.CharField)
     def get_sender_name(self, obj):
         if obj.freelancer_profile:
             return obj.freelancer_profile.freelancer.username
         return obj.client_profile.client.username
 
+    @extend_schema_serializer(serializers.BooleanField)
     def get_is_own_message(self, obj):
         user = self.context["request"].user
         if obj.freelancer_profile and obj.freelancer_profile.freelancer == user:

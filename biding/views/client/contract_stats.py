@@ -19,6 +19,7 @@ class ContractStatsListView(APIView):
     """
 
     permission_classes = [IsClient]
+    serializer_class = ContractStatsSerializer
 
     def get(self, request):
         """Get contract statistics for the authenticated client"""
@@ -73,7 +74,7 @@ class ContractStatsListView(APIView):
             }
 
             # Serialize the data
-            serializer = ContractStatsSerializer(stats_data)
+            serializer = self.get_serializer(stats_data)
 
             return Response(
                 status_code=200,
