@@ -1,0 +1,10 @@
+services:
+  client:
+    build:
+      context: .
+    image: marketplace-client
+    container_name: marketplace-client
+    environment:
+      NODE_ENV: production
+    ports:
+      - 8080:8080
