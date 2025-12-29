@@ -6,7 +6,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", cast=str)
 
 # Result backend configuration
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"  # Using Redis DB 1 for results
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str)
 CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
     "master_name": "mymaster",
 }

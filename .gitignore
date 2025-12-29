@@ -13,6 +13,7 @@ uploads/
 static/
 google_credentials.json
 
+db/
 
 # Backup files # 
 *.bak 

@@ -1,5 +1,0 @@
-{
-  "python.analysis.typeCheckingMode": "off",
-  "makefile.configureOnOpen": false,
-  "cursorpyright.analysis.typeCheckingMode": "off"
-}

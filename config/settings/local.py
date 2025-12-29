@@ -8,8 +8,6 @@ AUTH_PASSWORD_VALIDATORS = []
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 
 REST_FRAMEWORK.update(
     {

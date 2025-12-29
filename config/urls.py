@@ -21,6 +21,8 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from base import views as base_views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -35,6 +37,7 @@ urlpatterns = [
     path("work-diary/", include("work_diary.urls")),
     path("payments/", include("payments.urls")),
     path("meetings/", include("meeting.urls")),
+    path("health_check/", base_views.health_check),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

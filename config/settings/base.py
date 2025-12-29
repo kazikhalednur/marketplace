@@ -117,7 +117,9 @@ DATABASES = {
         "ENGINE": config("DB_ENGINE", cast=str),
         "NAME": config("DB_NAME", cast=str),
         "USER": config("DB_USER", cast=str),
-        "PASSWORD": config("DB_PASSWORD", cast=str),
+        "PASSWORD": open(
+            BASE_DIR / config("DB_PASSWORD_FILE", cast=str), "r"
+        ).read(),  # noqa: E501
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
     }
@@ -173,6 +175,16 @@ MEDIA_ROOT = BASE_DIR / "uploads"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# email configuration
+EMAIL_BACKEND = config("EMAIL_BACKEND")
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+SUPPORT_EMAIL = config("SUPPORT_EMAIL")
 
 
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
