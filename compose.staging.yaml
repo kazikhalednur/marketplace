@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:17
+    container_name: marketplace-db
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+    networks:
+      - private-net
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4
+    container_name: marketplace-redis
+    restart: always
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - private-net
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: marketplace-mailcatcher
+    expose:
+      - 1025
+    networks:
+      - private-net
+      - public-net
+    ports:
+      - 1080:1080
+
+  django: &django
+    build:
+      context: .
+      dockerfile: compose/staging/django/Dockerfile
+    image: marketplace-server
+    container_name: marketplace-server
+    depends_on:
+      db:
+        condition: service_healthy
+      mailcatcher:
+        condition: service_started
+      redis:
+        condition: service_started
+    secrets:
+      - db-password
+    env_file:
+      - .env
+    environment:
+      DB_PASSWORD_FILE: /run/secrets/db-password
+      DEBUG: true
+      SERVER_TYPE: staging
+    volumes:
+      - .:/app
+    networks:
+      - private-net
+      - public-net
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health_check/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # read_only: true
+    # cap_drop:
+    #   - ALL
+    # security_opt:
+    #   - no-new-privileges:true
+
+  celeryworker:
+    <<: *django
+    container_name: marketplace-celeryworker
+    command: /start-celeryworker
+    ports: []
+
+volumes:
+  db-data:
+  redis-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
+
+networks:
+  public-net:
+    driver: bridge
+  private-net:
+    driver: bridge
+    internal: true

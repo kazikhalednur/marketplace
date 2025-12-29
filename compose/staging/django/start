@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+
+
+python manage.py migrate
+exec gunicorn config.asgi:application \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 0.0.0.0:8000 \
+    --proxy-protocol \
+    --forwarded-allow-ips='*'
