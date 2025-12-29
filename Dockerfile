@@ -67,8 +67,8 @@ COPY --from=build /usr/src/app/public ./.next/standalone/
 COPY --from=build /usr/src/app/.next/static ./.next/standalone/.next/
 
 # Expose the port that the application listens on.
-EXPOSE 8080
-ENV PORT=8080
+EXPOSE 3000
+ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Run the application.
