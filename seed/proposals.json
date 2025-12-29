@@ -1,0 +1,737 @@
+[
+    {
+        "freelancer": "john_dev",
+        "job_title": "Build E-Commerce Website with React",
+        "cover_letter": "I have 5+ years of experience building e-commerce websites with React. I've worked on similar projects and can deliver a high-quality solution.",
+        "bid_amount": 7000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "emma_react",
+        "job_title": "Build E-Commerce Website with React",
+        "cover_letter": "React specialist here! I've built multiple e-commerce platforms and can integrate payment gateways seamlessly.",
+        "bid_amount": 6500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "mike_fullstack",
+        "job_title": "Build E-Commerce Website with React",
+        "cover_letter": "Full stack developer with expertise in React and Node.js. I can handle both frontend and backend development.",
+        "bid_amount": 7500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "lisa_mobile",
+        "job_title": "Mobile App Development with Flutter",
+        "cover_letter": "Flutter expert with 4 years of experience. I've developed several food delivery apps before.",
+        "bid_amount": 8000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "joseph_flutter",
+        "job_title": "Mobile App Development with Flutter",
+        "cover_letter": "I specialize in Flutter development and have experience with food delivery applications.",
+        "bid_amount": 7500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "david_python",
+        "job_title": "Python Django Backend API Development",
+        "cover_letter": "Django expert with extensive experience in building RESTful APIs for healthcare applications.",
+        "bid_amount": 5500,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "thomas_django",
+        "job_title": "Python Django Backend API Development",
+        "cover_letter": "I have 6 years of Django experience and have built APIs for various healthcare platforms.",
+        "bid_amount": 6000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "jennifer_ux",
+        "job_title": "UI/UX Design for Mobile App",
+        "cover_letter": "UX designer with a passion for creating intuitive travel app experiences. Portfolio available.",
+        "bid_amount": 2800,
+        "status": "pending"
+    },
+    {
+        "freelancer": "ashley_figma",
+        "job_title": "UI/UX Design for Mobile App",
+        "cover_letter": "Figma expert specializing in mobile app design. I can create modern and user-friendly interfaces.",
+        "bid_amount": 2500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "robert_devops",
+        "job_title": "DevOps Engineer for AWS Infrastructure",
+        "cover_letter": "DevOps engineer with 7 years of AWS experience. I can set up scalable infrastructure with Docker and Kubernetes.",
+        "bid_amount": 40,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "mark_aws",
+        "job_title": "DevOps Engineer for AWS Infrastructure",
+        "cover_letter": "AWS certified professional with expertise in containerization and orchestration.",
+        "bid_amount": 45,
+        "status": "pending"
+    },
+    {
+        "freelancer": "william_ai",
+        "job_title": "Machine Learning Model Development",
+        "cover_letter": "ML engineer with expertise in TensorFlow and PyTorch. I've built image classification models before.",
+        "bid_amount": 10000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "anthony_ml",
+        "job_title": "Machine Learning Model Development",
+        "cover_letter": "Experienced in computer vision and deep learning. I can deliver accurate classification models.",
+        "bid_amount": 9500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "joshua_tf",
+        "job_title": "Machine Learning Model Development",
+        "cover_letter": "TensorFlow specialist with a strong background in image processing and classification.",
+        "bid_amount": 11000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "patricia_writer",
+        "job_title": "Content Writer for Tech Blog",
+        "cover_letter": "Tech writer with 5 years of experience. I can create engaging and SEO-optimized content.",
+        "bid_amount": 20,
+        "status": "pending"
+    },
+    {
+        "freelancer": "kimberly_copy",
+        "job_title": "Content Writer for Tech Blog",
+        "cover_letter": "I specialize in technical writing and have written for several tech blogs.",
+        "bid_amount": 18,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "charles_video",
+        "job_title": "Video Editing for YouTube Channel",
+        "cover_letter": "Video editor with experience in educational content. I can deliver high-quality edited videos.",
+        "bid_amount": 750,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "michelle_premiere",
+        "job_title": "Video Editing for YouTube Channel",
+        "cover_letter": "Adobe Premiere Pro expert. I've edited hundreds of educational videos.",
+        "bid_amount": 800,
+        "status": "rejected"
+    },
+    {
+        "freelancer": "sandra_seo",
+        "job_title": "SEO Optimization for E-Commerce Site",
+        "cover_letter": "SEO specialist with proven track record of improving search rankings for e-commerce sites.",
+        "bid_amount": 3000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "susan_marketing",
+        "job_title": "SEO Optimization for E-Commerce Site",
+        "cover_letter": "I have 6 years of SEO experience and can significantly improve your site's visibility.",
+        "bid_amount": 3200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "matthew_ios",
+        "job_title": "iOS App Development",
+        "cover_letter": "iOS developer with expertise in Swift and HealthKit integration. I've built fitness apps before.",
+        "bid_amount": 8500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "george_swift",
+        "job_title": "iOS App Development",
+        "cover_letter": "Swift expert with 5 years of iOS development experience. I can deliver a polished fitness app.",
+        "bid_amount": 9000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "linda_data",
+        "job_title": "Data Analysis and Visualization",
+        "cover_letter": "Data analyst with Tableau expertise. I can create insightful dashboards for your sales data.",
+        "bid_amount": 4000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "sarah_tableau",
+        "job_title": "Data Analysis and Visualization",
+        "cover_letter": "Tableau specialist with experience in sales analytics and visualization.",
+        "bid_amount": 4200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "sarah_design",
+        "job_title": "Logo Design for Startup",
+        "cover_letter": "Creative designer with a portfolio of successful logo designs. I can create a unique brand identity.",
+        "bid_amount": 1200,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "dorothy_graphics",
+        "job_title": "Logo Design for Startup",
+        "cover_letter": "Graphic designer specializing in brand identity and logo design.",
+        "bid_amount": 1000,
+        "status": "rejected"
+    },
+    {
+        "freelancer": "carol_illustrator",
+        "job_title": "Logo Design for Startup",
+        "cover_letter": "Illustrator expert with modern design aesthetic. I can deliver a memorable logo.",
+        "bid_amount": 1300,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "mike_fullstack",
+        "job_title": "Full Stack Web Application",
+        "cover_letter": "Full stack developer with extensive SaaS experience. I can build scalable applications.",
+        "bid_amount": 12000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "john_dev",
+        "job_title": "Full Stack Web Application",
+        "cover_letter": "I have built multiple SaaS applications using React and Node.js. Ready to start immediately.",
+        "bid_amount": 13000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "daniel_node",
+        "job_title": "Full Stack Web Application",
+        "cover_letter": "Node.js specialist with React expertise. I can deliver a robust SaaS platform.",
+        "bid_amount": 11500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "betty_android",
+        "job_title": "Android App with Kotlin",
+        "cover_letter": "Android developer with Kotlin expertise. I've built social networking apps before.",
+        "bid_amount": 7500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "laura_kotlin",
+        "job_title": "Android App with Kotlin",
+        "cover_letter": "Kotlin specialist with 4 years of Android development experience.",
+        "bid_amount": 7000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "karen_php",
+        "job_title": "WordPress Website Development",
+        "cover_letter": "WordPress expert with custom theme development experience. I can deliver a professional site.",
+        "bid_amount": 2500,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "paul_laravel",
+        "job_title": "WordPress Website Development",
+        "cover_letter": "PHP developer with WordPress expertise. I can create custom themes and plugins.",
+        "bid_amount": 2800,
+        "status": "rejected"
+    },
+    {
+        "freelancer": "charles_video",
+        "job_title": "3D Animation for Product Demo",
+        "cover_letter": "3D animator with experience in product demonstrations. I can create stunning visuals.",
+        "bid_amount": 3200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "michelle_premiere",
+        "job_title": "3D Animation for Product Demo",
+        "cover_letter": "Motion graphics expert with 3D animation skills. Portfolio available upon request.",
+        "bid_amount": 3500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "susan_marketing",
+        "job_title": "Social Media Marketing Campaign",
+        "cover_letter": "Social media expert with proven results. I can manage campaigns across all platforms.",
+        "bid_amount": 25,
+        "status": "pending"
+    },
+    {
+        "freelancer": "deborah_social",
+        "job_title": "Social Media Marketing Campaign",
+        "cover_letter": "I specialize in social media marketing and have managed successful campaigns for various brands.",
+        "bid_amount": 28,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "paul_laravel",
+        "job_title": "Laravel E-Commerce Platform",
+        "cover_letter": "Laravel expert with e-commerce development experience. I can build a scalable multi-vendor platform.",
+        "bid_amount": 10000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "karen_php",
+        "job_title": "Laravel E-Commerce Platform",
+        "cover_letter": "PHP and Laravel specialist. I've built several e-commerce platforms before.",
+        "bid_amount": 9500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "john_dev",
+        "job_title": "Blockchain Smart Contract Development",
+        "cover_letter": "Blockchain developer with smart contract expertise. I can deliver secure and efficient contracts.",
+        "bid_amount": 12000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "mike_fullstack",
+        "job_title": "Blockchain Smart Contract Development",
+        "cover_letter": "Full stack developer with blockchain experience. I've developed smart contracts for crypto platforms.",
+        "bid_amount": 13000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "kimberly_copy",
+        "job_title": "Copywriting for Marketing Materials",
+        "cover_letter": "Copywriter with marketing expertise. I can create compelling copy that converts.",
+        "bid_amount": 1500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "patricia_writer",
+        "job_title": "Copywriting for Marketing Materials",
+        "cover_letter": "Creative copywriter with experience in marketing campaigns. I can deliver engaging content.",
+        "bid_amount": 1400,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "nancy_vue",
+        "job_title": "Vue.js Frontend Development",
+        "cover_letter": "Vue.js specialist with 4 years of experience. I can build responsive and modern frontends.",
+        "bid_amount": 5000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "emma_react",
+        "job_title": "Vue.js Frontend Development",
+        "cover_letter": "Frontend developer with Vue.js expertise. I can deliver clean and maintainable code.",
+        "bid_amount": 5200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "richard_cloud",
+        "job_title": "Business Strategy Consulting",
+        "cover_letter": "Business consultant with startup experience. I can help develop effective growth strategies.",
+        "bid_amount": 6500,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "steven_docker",
+        "job_title": "CI/CD Pipeline Setup",
+        "cover_letter": "DevOps engineer with CI/CD expertise. I can set up efficient Jenkins pipelines.",
+        "bid_amount": 4000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "robert_devops",
+        "job_title": "CI/CD Pipeline Setup",
+        "cover_letter": "I specialize in CI/CD automation and have set up pipelines for multiple projects.",
+        "bid_amount": 4200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "william_ai",
+        "job_title": "Natural Language Processing Project",
+        "cover_letter": "NLP expert with experience in text classification and sentiment analysis.",
+        "bid_amount": 8500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "anthony_ml",
+        "job_title": "Natural Language Processing Project",
+        "cover_letter": "Machine learning engineer with NLP specialization. I can deliver accurate classification systems.",
+        "bid_amount": 8000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "sarah_design",
+        "job_title": "Graphic Design for Social Media",
+        "cover_letter": "Graphic designer with social media expertise. I can create engaging visual content.",
+        "bid_amount": 1200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "dorothy_graphics",
+        "job_title": "Graphic Design for Social Media",
+        "cover_letter": "I specialize in social media graphics and have worked with various brands.",
+        "bid_amount": 1000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "lisa_mobile",
+        "job_title": "React Native Mobile App",
+        "cover_letter": "React Native developer with music streaming app experience. I can deliver a polished app.",
+        "bid_amount": 9000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "emma_react",
+        "job_title": "React Native Mobile App",
+        "cover_letter": "React specialist with React Native expertise. I've built cross-platform apps before.",
+        "bid_amount": 8500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "kevin_azure",
+        "job_title": "Azure Cloud Migration",
+        "cover_letter": "Azure expert with cloud migration experience. I can ensure smooth transition to Azure.",
+        "bid_amount": 10000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "richard_cloud",
+        "job_title": "Azure Cloud Migration",
+        "cover_letter": "Cloud engineer with Azure certification. I've managed multiple cloud migrations.",
+        "bid_amount": 10500,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "brian_sql",
+        "job_title": "Financial Analysis and Reporting",
+        "cover_letter": "Financial analyst with data analysis expertise. I can create comprehensive reports.",
+        "bid_amount": 3200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "jessica_angular",
+        "job_title": "Angular Web Application",
+        "cover_letter": "Angular expert with enterprise application experience. I can build scalable web apps.",
+        "bid_amount": 7500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "thomas_django",
+        "job_title": "Angular Web Application",
+        "cover_letter": "Full stack developer with Angular expertise. I can deliver robust enterprise applications.",
+        "bid_amount": 7800,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "anthony_ml",
+        "job_title": "Computer Vision Application",
+        "cover_letter": "Computer vision expert with PyTorch experience. I can build accurate object detection systems.",
+        "bid_amount": 11000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "william_ai",
+        "job_title": "Computer Vision Application",
+        "cover_letter": "AI engineer specializing in computer vision. I've developed detection systems before.",
+        "bid_amount": 10500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "jennifer_ux",
+        "job_title": "UX Research and Testing",
+        "cover_letter": "UX researcher with extensive testing experience. I can provide valuable user insights.",
+        "bid_amount": 2800,
+        "status": "pending"
+    },
+    {
+        "freelancer": "ashley_figma",
+        "job_title": "UX Research and Testing",
+        "cover_letter": "I specialize in UX research and have conducted usability testing for various products.",
+        "bid_amount": 2600,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "richard_cloud",
+        "job_title": "Google Cloud Platform Setup",
+        "cover_letter": "GCP expert with infrastructure setup experience. I can configure cloud services efficiently.",
+        "bid_amount": 6500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "mark_aws",
+        "job_title": "Google Cloud Platform Setup",
+        "cover_letter": "Cloud engineer with GCP certification. I've set up infrastructure for multiple projects.",
+        "bid_amount": 6800,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "patricia_writer",
+        "job_title": "Technical Documentation Writing",
+        "cover_letter": "Technical writer with API documentation experience. I can create clear and comprehensive docs.",
+        "bid_amount": 2000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "kimberly_copy",
+        "job_title": "Technical Documentation Writing",
+        "cover_letter": "I specialize in technical writing and have created documentation for various software projects.",
+        "bid_amount": 1800,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "linda_data",
+        "job_title": "Data Science Project",
+        "cover_letter": "Data scientist with predictive modeling experience. I can analyze data and build accurate models.",
+        "bid_amount": 7500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "brian_sql",
+        "job_title": "Data Science Project",
+        "cover_letter": "I have expertise in data analysis and machine learning. I can deliver valuable insights.",
+        "bid_amount": 7200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "charles_video",
+        "job_title": "Motion Graphics Video",
+        "cover_letter": "Motion graphics designer with explainer video experience. I can create engaging animations.",
+        "bid_amount": 2000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "michelle_premiere",
+        "job_title": "Motion Graphics Video",
+        "cover_letter": "After Effects expert specializing in motion graphics. Portfolio available.",
+        "bid_amount": 2200,
+        "status": "rejected"
+    },
+    {
+        "freelancer": "david_python",
+        "job_title": "Flask API Development",
+        "cover_letter": "Python developer with Flask expertise. I can build efficient RESTful APIs.",
+        "bid_amount": 4000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "thomas_django",
+        "job_title": "Flask API Development",
+        "cover_letter": "Backend developer with Flask experience. I can deliver clean and well-documented APIs.",
+        "bid_amount": 4200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "susan_marketing",
+        "job_title": "Email Marketing Campaign",
+        "cover_letter": "Email marketing expert with proven results. I can create effective campaigns.",
+        "bid_amount": 1500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "deborah_social",
+        "job_title": "Email Marketing Campaign",
+        "cover_letter": "I specialize in email marketing and have managed successful campaigns for e-commerce brands.",
+        "bid_amount": 1600,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "daniel_node",
+        "job_title": "Desktop Application Development",
+        "cover_letter": "Electron developer with desktop app experience. I can build cross-platform applications.",
+        "bid_amount": 6500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "john_dev",
+        "job_title": "Desktop Application Development",
+        "cover_letter": "Full stack developer with Electron expertise. I've built several desktop applications.",
+        "bid_amount": 6800,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "sarah_tableau",
+        "job_title": "Power BI Dashboard Development",
+        "cover_letter": "Power BI expert with dashboard development experience. I can create interactive visualizations.",
+        "bid_amount": 3200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "linda_data",
+        "job_title": "Power BI Dashboard Development",
+        "cover_letter": "Data analyst with Power BI expertise. I can deliver insightful business dashboards.",
+        "bid_amount": 3000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "sarah_design",
+        "job_title": "Brand Identity Design",
+        "cover_letter": "Brand designer with complete identity design experience. I can create cohesive brand guidelines.",
+        "bid_amount": 4000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "carol_illustrator",
+        "job_title": "Brand Identity Design",
+        "cover_letter": "I specialize in brand identity and have created successful brand systems for various companies.",
+        "bid_amount": 4200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "william_ai",
+        "job_title": "Deep Learning Research",
+        "cover_letter": "Deep learning researcher with neural network optimization experience. I can contribute to cutting-edge research.",
+        "bid_amount": 12000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "joshua_tf",
+        "job_title": "Deep Learning Research",
+        "cover_letter": "AI researcher with TensorFlow and PyTorch expertise. I have published papers on neural networks.",
+        "bid_amount": 13000,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "joseph_flutter",
+        "job_title": "Ionic Mobile App Development",
+        "cover_letter": "Mobile developer with Ionic experience. I can build hybrid apps efficiently.",
+        "bid_amount": 5000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "lisa_mobile",
+        "job_title": "Ionic Mobile App Development",
+        "cover_letter": "I have experience with Ionic and Angular. I can deliver a polished hybrid app.",
+        "bid_amount": 4800,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "robert_devops",
+        "job_title": "Project Management Consulting",
+        "cover_letter": "Project manager with software development experience. I can help manage your projects effectively.",
+        "bid_amount": 50,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "david_python",
+        "job_title": "Ruby on Rails Development",
+        "cover_letter": "Full stack developer with Rails experience. I can build complex web applications.",
+        "bid_amount": 8500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "linda_data",
+        "job_title": "R Programming for Statistical Analysis",
+        "cover_letter": "Data analyst with R programming expertise. I can perform comprehensive statistical analysis.",
+        "bid_amount": 2800,
+        "status": "pending"
+    },
+    {
+        "freelancer": "brian_sql",
+        "job_title": "R Programming for Statistical Analysis",
+        "cover_letter": "I specialize in statistical analysis using R. I can provide detailed insights from your data.",
+        "bid_amount": 2600,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "ashley_figma",
+        "job_title": "Adobe XD UI Design",
+        "cover_letter": "UI designer with Adobe XD expertise. I can create modern and intuitive interfaces.",
+        "bid_amount": 2400,
+        "status": "pending"
+    },
+    {
+        "freelancer": "jennifer_ux",
+        "job_title": "Adobe XD UI Design",
+        "cover_letter": "I specialize in UI design using Adobe XD. Portfolio available upon request.",
+        "bid_amount": 2600,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "edward_unity",
+        "job_title": "C++ Desktop Software",
+        "cover_letter": "C++ developer with desktop software experience. I can build high-performance applications.",
+        "bid_amount": 10000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "mike_fullstack",
+        "job_title": ".NET Application Development",
+        "cover_letter": "Full stack developer with .NET and C# expertise. I can build enterprise applications.",
+        "bid_amount": 8500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "sarah_design",
+        "job_title": "Sketch Design for Website",
+        "cover_letter": "Designer with Sketch expertise. I can create beautiful website mockups.",
+        "bid_amount": 2000,
+        "status": "accepted"
+    },
+    {
+        "freelancer": "ashley_figma",
+        "job_title": "Sketch Design for Website",
+        "cover_letter": "I have experience with Sketch and can deliver professional website designs.",
+        "bid_amount": 2100,
+        "status": "rejected"
+    },
+    {
+        "freelancer": "daniel_node",
+        "job_title": "Java Enterprise Application",
+        "cover_letter": "Backend developer with Java expertise. I can build scalable enterprise applications.",
+        "bid_amount": 10000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "linda_data",
+        "job_title": "NumPy Data Processing",
+        "cover_letter": "Python developer with NumPy expertise. I can process large datasets efficiently.",
+        "bid_amount": 2800,
+        "status": "pending"
+    },
+    {
+        "freelancer": "brian_sql",
+        "job_title": "NumPy Data Processing",
+        "cover_letter": "I specialize in data processing using NumPy and Pandas. I can handle large-scale data.",
+        "bid_amount": 2600,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "anthony_ml",
+        "job_title": "Scikit-learn ML Models",
+        "cover_letter": "ML engineer with scikit-learn expertise. I can build accurate classification models.",
+        "bid_amount": 5000,
+        "status": "pending"
+    },
+    {
+        "freelancer": "william_ai",
+        "job_title": "Scikit-learn ML Models",
+        "cover_letter": "Machine learning specialist with scikit-learn experience. I can deliver reliable models.",
+        "bid_amount": 5200,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "patricia_writer",
+        "job_title": "SEO Content Writing",
+        "cover_letter": "SEO writer with content optimization experience. I can create search-friendly content.",
+        "bid_amount": 1200,
+        "status": "pending"
+    },
+    {
+        "freelancer": "kimberly_copy",
+        "job_title": "SEO Content Writing",
+        "cover_letter": "I specialize in SEO writing and can improve your website's search rankings.",
+        "bid_amount": 1100,
+        "status": "reviewed"
+    },
+    {
+        "freelancer": "patricia_writer",
+        "job_title": "Creative Writing for Blog",
+        "cover_letter": "Creative writer with blogging experience. I can write engaging stories and articles.",
+        "bid_amount": 1500,
+        "status": "pending"
+    },
+    {
+        "freelancer": "kimberly_copy",
+        "job_title": "Creative Writing for Blog",
+        "cover_letter": "I have a passion for creative writing and can deliver compelling blog content.",
+        "bid_amount": 1400,
+        "status": "reviewed"
+    }
+]

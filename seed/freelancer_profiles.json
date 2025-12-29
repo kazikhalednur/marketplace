@@ -1,0 +1,302 @@
+[
+    {
+        "username": "john_dev",
+        "student_id": "2019-10001-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "sarah_design",
+        "student_id": "2019-10002-1",
+        "is_available": true,
+        "available_connects": 25
+    },
+    {
+        "username": "mike_fullstack",
+        "student_id": "2019-10003-1",
+        "is_available": true,
+        "available_connects": 35
+    },
+    {
+        "username": "emma_react",
+        "student_id": "2019-10004-1",
+        "is_available": true,
+        "available_connects": 28
+    },
+    {
+        "username": "david_python",
+        "student_id": "2019-10005-1",
+        "is_available": true,
+        "available_connects": 32
+    },
+    {
+        "username": "lisa_mobile",
+        "student_id": "2019-10006-1",
+        "is_available": true,
+        "available_connects": 27
+    },
+    {
+        "username": "james_backend",
+        "student_id": "2019-10007-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "maria_frontend",
+        "student_id": "2019-10008-1",
+        "is_available": true,
+        "available_connects": 29
+    },
+    {
+        "username": "robert_devops",
+        "student_id": "2019-10009-1",
+        "is_available": true,
+        "available_connects": 31
+    },
+    {
+        "username": "jennifer_ux",
+        "student_id": "2019-10010-1",
+        "is_available": true,
+        "available_connects": 26
+    },
+    {
+        "username": "william_ai",
+        "student_id": "2019-10011-1",
+        "is_available": true,
+        "available_connects": 33
+    },
+    {
+        "username": "linda_data",
+        "student_id": "2019-10012-1",
+        "is_available": true,
+        "available_connects": 28
+    },
+    {
+        "username": "richard_cloud",
+        "student_id": "2019-10013-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "patricia_writer",
+        "student_id": "2019-10014-1",
+        "is_available": true,
+        "available_connects": 24
+    },
+    {
+        "username": "charles_video",
+        "student_id": "2019-10015-1",
+        "is_available": true,
+        "available_connects": 27
+    },
+    {
+        "username": "susan_marketing",
+        "student_id": "2019-10016-1",
+        "is_available": true,
+        "available_connects": 25
+    },
+    {
+        "username": "joseph_flutter",
+        "student_id": "2019-10017-1",
+        "is_available": true,
+        "available_connects": 29
+    },
+    {
+        "username": "jessica_angular",
+        "student_id": "2019-10018-1",
+        "is_available": true,
+        "available_connects": 28
+    },
+    {
+        "username": "thomas_django",
+        "student_id": "2019-10019-1",
+        "is_available": true,
+        "available_connects": 31
+    },
+    {
+        "username": "nancy_vue",
+        "student_id": "2019-10020-1",
+        "is_available": true,
+        "available_connects": 26
+    },
+    {
+        "username": "daniel_node",
+        "student_id": "2019-10021-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "karen_php",
+        "student_id": "2019-10022-1",
+        "is_available": true,
+        "available_connects": 27
+    },
+    {
+        "username": "matthew_ios",
+        "student_id": "2019-10023-1",
+        "is_available": true,
+        "available_connects": 32
+    },
+    {
+        "username": "betty_android",
+        "student_id": "2019-10024-1",
+        "is_available": true,
+        "available_connects": 29
+    },
+    {
+        "username": "anthony_ml",
+        "student_id": "2019-10025-1",
+        "is_available": true,
+        "available_connects": 34
+    },
+    {
+        "username": "dorothy_graphics",
+        "student_id": "2019-10026-1",
+        "is_available": false,
+        "available_connects": 23
+    },
+    {
+        "username": "mark_aws",
+        "student_id": "2019-10027-1",
+        "is_available": true,
+        "available_connects": 31
+    },
+    {
+        "username": "sandra_seo",
+        "student_id": "2019-10028-1",
+        "is_available": true,
+        "available_connects": 25
+    },
+    {
+        "username": "steven_docker",
+        "student_id": "2019-10029-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "ashley_figma",
+        "student_id": "2019-10030-1",
+        "is_available": true,
+        "available_connects": 28
+    },
+    {
+        "username": "paul_laravel",
+        "student_id": "2019-10031-1",
+        "is_available": true,
+        "available_connects": 29
+    },
+    {
+        "username": "kimberly_copy",
+        "student_id": "2019-10032-1",
+        "is_available": true,
+        "available_connects": 26
+    },
+    {
+        "username": "andrew_k8s",
+        "student_id": "2019-10033-1",
+        "is_available": true,
+        "available_connects": 32
+    },
+    {
+        "username": "donna_photoshop",
+        "student_id": "2019-10034-1",
+        "is_available": false,
+        "available_connects": 22
+    },
+    {
+        "username": "joshua_tf",
+        "student_id": "2019-10035-1",
+        "is_available": true,
+        "available_connects": 33
+    },
+    {
+        "username": "carol_illustrator",
+        "student_id": "2019-10036-1",
+        "is_available": true,
+        "available_connects": 27
+    },
+    {
+        "username": "kenneth_pytorch",
+        "student_id": "2019-10037-1",
+        "is_available": true,
+        "available_connects": 31
+    },
+    {
+        "username": "michelle_premiere",
+        "student_id": "2019-10038-1",
+        "is_available": true,
+        "available_connects": 28
+    },
+    {
+        "username": "kevin_azure",
+        "student_id": "2019-10039-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "sarah_tableau",
+        "student_id": "2019-10040-1",
+        "is_available": true,
+        "available_connects": 29
+    },
+    {
+        "username": "brian_sql",
+        "student_id": "2019-10041-1",
+        "is_available": true,
+        "available_connects": 27
+    },
+    {
+        "username": "deborah_social",
+        "student_id": "2019-10042-1",
+        "is_available": true,
+        "available_connects": 26
+    },
+    {
+        "username": "george_swift",
+        "student_id": "2019-10043-1",
+        "is_available": true,
+        "available_connects": 32
+    },
+    {
+        "username": "laura_kotlin",
+        "student_id": "2019-10044-1",
+        "is_available": true,
+        "available_connects": 30
+    },
+    {
+        "username": "edward_unity",
+        "student_id": "2019-10045-1",
+        "is_available": false,
+        "available_connects": 21
+    },
+    {
+        "username": "admin1",
+        "student_id": "2018-00001-1",
+        "is_available": false,
+        "available_connects": 50
+    },
+    {
+        "username": "admin2",
+        "student_id": "2018-00002-1",
+        "is_available": false,
+        "available_connects": 50
+    },
+    {
+        "username": "admin3",
+        "student_id": "2018-00003-1",
+        "is_available": false,
+        "available_connects": 50
+    },
+    {
+        "username": "admin4",
+        "student_id": "2018-00004-1",
+        "is_available": false,
+        "available_connects": 50
+    },
+    {
+        "username": "admin5",
+        "student_id": "2018-00005-1",
+        "is_available": false,
+        "available_connects": 50
+    }
+]
