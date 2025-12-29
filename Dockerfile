@@ -63,8 +63,8 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/.next ./.next
-COPY --from=build /usr/src/app/public ./.next/standalone/
-COPY --from=build /usr/src/app/.next/static ./.next/standalone/.next/
+COPY --from=build /usr/src/app/public ./.next/standalone/public
+COPY --from=build /usr/src/app/.next/static ./.next/standalone/.next/static
 
 # Expose the port that the application listens on.
 EXPOSE 3000
