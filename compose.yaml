@@ -4,6 +4,7 @@ services:
       context: .
     image: marketplace-client
     container_name: marketplace-client
+    restart: unless-stopped
     environment:
       NODE_ENV: production
     ports:
