@@ -118,9 +118,9 @@ DATABASES = {
         "ENGINE": config("DB_ENGINE", cast=str),
         "NAME": config("DB_NAME", cast=str),
         "USER": config("DB_USER", cast=str),
-        "PASSWORD": open(
-            BASE_DIR / config("DB_PASSWORD_FILE", cast=str), "r"
-        ).read(),  # noqa: E501
+        "PASSWORD": open(BASE_DIR / config("DB_PASSWORD_FILE", cast=str), "r")
+        .read()
+        .strip(),  # noqa: E501
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
     }
