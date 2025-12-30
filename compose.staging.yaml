@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:17
     container_name: marketplace-db
-    restart: always
+    restart: unless-stopped
     user: postgres
     secrets:
       - db-password
@@ -25,7 +25,7 @@ services:
   redis:
     image: redis:7.4
     container_name: marketplace-redis
-    restart: always
+    restart: unless-stopped
     expose:
       - 6379
     volumes:
@@ -42,6 +42,7 @@ services:
   mailcatcher:
     image: sj26/mailcatcher
     container_name: marketplace-mailcatcher
+    restart: unless-stopped
     expose:
       - 1025
     networks:
@@ -56,6 +57,7 @@ services:
       dockerfile: compose/staging/django/Dockerfile
     image: marketplace-server
     container_name: marketplace-server
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -79,7 +81,7 @@ services:
     ports:
       - 8000:8000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health_check/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health_check/" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -98,6 +100,7 @@ services:
 volumes:
   db-data:
   redis-data:
+
 
 secrets:
   db-password:
