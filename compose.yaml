@@ -79,8 +79,6 @@ services:
     container_name: marketplace-celeryworker
     command: /start-celeryworker
     depends_on:
-      django:
-        condition: service_healthy
       redis:
         condition: service_healthy
     secrets:
