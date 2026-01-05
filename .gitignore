@@ -13,7 +13,8 @@ uploads/
 static/
 google_credentials.json
 
-db/
+secrets/
+minio_data/
 
 # Backup files # 
 *.bak 
