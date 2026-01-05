@@ -10,6 +10,7 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/.env.*
 **/.git
 **/.gitignore
 **/.project
@@ -24,6 +25,7 @@
 **/charts
 **/docker-compose*
 **/compose.y*ml
+**/compose.*.y*ml
 **/Dockerfile*
 **/node_modules
 **/npm-debug.log
@@ -31,12 +33,21 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/venv
+**/*.md
+**/uploads
+**/secrets
+
 LICENSE
-README.md
-db/
+Makefile
 
 # remove lint file
 .flake8
 pre-commit-config.yaml
 pyproject.toml
 
+
+# Credentials (extra safety)
+google_credentials.json
+*.pem
+*.key
+*.crt
