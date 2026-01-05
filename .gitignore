@@ -1,0 +1,3 @@
+secrets
+minio/**
+!minio/config
