@@ -15,6 +15,8 @@ services:
       MINIO_CONFIG_ENV_FILE: /mnt/minio/config
       MINIO_ROOT_USER_FILE: /run/secrets/root_user
       MINIO_ROOT_PASSWORD_FILE: /run/secrets/root_password
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
