@@ -14,7 +14,6 @@ static/
 google_credentials.json
 
 secrets/
-minio_data/
 
 # Backup files # 
 *.bak 

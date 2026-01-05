@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "whitenoise",
     "simple_history",
     "django_filters",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -160,7 +161,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -212,3 +212,4 @@ from .celery import *
 from .rest_framework import *
 from .simple_jwt import *
 from .spectacular import *
+from .storage import *

@@ -14,6 +14,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
     expose:
       - 5432
+    networks:
+      - private-net
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
@@ -29,6 +31,8 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    networks:
+      - private-net
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 10s
@@ -42,7 +46,9 @@ services:
       - 1025
     ports:
       - 1080:1080
-
+    networks:
+      - private-net
+      - public-net
 
   django: &django
     build:
@@ -53,8 +59,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      minio:
-        condition: service_healthy
       mailcatcher:
         condition: service_started
       redis:
@@ -63,6 +67,8 @@ services:
       - secret-password
       - db-password
       - smtp-password
+      - minio-access-key
+      - minio-secret-key
     env_file:
       - .env
     environment:
@@ -71,10 +77,16 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db-password
       DEBUG: true
       SERVER_TYPE: local
+      MINIO_ACCESS_KEY_FILE: /run/secrets/minio-access-key
+      MINIO_SECRET_KEY_FILE: /run/secrets/minio-secret-key
     volumes:
       - ./src:/app
     ports:
       - 8000:8000
+    networks:
+      - private-net
+      - public-net
+      - s3-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health_check/"]
       interval: 10s
@@ -87,6 +99,14 @@ services:
     command: /start-celeryworker
     ports: []
 
+networks:
+  public-net:
+    driver: bridge
+  private-net:
+    driver: bridge
+    internal: true
+  s3-net:
+    external: true
 
 volumes:
   db-data:
@@ -99,3 +119,7 @@ secrets:
     file: secrets/django/smtp_password.txt
   db-password:
     file: secrets/db/password.txt
+  minio-access-key:
+    file: secrets/minio/access_key.txt
+  minio-secret-key:
+    file: secrets/minio/secret_key.txt

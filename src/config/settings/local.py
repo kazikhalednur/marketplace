@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.conf import global_settings
+
 from .base import *
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -8,6 +10,11 @@ AUTH_PASSWORD_VALIDATORS = []
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_ROOT = BASE_DIR / "uploads"
 
+STORAGES.update(
+    {
+        "staticfiles": global_settings.STORAGES["staticfiles"],
+    },
+)
 
 REST_FRAMEWORK.update(
     {

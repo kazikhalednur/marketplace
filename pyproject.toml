@@ -7,5 +7,6 @@ exclude = '''
 /(
     .*migrations.*
     | venv
+    | src/config
 )/
 '''

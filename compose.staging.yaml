@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: marketplace-db
+    container_name: marketplace-staging-db
     restart: unless-stopped
     user: postgres
     secrets:
@@ -24,7 +24,7 @@ services:
 
   redis:
     image: redis:7.4
-    container_name: marketplace-redis
+    container_name: marketplace-staging-redis
     restart: unless-stopped
     expose:
       - 6379
@@ -41,7 +41,7 @@ services:
 
   mailcatcher:
     image: sj26/mailcatcher
-    container_name: marketplace-mailcatcher
+    container_name: marketplace-staging-mailcatcher
     restart: unless-stopped
     expose:
       - 1025
@@ -55,8 +55,8 @@ services:
     build:
       context: .
       dockerfile: compose/staging/django/Dockerfile
-    image: marketplace-server
-    container_name: marketplace-server
+    image: marketplace-staging-server
+    container_name: marketplace-staging-server
     restart: unless-stopped
     depends_on:
       db:
@@ -66,18 +66,27 @@ services:
       redis:
         condition: service_started
     secrets:
+      - secret-password
       - db-password
+      - smtp-password
+      - minio-access-key
+      - minio-secret-key
     env_file:
       - .env
     environment:
+      SECRET_KEY_FILE: /run/secrets/secret-password
+      EMAIL_HOST_PASSWORD_FILE: /run/secrets/smtp-password
       DB_PASSWORD_FILE: /run/secrets/db-password
+      MINIO_ACCESS_KEY_FILE: /run/secrets/minio-access-key
+      MINIO_SECRET_KEY_FILE: /run/secrets/minio-secret-key
       DEBUG: true
       SERVER_TYPE: staging
     volumes:
-      - .:/app
+      - ./src:/app
     networks:
       - private-net
       - public-net
+      - s3-net
     ports:
       - 8000:8000
     healthcheck:
@@ -93,7 +102,7 @@ services:
 
   celeryworker:
     <<: *django
-    container_name: marketplace-celeryworker
+    container_name: marketplace-staging-celeryworker
     command: /start-celeryworker
     ports: []
 
@@ -103,8 +112,16 @@ volumes:
 
 
 secrets:
+  secret-password:
+    file: secrets/django/secret_key.txt
+  smtp-password:
+    file: secrets/django/smtp_password.txt
   db-password:
-    file: db/password.txt
+    file: secrets/db/password.txt
+  minio-access-key:
+    file: secrets/minio/access_key.txt
+  minio-secret-key:
+    file: secrets/minio/secret_key.txt
 
 networks:
   public-net:
@@ -112,3 +129,5 @@ networks:
   private-net:
     driver: bridge
     internal: true
+  s3-net:
+    external: true
