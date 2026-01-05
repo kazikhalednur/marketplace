@@ -22,11 +22,11 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - public-net
+      - s3-net
 
 networks:
-  public-net:
-    driver: bridge
+  s3-net:
+    external: true
 
 secrets:
   root_user:
