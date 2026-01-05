@@ -48,7 +48,7 @@ RUN adduser \
     appuser
 
 COPY --from=builder /install /usr/local
-COPY . /app/
+COPY src/. /app/
 
 RUN chown -R appuser:appuser /app
 
