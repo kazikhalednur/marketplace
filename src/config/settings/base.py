@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", cast=str)
+SECRET_KEY = open(BASE_DIR / config("SECRET_KEY_FILE", cast=str), "r").read().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
@@ -120,7 +120,7 @@ DATABASES = {
         "USER": config("DB_USER", cast=str),
         "PASSWORD": open(BASE_DIR / config("DB_PASSWORD_FILE", cast=str), "r")
         .read()
-        .strip(),  # noqa: E501
+        .strip(),
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
     }
@@ -135,7 +135,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -181,7 +181,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = config("EMAIL_BACKEND")
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_PASSWORD = (
+    open(BASE_DIR / config("EMAIL_HOST_PASSWORD_FILE", cast=str), "r").read().strip()
+)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 EMAIL_PORT = config("EMAIL_PORT", cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
