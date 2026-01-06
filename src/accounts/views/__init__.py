@@ -1,6 +1,5 @@
 from .email_resend import EmailResendView
 from .email_verify import EmailVerifyView
-from .get_user_by_username import UserInfoByUsernameView
 from .logout import LogoutView
 from .otp_verify import OTPVerifyView
 from .password_change import PasswordChangeView
@@ -21,5 +20,4 @@ __all__ = [
     "EmailVerifyView",
     "EmailResendView",
     "SigninGoogleView",
-    "UserInfoByUsernameView",
 ]

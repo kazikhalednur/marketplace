@@ -1,6 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
-from rest_framework import filters, permissions, status
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+    inline_serializer,
+)
+from rest_framework import filters, permissions
+from rest_framework import serializers as drf_serializers
+from rest_framework import status
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -39,6 +46,9 @@ class NotificationListView(ListAPIView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
+        # Return empty queryset during schema generation
+        if getattr(self, "swagger_fake_view", False):
+            return Notification.objects.none()
         return Notification.objects.filter(user=self.request.user)
 
     def get_serializer_context(self):
@@ -59,12 +69,29 @@ class NotificationCreateView(CreateAPIView):
 
 
 class MarkNotificationReadView(UpdateAPIView):
+    serializer_class = NotificationListSerializer  # Required for schema generation
     http_method_names = ["patch"]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        # Return empty queryset during schema generation
+        if getattr(self, "swagger_fake_view", False):
+            return Notification.objects.none()
+        return Notification.objects.filter(user=self.request.user, pk=self.kwargs["pk"])
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="MarkNotificationReadResponse",
+                fields={
+                    "message": drf_serializers.CharField(
+                        default="Notification marked as read"
+                    ),
+                },
+            )
+        },
+    )
     def update(self, request, *args, **kwargs):
         notification = self.get_object()
         notification.is_read = True
@@ -76,6 +103,20 @@ class MarkNotificationReadView(UpdateAPIView):
 class MarkAllNotificationsReadView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="MarkAllNotificationsReadResponse",
+                fields={
+                    "message": drf_serializers.CharField(
+                        default="All notifications marked as read"
+                    ),
+                    "updated_count": drf_serializers.IntegerField(),
+                },
+            )
+        },
+    )
     def post(self, request):
         try:
             updated_count = Notification.objects.filter(
@@ -98,6 +139,24 @@ class MarkAllNotificationsReadView(APIView):
 class NotificationStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        responses={
+            200: inline_serializer(
+                name="NotificationStatsResponse",
+                fields={
+                    "stats": inline_serializer(
+                        name="NotificationStats",
+                        fields={
+                            "total": drf_serializers.IntegerField(),
+                            "unread": drf_serializers.IntegerField(),
+                            "read": drf_serializers.IntegerField(),
+                            "by_type": drf_serializers.DictField(),
+                        },
+                    )
+                },
+            )
+        },
+    )
     def get(self, request):
         try:
             total_notifications = Notification.objects.filter(user=request.user).count()
@@ -130,10 +189,34 @@ class NotificationStatsView(APIView):
 
 
 class DeleteNotificationView(DestroyAPIView):
+    serializer_class = NotificationListSerializer  # Required for schema generation
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Return empty queryset during schema generation
+        if getattr(self, "swagger_fake_view", False):
+            return Notification.objects.none()
         return Notification.objects.filter(user=self.request.user)
+
+    @extend_schema(
+        request=None,
+        responses={
+            204: inline_serializer(
+                name="DeleteNotificationResponse",
+                fields={
+                    "message": drf_serializers.CharField(
+                        default="Notification deleted successfully"
+                    ),
+                },
+            )
+        },
+    )
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response(
+            {"message": "Notification deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
 @extend_schema(
@@ -156,6 +239,19 @@ class DeleteNotificationView(DestroyAPIView):
 class DeleteAllNotificationsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        responses={
+            200: inline_serializer(
+                name="DeleteAllNotificationsResponse",
+                fields={
+                    "message": drf_serializers.CharField(
+                        default="All notifications deleted successfully"
+                    ),
+                    "deleted_count": drf_serializers.IntegerField(),
+                },
+            )
+        }
+    )
     def delete(self, request):
         try:
             message_type = request.query_params.get("message_type")

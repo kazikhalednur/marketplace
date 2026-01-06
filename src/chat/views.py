@@ -1,5 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions, status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import generics, permissions
+from rest_framework import serializers as drf_serializers
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -105,6 +108,19 @@ class MarkMessageAsReadView(APIView):
 
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="MarkMessageAsReadViewResponse",
+                fields={
+                    "status": drf_serializers.CharField(
+                        default="Message marked as read"
+                    )
+                },
+            )
+        },
+    )
     def post(self, request, conversation_id, message_id):
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
         message = get_object_or_404(Message, id=message_id, conversation=conversation)
@@ -126,6 +142,19 @@ class MarkAllMessagesAsReadView(APIView):
 
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: inline_serializer(
+                name="MarkAllMessagesAsReadViewResponse",
+                fields={
+                    "status": drf_serializers.CharField(
+                        default="All messages marked as read"
+                    )
+                },
+            )
+        },
+    )
     def post(self, request, conversation_id):
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
         user = request.user

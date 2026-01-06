@@ -59,12 +59,6 @@ urlpatterns = [
         name="accepted_domain",
     ),
     path("info/", freelancers_views.UserInfoView.as_view(), name="info"),
-    # Retrieve user info by username endpoint
-    path(
-        "info/<str:username>/",
-        views.UserInfoByUsernameView.as_view(),
-        name="user_info_by_username",
-    ),
     # Client specific URLs
     path("clients/signup/", clients_views.SignupView.as_view(), name="clients_signup"),
     path(

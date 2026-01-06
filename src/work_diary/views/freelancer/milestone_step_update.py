@@ -11,13 +11,13 @@ from ...serializers.freelancer import FreelancerMilestoneStepSerializer
 
 @extend_schema(tags=["freelancer_work_diary"])
 @extend_schema_view(
-    create=extend_schema(
+    update=extend_schema(
         summary="Update a milestone step",
         description="Update a milestone step",
     ),
 )
 class MilestoneStepUpdateView(UpdateAPIView):
-    """Create or update a milestone step submission (freelancer view)."""
+    """Update a milestone step submission (freelancer view)."""
 
     serializer_class = FreelancerMilestoneStepSerializer
     permission_classes = [IsFreelancer]
