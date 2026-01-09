@@ -70,7 +70,7 @@ export class NotificationWebSocket {
     this.connectionAttempts++;
     
     // Connect without token in URL - send it as a message after connection
-    const url = `wss://cpchub.diu.edu.bd:8443/ws/notification/${this.notificationId}/?token=${token}`;
+    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/notification/${this.notificationId}/?token=${token}`;
     
     logWebSocket('Attempting WebSocket connection...');
     logWebSocket('Notification ID:', this.notificationId);

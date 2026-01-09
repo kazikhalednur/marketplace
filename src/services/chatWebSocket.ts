@@ -102,7 +102,7 @@ export class ChatWebSocket {
     this.connectionAttempts++;
     
     // Connect to chat WebSocket
-    const url = `wss://cpchub.diu.edu.bd:8443/ws/chat/${this.roomName}/?token=${token}`;
+    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chat/${this.roomName}/?token=${token}`;
     
     logWebSocket('Attempting chat WebSocket connection...', {
       attempt: this.connectionAttempts,
