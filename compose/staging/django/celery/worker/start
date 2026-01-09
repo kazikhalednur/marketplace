@@ -4,4 +4,4 @@ set -o errexit
 set -o nounset
 
 
-exec celery -A config.celery worker -l INFO
+exec celery -A config.celery worker -l INFO --concurrency=6 --max-tasks-per-child=250 --max-memory-per-child=256000 --autoscale=10,3 --pool=prefork --queues=celery --without-heartbeat --without-mingle --without-gossip
