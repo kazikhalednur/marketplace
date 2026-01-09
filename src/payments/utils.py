@@ -1,205 +1,178 @@
-import uuid
-from typing import Any, Dict, Optional
-
 import requests
-from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.urls import reverse
 
-from .models import InitiatePayment, SSLCommerzConfig
-from .serializers import InitiatePaymentResponseSerializer, InitiatePaymentSerializer
+from .models import PaymentHistory, PaymentRequest, PaymentTransaction
 
 
 class PaymentUtility:
     """Payment utility class using serializers for data validation and processing"""
 
-    def __init__(self, config_name: str = None):
+    def __init__(self, request, payment_history: PaymentHistory):
         """
         Initialize Payment Utility
-
-        Args:
-            config_name (str): Name of the configuration to use.
-                             If None, uses the first active configuration.
         """
-        self.config = self._get_config(config_name)
-        if not self.config:
-            raise ValueError("No active SSLCommerz configuration found")
+        self.payment_history: PaymentHistory = payment_history
+        self.payment_request: PaymentRequest = payment_history.payment_request
+        self.__paystation_marchant_id = settings.PAYSTATION_MARCHANT_ID
+        self.__paystation_password = settings.PAYSTATION_PASSWORD
+        self.callback_url = request.build_absolute_uri(reverse("payments:callback"))
+        self.initiate_payment_url = "https://api.paystation.com.bd/initiate-payment"
+        self.transaction_status_url = "https://api.paystation.com.bd/transaction-status"
 
-    def _get_config(self, config_name: str = None) -> Optional[SSLCommerzConfig]:
-        """Get SSLCommerz configuration"""
-        if config_name:
-            try:
-                return SSLCommerzConfig.objects.get(name=config_name, is_active=True)
-            except SSLCommerzConfig.DoesNotExist:
-                raise ValueError(f"Configuration '{config_name}' not found or inactive")
-        else:
-            return SSLCommerzConfig.objects.filter(is_active=True).first()
-
-    def _generate_tran_id(self) -> str:
-        """Generate unique transaction ID"""
-        return str(uuid.uuid4().hex[:10])
-
-    def _prepare_sslcommerz_data(
-        self,
-        request,
-        user,
-        amount: float,
-        currency: str = "BDT",
-        additional_data: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
-        """
-        Prepare data for SSLCommerz API call
-
-        Args:
-            user: Django User instance
-            amount (float): Payment amount
-            currency (str): Currency code (default: BDT)
-            additional_data (dict): Additional data for payment
-
-        Returns:
-            dict: Prepared SSLCommerz API data
-        """
-        tran_id = self._generate_tran_id()
-
-        # Get user profile data
-        user_email = getattr(user, "email", "")
-        user_first_name = getattr(user, "first_name", "")
-        user_last_name = getattr(user, "last_name", "")
-        user_name = f"{user_first_name} {user_last_name}".strip() or user.username
-
-        # Get user phone from profile if available
-        user_phone = ""
-        if hasattr(user, "clientprofile"):
-            user_phone = getattr(user.clientprofile, "phone", "")
-        elif hasattr(user, "freelancerprofile"):
-            user_phone = getattr(user.freelancerprofile, "phone", "")
-
-        # Get user address from profile if available
-        user_address = ""
-        user_city = ""
-        if hasattr(user, "clientprofile"):
-            user_address = getattr(user.clientprofile, "address", "")
-            user_city = getattr(user.clientprofile, "city", "")
-        elif hasattr(user, "freelancerprofile"):
-            user_address = getattr(user.freelancerprofile, "address", "")
-            user_city = getattr(user.freelancerprofile, "city", "")
-
-        # Base SSLCommerz API data
-        sslcommerz_data = {
-            "store_id": self.config.store_id,
-            "store_passwd": self.config.store_password,
-            "total_amount": amount,
-            "currency": currency,
-            "tran_id": tran_id,
-            "success_url": self.config.success_url,
-            "fail_url": self.config.fail_url,
-            "cancel_url": self.config.cancel_url,
-            "ipn_url": self.config.ipn_url,
-            "cus_name": user_name,
-            "cus_email": user_email,
-            "cus_add1": user_address or "N/A",
-            "cus_city": user_city or "Dhaka",
-            "cus_phone": user_phone or "01700000000",
-            "cus_country": "Bangladesh",
-            "shipping_method": "YES",
-            "ship_name": "CPC WOR HUB Marketplace",
-            "ship_add1": "Daffodil International University",
-            "ship_city": "Dhaka",
-            "ship_postcode": "1341",
-            "ship_country": "Bangladesh",
-            "product_name": "Job Payment",
-            "product_category": "Freelancing",
-            "product_profile": "general",
+    def _initiate_payment_payload(self):
+        return {
+            "merchantId": self.__paystation_marchant_id,
+            "password": self.__paystation_password,
+            "invoice_number": self.payment_request.invoice_number,
+            "currency": self.payment_history.currency,
+            "payment_amount": self.payment_history.amount,
+            "pay_with_charge": 1,
+            "cust_name": self.payment_history.user.get_full_name(),
+            "cust_phone": self.payment_history.user.phone,
+            "cust_email": self.payment_history.user.email,
+            "callback_url": self.callback_url,
         }
 
-        # Add additional data if provided
-        if additional_data:
-            sslcommerz_data.update(additional_data)
-
-        return sslcommerz_data
-
-    def initiate_payment(
-        self,
-        request,
-        user,
-        amount: float,
-        currency: str = "BDT",
-        additional_data: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
-        """
-        Initiate payment using serializer validation
-
-        Args:
-            user: Django User instance
-            amount (float): Payment amount
-            currency (str): Currency code (default: BDT)
-            additional_data (dict): Additional data for payment
-
-        Returns:
-            dict: Response with serializer data and API response
-        """
+    def _initiate_payment_request(self):
         try:
-            # Prepare SSLCommerz API data
-            request_data = self._prepare_sslcommerz_data(
-                request, user, amount, currency, additional_data
-            )
+            self.response = requests.post(
+                self.initiate_payment_url,
+                data=self._initiate_payment_payload(),
+                timeout=10,
+            ).json()
 
-            # Validate data using serializer
-            serializer = InitiatePaymentSerializer(data=request_data)
-            serializer.is_valid(raise_exception=True)
-
-            # Make API request to SSLCommerz
-            response = requests.post(
-                self.config.api_url, data=serializer.data, timeout=30
-            )
-            # Parse response
-            response_data = (
-                response.json()
-                if response.headers.get("content-type", "").startswith(
-                    "application/json"
-                )
-                else {}
-            )
-
-            # Create InitiatePayment record with validated data
-            initiate_payment_data = {
-                "user": user,
-                "tran_id": serializer.data["tran_id"],
-                "total_amount": amount,
-                "currency": currency,
-                "status": response_data.get("status", "FAILED"),
-                "failedreason": response_data.get("failedreason", ""),
-                "sessionkey": response_data.get("sessionkey", ""),
-                "GatewayPageURL": response_data.get("GatewayPageURL", ""),
-            }
-
-            initiate_payment = InitiatePayment.objects.create(**initiate_payment_data)
-
-            initiate_payment_serializer = InitiatePaymentResponseSerializer(
-                data=initiate_payment_data
-            )
-            initiate_payment_serializer.is_valid(raise_exception=True)
-
-            return {
-                "success": True,
-                "data": initiate_payment_serializer.data,
-                "message": "Payment initiated successfully",
-                "payment": initiate_payment,
-            }
-
-        except requests.exceptions.RequestException as e:
-            return {
-                "success": False,
-                "error": f"Network error: {str(e)}",
+        except requests.exceptions.RequestException:
+            self.response = {
+                "status_code": 504,
                 "message": "Failed to connect to payment gateway",
             }
-        except ValidationError as e:
+
+    def _save_initiate_payment_response(self, success: bool):
+        self.payment_request.status_code = self.response.get("status_code")
+        self.payment_request.status = "SUCCESS" if success else "FAILED"
+        self.payment_request.message = self.response.get("message")
+        self.payment_request.payment_url = self.response.get("payment_url")
+        self.payment_request.payment_url_expiry = self.response.get(
+            "payment_url_expiry"
+        )
+        self.payment_request.save(
+            update_fields=[
+                "status_code",
+                "status",
+                "message",
+                "payment_url",
+                "payment_url_expiry",
+            ]
+        )
+
+    def initiate_payment(self):
+        """
+        Initiate payment using serializer validation
+        """
+        self._initiate_payment_request()
+
+        if self.response.get("status_code") == "200":
+            self._save_initiate_payment_response(success=True)
             return {
-                "success": False,
-                "error": f"Validation error: {str(e)}",
-                "message": "Payment data validation failed",
+                "status_code": int(self.response.get("status_code")),
+                "message": self.response.get("message"),
+                "payment_url": self.response.get("payment_url"),
             }
-        except Exception as e:
+
+        elif self.response.get("status_code") == "1008":
+            self.payment_request.update_invoice_number()
+            return self.initiate_payment()
+
+        elif self.response.get("status_code") == 504:
+            return self.response
+
+        else:
+            self._save_initiate_payment_response(success=False)
             return {
-                "success": False,
-                "error": f"Unexpected error: {str(e)}",
+                "status_code": 500,
+                "status": "failed",
                 "message": "Payment initiation failed",
+            }
+
+    def _payment_callback_headers(self):
+        return {"merchantId": self.__paystation_marchant_id}
+
+    def _payment_callback_payload(self):
+        return {
+            "invoice_number": self.payment_request.invoice_number,
+        }
+
+    def _payment_callback_request(self):
+        try:
+            self.callback_response = requests.post(
+                self.transaction_status_url,
+                headers=self._payment_callback_headers(),
+                data=self._payment_callback_payload(),
+                timeout=10,
+            ).json()
+
+        except requests.exceptions.RequestException:
+            self.callback_response = {
+                "status_code": 504,
+                "message": "Failed to connect to payment gateway",
+            }
+
+    def _verify_trx_id(self):
+        if not self.payment_request.callback_log.trx_id:
+            return False
+
+        return (
+            self.callback_response["data"].get("trx_id")
+            == self.payment_request.callback_log.trx_id
+        )
+
+    def _save_payment_callback_response(self):
+        transaction: PaymentTransaction = self.payment_request.transaction
+        trx_status = self.callback_response["data"].get("trx_status").upper()
+        transaction.trx_status = trx_status if trx_status != "CANCELLED" else "CANCELED"
+        transaction.trx_id = self.callback_response["data"].get("trx_id")
+        transaction.payment_amount = self.callback_response["data"].get(
+            "payment_amount"
+        )
+        transaction.order_date_time = self.callback_response["data"].get(
+            "order_date_time"
+        )
+        transaction.payer_mobile_no = self.callback_response["data"].get(
+            "payer_mobile_no"
+        )
+        transaction.payment_method = self.callback_response["data"].get(
+            "payment_method"
+        )
+        transaction.is_verified = self._verify_trx_id()
+        transaction.save(
+            update_fields=[
+                "trx_id",
+                "trx_status",
+                "payment_amount",
+                "order_date_time",
+                "payer_mobile_no",
+                "payment_method",
+                "is_verified",
+            ]
+        )
+
+    def handle_payment_callback(self):
+        self._payment_callback_request()
+
+        if self.callback_response.get("status_code") == "200":
+            self._save_payment_callback_response()
+
+        elif self.callback_response.get("status_code") == "2001":
+            return {
+                "status_code": "2001",
+                "status": "failed",
+                "message": "Invalid Token.",
+            }
+
+        elif self.callback_response.get("status_code") == 504:
+            return {
+                "status_code": 504,
+                "status": "failed",
+                "message": "Failed to connect to payment gateway",
             }

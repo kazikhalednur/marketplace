@@ -1,12 +1,12 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Attachment, Category, Job, JobPayment, Skill
+from .models import Attachment, Category, Job, Skill
 
 admin.site.register(Category, SimpleHistoryAdmin)
 admin.site.register(Attachment, SimpleHistoryAdmin)
 admin.site.register(Skill, SimpleHistoryAdmin)
-admin.site.register(JobPayment, SimpleHistoryAdmin)
+# admin.site.register(JobPayment, SimpleHistoryAdmin)
 
 
 @admin.register(Job)

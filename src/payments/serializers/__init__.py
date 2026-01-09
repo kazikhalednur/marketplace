@@ -1,9 +1,6 @@
-from .initiate_payment import InitiatePaymentSerializer
-from .initiate_payment_response import InitiatePaymentResponseSerializer
-from .ipn_validate_payment import IPNValidatePaymentSerializer
+from .job_payment import JobPaymentResponseSerializer, JobPaymentSerializer
 
 __all__ = [
-    "InitiatePaymentSerializer",
-    "InitiatePaymentResponseSerializer",
-    "IPNValidatePaymentSerializer",
+    "JobPaymentSerializer",
+    "JobPaymentResponseSerializer",
 ]

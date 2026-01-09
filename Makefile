@@ -24,3 +24,7 @@ lint:
 update-database:
 	$(VENV)/python src/manage.py makemigrations;
 	$(VENV)/python src/manage.py migrate;
+
+migrate:
+	docker compose exec django python manage.py makemigrations; 
+	docker compose exec django python manage.py migrate;

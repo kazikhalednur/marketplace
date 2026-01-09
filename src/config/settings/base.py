@@ -207,6 +207,13 @@ ZOOM_ACCOUNT_ID = config("ZOOM_ACCOUNT_ID", cast=str)
 ZOOM_CLIENT_ID = config("ZOOM_CLIENT_ID", cast=str)
 ZOOM_CLIENT_SECRET = config("ZOOM_CLIENT_SECRET", cast=str)
 
+PAYSTATION_MARCHANT_ID = (
+    open(BASE_DIR / config("PAYSTATION_MARCHANT_ID_FILE", cast=str), "r").read().strip()
+)
+PAYSTATION_PASSWORD = (
+    open(BASE_DIR / config("PAYSTATION_PASSWORD_FILE", cast=str), "r").read().strip()
+)
+
 
 from .celery import *
 from .rest_framework import *

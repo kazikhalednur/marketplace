@@ -5,5 +5,6 @@ from . import views
 app_name = "payments"
 
 urlpatterns = [
-    path("ipn-validate/", views.IPNValidatePaymentView.as_view(), name="ipn_validate"),
+    path("job/", views.JobPaymentView.as_view(), name="job"),
+    path("callback/", views.CallbackPaymentView.as_view(), name="callback"),
 ]

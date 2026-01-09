@@ -56,6 +56,7 @@ services:
       dockerfile: compose/local/django/Dockerfile
     image: marketplace-server
     container_name: marketplace-server
+    user: "${UID}:${GID}"
     depends_on:
       db:
         condition: service_healthy
@@ -69,16 +70,22 @@ services:
       - smtp-password
       - minio-access-key
       - minio-secret-key
+      - paystation-marchant-id
+      - paystation-password
     env_file:
       - .env
     environment:
       SECRET_KEY_FILE: /run/secrets/secret-password
       EMAIL_HOST_PASSWORD_FILE: /run/secrets/smtp-password
       DB_PASSWORD_FILE: /run/secrets/db-password
-      DEBUG: true
-      SERVER_TYPE: local
       MINIO_ACCESS_KEY_FILE: /run/secrets/minio-access-key
       MINIO_SECRET_KEY_FILE: /run/secrets/minio-secret-key
+      PAYSTATION_MARCHANT_ID_FILE: /run/secrets/paystation-marchant-id
+      PAYSTATION_PASSWORD_FILE: /run/secrets/paystation-password
+      DEBUG: true
+      SERVER_TYPE: local
+      UID: "${UID}"
+      GID: "${GID}"
     volumes:
       - ./src:/app
     ports:
@@ -123,3 +130,7 @@ secrets:
     file: secrets/minio/access_key.txt
   minio-secret-key:
     file: secrets/minio/secret_key.txt
+  paystation-marchant-id:
+    file: secrets/paystation/marchant_id.txt
+  paystation-password:
+    file: secrets/paystation/password.txt
