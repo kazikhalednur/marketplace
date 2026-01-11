@@ -7,6 +7,7 @@ from ..utils import PaymentUtility
 
 class CallbackPaymentView(APIView):
     permission_classes = []
+    serializer_class = None
 
     def get(self, request):
 
