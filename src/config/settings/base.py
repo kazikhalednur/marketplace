@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "work_diary.apps.WorkDiaryConfig",
     "payments.apps.PaymentsConfig",
     "meeting.apps.MeetingConfig",
+    "custom_admin.apps.CustomAdminConfig",
     # third-party apps
     "corsheaders",
     "rest_framework",

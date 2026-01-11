@@ -38,6 +38,7 @@ urlpatterns = [
     path("payments/", include("payments.urls")),
     path("meetings/", include("meeting.urls")),
     path("health_check/", base_views.health_check),
+    path("admin-api/", include("custom_admin.urls")),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
