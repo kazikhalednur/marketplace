@@ -1,45 +1,5 @@
 [
     {
-        "email": "admin1@marketplace.com",
-        "username": "admin1",
-        "first_name": "Admin",
-        "last_name": "One",
-        "role": "admin",
-        "email_verified": true
-    },
-    {
-        "email": "admin2@marketplace.com",
-        "username": "admin2",
-        "first_name": "Admin",
-        "last_name": "Two",
-        "role": "admin",
-        "email_verified": true
-    },
-    {
-        "email": "admin3@marketplace.com",
-        "username": "admin3",
-        "first_name": "Admin",
-        "last_name": "Three",
-        "role": "admin",
-        "email_verified": true
-    },
-    {
-        "email": "admin4@marketplace.com",
-        "username": "admin4",
-        "first_name": "Admin",
-        "last_name": "Four",
-        "role": "admin",
-        "email_verified": true
-    },
-    {
-        "email": "admin5@marketplace.com",
-        "username": "admin5",
-        "first_name": "Admin",
-        "last_name": "Five",
-        "role": "admin",
-        "email_verified": true
-    },
-    {
         "email": "john.developer@email.com",
         "username": "john_dev",
         "first_name": "John",

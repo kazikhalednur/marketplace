@@ -28,6 +28,9 @@ class Command(BaseCommand):
 
         try:
             with transaction.atomic():
+                # Load super admin accounts
+                self.load_super_admins(seed_dir)
+
                 # Load categories
                 self.load_categories(seed_dir)
 
@@ -56,6 +59,24 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f"Error loading seed data: {str(e)}"))
             raise
 
+    def load_super_admins(self, seed_dir):
+        file_path = os.path.join(seed_dir, "super_admins.json")
+        with open(file_path, "r") as f:
+            admins = json.load(f)
+
+        count = 0
+        for admin_data in admins:
+            User.objects.create_superuser(
+                username=admin_data["username"],
+                email=admin_data["email"],
+                role=User.UserRole.ADMIN,
+                email_verified=admin_data.get("email_verified", True),
+                password=admin_data["password"],
+            )
+            count += 1
+
+        self.stdout.write(self.style.SUCCESS(f"✓ Loaded {count} super admins"))
+
     def load_categories(self, seed_dir):
         file_path = os.path.join(seed_dir, "categories.json")
         with open(file_path, "r") as f:
@@ -63,9 +84,8 @@ class Command(BaseCommand):
 
         count = 0
         for cat_data in categories:
-            category, created = Category.objects.get_or_create(name=cat_data["name"])
-            if created:
-                count += 1
+            Category.objects.create(name=cat_data["name"])
+            count += 1
 
         self.stdout.write(self.style.SUCCESS(f"✓ Loaded {count} categories"))
 
@@ -140,16 +160,16 @@ class Command(BaseCommand):
                         ),
                     },
                 )
-                if created:
-                    # Create a default sub-profile for each freelancer
-                    FreelancerSubProfile.objects.create(
-                        freelancer_profile=profile,
-                        hours_per_week=40,
-                        is_more_available=True,
-                        hour_rate=Decimal("25.00"),
-                        bio="Experienced professional ready to work on your projects.",
-                    )
-                    count += 1
+                FreelancerSubProfile.objects.get_or_create(
+                    freelancer_profile=profile,
+                    defaults={
+                        "hours_per_week": 40,
+                        "is_more_available": True,
+                        "hour_rate": Decimal("25.00"),
+                        "bio": "Experienced professional ready to work on your projects.",  # noqa: E501
+                    },
+                )
+                count += 1
             except Freelancer.DoesNotExist:
                 self.stdout.write(
                     self.style.WARNING(
