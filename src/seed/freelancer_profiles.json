@@ -268,35 +268,5 @@
         "student_id": "2019-10045-1",
         "is_available": false,
         "available_connects": 21
-    },
-    {
-        "username": "admin1",
-        "student_id": "2018-00001-1",
-        "is_available": false,
-        "available_connects": 50
-    },
-    {
-        "username": "admin2",
-        "student_id": "2018-00002-1",
-        "is_available": false,
-        "available_connects": 50
-    },
-    {
-        "username": "admin3",
-        "student_id": "2018-00003-1",
-        "is_available": false,
-        "available_connects": 50
-    },
-    {
-        "username": "admin4",
-        "student_id": "2018-00004-1",
-        "is_available": false,
-        "available_connects": 50
-    },
-    {
-        "username": "admin5",
-        "student_id": "2018-00005-1",
-        "is_available": false,
-        "available_connects": 50
     }
 ]
