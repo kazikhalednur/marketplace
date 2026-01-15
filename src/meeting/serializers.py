@@ -119,6 +119,7 @@ class ContractFreelancerSerializer(serializers.Serializer):
 
 
 class MeetingJoinSerializer(serializers.Serializer):
+    room_name = serializers.CharField()
     token = serializers.CharField()
     domain = serializers.CharField(
         default=getattr(settings, "JITSI_DOMAIN"),

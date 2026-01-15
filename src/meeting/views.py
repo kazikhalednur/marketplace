@@ -72,7 +72,7 @@ class JoinMeetingView(APIView):
 
         MeetingHistory.objects.create(meeting=meeting, user=user)
 
-        serializer = MeetingJoinSerializer({"token": token})
+        serializer = MeetingJoinSerializer({"token": token, "room_name": room_name})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
