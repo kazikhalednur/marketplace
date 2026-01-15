@@ -73,6 +73,8 @@ services:
       - minio-secret-key
       - paystation-marchant-id
       - paystation-password
+      - jitsi-app-id
+      - jitsi-app-secret
     env_file:
       - .env
     environment:
@@ -83,6 +85,8 @@ services:
       MINIO_SECRET_KEY_FILE: /run/secrets/minio-secret-key
       PAYSTATION_MARCHANT_ID_FILE: /run/secrets/paystation-marchant-id
       PAYSTATION_PASSWORD_FILE: /run/secrets/paystation-password
+      JITSI_APP_ID_FILE: /run/secrets/jitsi-app-id
+      JITSI_APP_SECRET_FILE: /run/secrets/jitsi-app-secret
       DEBUG: true
       SERVER_TYPE: staging
     volumes:
@@ -130,6 +134,10 @@ secrets:
     file: secrets/paystation/marchant_id.txt
   paystation-password:
     file: secrets/paystation/password.txt
+  jitsi-app-id:
+    file: secrets/jitsi/app_id.txt
+  jitsi-app-secret:
+    file: secrets/jitsi/app_secret.txt
 
 networks:
   public-net:

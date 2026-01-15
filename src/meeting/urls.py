@@ -6,18 +6,22 @@ app_name = "meetings"
 
 urlpatterns = [
     path(
-        "auth/",
-        views.ZoomMeetingSDKAuthView.as_view(),
-        name="zoom_meeting_sdk_auth",
+        "create/",
+        views.CreateMeetingView.as_view(),
+        name="create_meeting",
     ),
     path(
-        "all/",
-        views.MeetingListView.as_view(),
-        name="meeting_list",
+        "freelancer-list/", views.FreelancerListView.as_view(), name="freelancer_list"
     ),
     path(
-        "<str:conversation_id>/",
-        views.MeetingListCreateView.as_view(),
-        name="meeting_list_create",
+        "history/",
+        views.MeetingHistoryView.as_view(),
+        name="meeting_history",
+    ),
+    path("my/", views.MyMeetingsView.as_view(), name="my_meetings"),
+    path(
+        "join/<str:room_name>/",
+        views.JoinMeetingView.as_view(),
+        name="join_meeting",
     ),
 ]

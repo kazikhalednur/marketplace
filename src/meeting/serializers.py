@@ -1,113 +1,125 @@
-from django.utils import timezone
+from django.conf import settings
 from rest_framework import serializers
 
-from accounts.models import User
-from chat.models import Conversation
-from utils.helpers import extract_query_param
+from accounts.models import Client, Freelancer
 
-from .models import Meeting
-from .tasks import create_zoom_meeting_task
+from .models import Meeting, MeetingHistory
+
+
+class FreelancerSerializer(serializers.ModelSerializer):
+    """Serializer for Freelancer model"""
+
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Freelancer
+        fields = ["username", "email", "full_name"]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    """Serializer for Client model"""
+
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Client
+        fields = ["username", "email", "full_name"]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
 
 
 class MeetingSerializer(serializers.ModelSerializer):
-    signature = serializers.CharField(required=False, read_only=True)
-    meeting_number = serializers.CharField(source="meeting_id", read_only=True)
-    user_name = serializers.SerializerMethodField()
-    user_email = serializers.SerializerMethodField()
-    zak = serializers.SerializerMethodField(read_only=True)
+    """Serializer for Meeting model"""
+
+    guest = FreelancerSerializer(read_only=True)
+    guest_username = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = Meeting
         fields = [
             "id",
+            "room_name",
             "topic",
-            "signature",
-            "meeting_number",
-            "password",
-            "user_name",
-            "user_email",
-            "zak",
-            "start_time",
             "duration",
-            # "join_url",
-            # "start_url",
+            "start_date",
+            "start_time",
+            "guest",
+            "guest_username",
             "created_at",
             "updated_at",
         ]
-
-    def validate(self, attrs):
-        if self.context.get("conversation_id"):
-            try:
-                Conversation.objects.get(
-                    conversation_id=self.context.get("conversation_id")
-                )
-            except Conversation.DoesNotExist:
-                raise serializers.ValidationError(
-                    {"detail": "No Conversation matches the given query."}
-                )
-
-        if attrs.get("start_time") and attrs.get("start_time") < timezone.now():
-            raise serializers.ValidationError(
-                {"start_time": "Start time must be in the future"}
-            )
-
-        if attrs.get("duration") < 30:
-            raise serializers.ValidationError(
-                {"duration": "Duration must be at least 30 minutes"}
-            )
-
-        if attrs.get("duration") > 60:
-            raise serializers.ValidationError(
-                {"duration": "Duration cannot exceed 1 hour"}
-            )
-
-        return attrs
+        read_only_fields = ["id", "room_name", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        """Create a Zoom meeting asynchronously"""
-        conversation_id = self.context.get("conversation_id")
-        created_by_email = self.context.get("created_by_email")
+        guest_username = validated_data.pop("guest_username")
+        try:
+            guest = Freelancer.objects.get(username=guest_username)
+        except Freelancer.DoesNotExist:
+            raise serializers.ValidationError({"username": "Freelancer not found"})
 
-        create_zoom_meeting_task.delay(
-            conversation_id=conversation_id,
-            created_by_email=created_by_email,
-            topic=validated_data["topic"],
-            start_time=validated_data["start_time"],
-            duration=validated_data["duration"],
-        )
-
-        return Meeting(
-            topic=validated_data["topic"],
-            duration=validated_data["duration"],
-            start_time=validated_data["start_time"],
-        )
-
-    def get_user_name(self, obj):
-        return User.objects.get(email=self.context["created_by_email"]).get_full_name()
-
-    def get_user_email(self, obj):
-        return self.context["created_by_email"]
-
-    def get_zak(self, obj):
-        return extract_query_param(obj.start_url, "zak")
+        validated_data["guest"] = guest
+        return super().create(validated_data)
 
 
-class ZoomMeetingSDKAuthSerializer(serializers.Serializer):
-    """Serializer for Zoom Meeting SDK authentication"""
+class MeetingListSerializer(serializers.ModelSerializer):
+    """Simplified serializer for listing meetings"""
 
-    meetingNumber = serializers.CharField(required=True, write_only=True)
-    role = serializers.IntegerField(required=True, write_only=True)
-    expirationSeconds = serializers.IntegerField(
-        required=False, min_value=1800, max_value=7200, write_only=True
+    created_by_name = serializers.CharField(
+        source="created_by.get_full_name", read_only=True
     )
-    videoWebRtcMode = serializers.IntegerField(
-        required=False, min_value=0, max_value=1, write_only=True
-    )
-    signature = serializers.CharField(required=False, read_only=True)
+    guest_name = serializers.CharField(source="guest.get_full_name", read_only=True)
 
-    def validate_role(self, value):
-        if value not in [0, 1]:
-            raise serializers.ValidationError(
-                {"role": "Role must be 0 (participant) or 1 (host)"}
-            )
-        return value
+    class Meta:
+        model = Meeting
+        fields = [
+            "id",
+            "room_name",
+            "topic",
+            "duration",
+            "start_date",
+            "start_time",
+            "created_by_name",
+            "guest_name",
+            "created_at",
+        ]
+
+
+class MeetingHistorySerializer(serializers.ModelSerializer):
+    """Serializer for MeetingHistory model"""
+
+    user_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    meeting_topic = serializers.CharField(source="meeting.topic", read_only=True)
+    room_name = serializers.CharField(source="meeting.room_name", read_only=True)
+
+    class Meta:
+        model = MeetingHistory
+        fields = [
+            "id",
+            "meeting",
+            "meeting_topic",
+            "room_name",
+            "user",
+            "user_name",
+            "joined_at",
+            "left_at",
+        ]
+        read_only_fields = ["id", "joined_at", "left_at"]
+
+
+class ContractFreelancerSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    full_name = serializers.CharField()
+    contract_id = serializers.UUIDField()
+    job_title = serializers.CharField()
+    contract_status = serializers.CharField()
+
+
+class MeetingJoinSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    domain = serializers.CharField(
+        default=getattr(settings, "JITSI_DOMAIN"),
+    )

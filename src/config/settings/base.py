@@ -217,6 +217,7 @@ PAYSTATION_PASSWORD = (
 
 
 from .celery import *
+from .jitsi import *
 from .rest_framework import *
 from .simple_jwt import *
 from .spectacular import *
