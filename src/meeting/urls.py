@@ -25,7 +25,7 @@ urlpatterns = [
         name="join_meeting",
     ),
     path(
-        "list/<contract_id>",
+        "list/<contract_id>/",
         views.ContractMeetingListView.as_view(),
         name="contract_meetings",
     ),
