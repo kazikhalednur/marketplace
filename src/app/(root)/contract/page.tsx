@@ -3,6 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/toast-provider";
 import { useAuth } from "@/hooks/useAuth";
 import { 
   FileText, 
@@ -14,20 +18,31 @@ import {
   AlertCircle,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Video
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UnauthorizedPage from "@/app/unauthorized/page";
 import { useGetContractsQuery, Contract, useGetFreelancerContractsQuery, FreelancerContractListItem } from "@/features/api/apiSlice";
+import { useGetFreelancerListQuery, useCreateMeetingMutation } from "@/features/api/meetingsApi";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function ContractPage() {
   const { user, isAuthenticated, showLoader } = useAuth();
   const router = useRouter();
+  const { showToast } = useToast();
   const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [formData, setFormData] = useState({
+    topic: "",
+    duration: 60,
+    start_date: "",
+    start_time: "",
+  });
   
   // Client contracts
   const { data: clientContractsResponse, isLoading: isClientLoading, error: clientError } = useGetContractsQuery(
@@ -37,6 +52,13 @@ export default function ContractPage() {
   const { data: freelancerContractsResponse, isLoading: isFreelancerLoading, error: freelancerError } = useGetFreelancerContractsQuery(
     user?.role === 'freelancer' ? { page: currentPage, page_size: pageSize } : skipToken
   );
+  
+  // Fetch freelancer list for meeting creation (only for clients)
+  const { data: freelancerList } = useGetFreelancerListQuery(undefined, {
+    skip: user?.role !== 'client',
+  });
+  
+  const [createMeeting, { isLoading: isCreating }] = useCreateMeetingMutation();
 
   useEffect(() => {
     setMounted(true);
@@ -58,8 +80,57 @@ export default function ContractPage() {
   const hasPrevious = !!(isClient ? clientContractsResponse?.data?.previous : freelancerContractsResponse?.data?.previous);
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const handleContractClick = (contract: Contract | FreelancerContractListItem) => {
+  const handleContractClick = (contract: Contract | FreelancerContractListItem, e?: React.MouseEvent) => {
+    // Don't navigate if clicking on a button inside the card
+    if (e && (e.target as HTMLElement).closest('button')) {
+      return;
+    }
     router.push(`/contract/${contract.id}`);
+  };
+
+  const handleCreateMeetingClick = (contract: Contract, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedContract(contract);
+    setCreateModalOpen(true);
+  };
+
+  const handleCreateMeeting = async () => {
+    if (!selectedContract) {
+      showToast({ type: "error", message: "Please select a contract" });
+      return;
+    }
+
+    // Find the freelancer username from the freelancer list by matching contract_id
+    const freelancer = freelancerList?.find(f => f.contract_id === selectedContract.id);
+    if (!freelancer) {
+      showToast({ type: "error", message: "Freelancer not found for this contract" });
+      return;
+    }
+
+    if (!formData.topic || !formData.start_date || !formData.start_time) {
+      showToast({ type: "error", message: "Please fill in all required fields" });
+      return;
+    }
+
+    try {
+      const result = await createMeeting({
+        ...formData,
+        guest_username: freelancer.username,
+      }).unwrap();
+
+      showToast({ type: "success", message: "Meeting created successfully!" });
+      setCreateModalOpen(false);
+      setFormData({ topic: "", duration: 60, start_date: "", start_time: "" });
+      setSelectedContract(null);
+      
+      // Redirect to the meetings page where client can see and join the meeting
+      router.push("/meetings");
+    } catch (error: any) {
+      showToast({
+        type: "error",
+        message: error?.data?.message || "Failed to create meeting"
+      });
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -236,11 +307,12 @@ export default function ContractPage() {
 
             if (isClient) {
               const c = contract as Contract;
+              const canCreateMeeting = c.status === 'active' && freelancerList?.some(f => f.contract_id === c.id);
               return (
                 <Card 
                   key={c.id} 
                   className="p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/20 group"
-                  onClick={() => handleContractClick(c)}
+                  onClick={(e) => handleContractClick(c, e)}
                 >
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -280,8 +352,21 @@ export default function ContractPage() {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        Contract ID: #{c.id.slice(-8)}
+                      <div className="flex items-center gap-2">
+                        {canCreateMeeting && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={(e) => handleCreateMeetingClick(c, e)}
+                            className="shrink-0"
+                          >
+                            <Video className="h-4 w-4 mr-2" />
+                            Create Meeting
+                          </Button>
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          Contract ID: #{c.id.slice(-8)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -422,6 +507,82 @@ export default function ContractPage() {
             )}
           </Card>
         )}
+
+        {/* Create Meeting Dialog */}
+        <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Create New Meeting</DialogTitle>
+              <DialogDescription>
+                Schedule a meeting with {selectedContract?.freelancer_profile?.full_name || 'the freelancer'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="topic">Meeting Topic *</Label>
+                <Input
+                  id="topic"
+                  placeholder="e.g., Project Discussion"
+                  value={formData.topic}
+                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_date">Start Date *</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="start_time">Start Time *</Label>
+                  <Input
+                    id="start_time"
+                    type="time"
+                    value={formData.start_time}
+                    onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  min="1"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 60 })}
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCreateModalOpen(false);
+                    setFormData({ topic: "", duration: 60, start_date: "", start_time: "" });
+                    setSelectedContract(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateMeeting} disabled={isCreating}>
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Meeting"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
       </div>
     </main>
