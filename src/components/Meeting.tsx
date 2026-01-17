@@ -23,6 +23,7 @@ export default function Meeting({ room, jwt, domain }: Props) {
                     'microphone',
                     'camera',
                     'desktop', // screen share
+                    'fullscreen', // fullscreen toggle
                     'raisehand',
                     'settings',
                     'hangup',
@@ -35,8 +36,10 @@ export default function Meeting({ room, jwt, domain }: Props) {
             }}
             getIFrameRef={(node) => {
                 if (node) {
-                    node.style.height = '100vh'
-                    node.style.width = '100vw'
+                    node.style.height = '100%'
+                    node.style.width = '100%'
+                    node.style.borderRadius = '8px'
+                    node.style.overflow = 'hidden'
                 }
             }}
         />
