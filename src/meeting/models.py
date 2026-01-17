@@ -28,13 +28,13 @@ class Meeting(models.Model):
 
     history = HistoricalRecords()
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["created_by", "guest", "start_date"],
-                name="unique_meeting",
-            )
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=["created_by", "guest", "start_date"],
+    #             name="unique_meeting",
+    #         )
+    #     ]
 
     def __str__(self):
         return self.topic

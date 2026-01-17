@@ -8,10 +8,11 @@ from ...models import Contract
 
 class FreelancerProfileSerializer(ModelSerializer):
     full_name = serializers.CharField(source="freelancer.get_full_name", read_only=True)
+    username = serializers.CharField(source="freelancer.username", read_only=True)
 
     class Meta:
         model = FreelancerProfile
-        fields = ("full_name",)
+        fields = ("full_name", "username")
 
 
 class ClientContractListSerializer(ModelSerializer):
