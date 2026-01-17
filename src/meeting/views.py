@@ -99,7 +99,7 @@ class MyMeetingsView(ListAPIView):
     List all meetings created by the authenticated client.
     """
 
-    permission_classes = [IsClient]
+    permission_classes = [IsAuthenticated]
     serializer_class = MeetingListSerializer
 
     def get_queryset(self):
