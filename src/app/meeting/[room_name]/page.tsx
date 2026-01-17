@@ -1,30 +1,37 @@
-'use client'
-import { useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Meeting from '@/components/Meeting'
-import { useJoinMeetingQuery } from '@/features/api/meetingsApi'
-import { useToast } from '@/components/ui/toast-provider'
-import { Loader2 } from 'lucide-react'
+"use client";
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Meeting from "@/components/Meeting";
+import { useJoinMeetingQuery } from "@/features/api/meetingsApi";
+import { useToast } from "@/components/ui/toast-provider";
+import { Loader2 } from "lucide-react";
 
 export default function MeetingPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { showToast } = useToast()
-  const roomName = params.room_name as string
+  const params = useParams();
+  const router = useRouter();
+  const { showToast } = useToast();
+  const roomName = params.room_name as string;
 
-  const { data: joinData, isLoading, isError } = useJoinMeetingQuery(roomName, {
+  const {
+    data: joinData,
+    isLoading,
+    isError,
+  } = useJoinMeetingQuery(roomName, {
     skip: !roomName,
-  })
+  });
 
   useEffect(() => {
     if (isError) {
-      showToast('Failed to join meeting. Please try again.', 'error')
+      showToast({
+        type: "error",
+        message: "Failed to join meeting. Please try again.",
+      });
       // Redirect back after a delay
       setTimeout(() => {
-        router.push('/meetings')
-      }, 2000)
+        router.push("/meetings");
+      }, 2000);
     }
-  }, [isError, showToast, router])
+  }, [isError, showToast, router]);
 
   if (isLoading) {
     return (
@@ -34,7 +41,7 @@ export default function MeetingPage() {
           <p className="text-muted-foreground">Joining meeting...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (isError || !joinData) {
@@ -43,14 +50,14 @@ export default function MeetingPage() {
         <div className="text-center">
           <p className="text-destructive mb-4">Failed to join meeting</p>
           <button
-            onClick={() => router.push('/meetings')}
+            onClick={() => router.push("/meetings")}
             className="text-primary hover:underline"
           >
             Go back to meetings
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -59,5 +66,5 @@ export default function MeetingPage() {
       jwt={joinData.token}
       domain={joinData.domain}
     />
-  )
+  );
 }

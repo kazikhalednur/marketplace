@@ -15,13 +15,7 @@ export interface CreateMeetingPayload {
   duration: number;
   start_date: string;
   start_time: string;
-  guest_username: string;
-}
-
-export interface MeetingGuest {
-  username: string;
-  email: string;
-  full_name: string;
+  contract: string;
 }
 
 export interface MeetingData {
@@ -31,7 +25,6 @@ export interface MeetingData {
   duration: number;
   start_date: string;
   start_time: string;
-  guest: MeetingGuest;
   created_at: string;
   updated_at: string;
 }
@@ -42,16 +35,24 @@ export interface JoinMeetingData {
   domain: string;
 }
 
-export interface MyMeetingItem {
+export interface MeetingListItem {
   id: string;
   room_name: string;
   topic: string;
   duration: number;
   start_date: string;
   start_time: string;
-  created_by_name: string;
-  guest_name: string;
+  created_by: string;
+  guest: string;
+  job_title: string;
   created_at: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }
 
 export interface ApiResponse<T> {
@@ -74,17 +75,35 @@ export const meetingsApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Meetings', 'FreelancerList', 'MyMeetings'],
+  tagTypes: ['Meetings', 'FreelancerList', 'MyMeetings', 'ContractMeetings'],
   endpoints: (builder) => ({
     getFreelancerList: builder.query<FreelancerListItem[], void>({
       query: () => 'meetings/freelancer-list/',
       transformResponse: (response: ApiResponse<FreelancerListItem[]>) => response.data,
       providesTags: ['FreelancerList'],
     }),
-    getMyMeetings: builder.query<MyMeetingItem[], void>({
-      query: () => 'meetings/my/',
-      transformResponse: (response: ApiResponse<MyMeetingItem[]>) => response.data,
+    getMyMeetings: builder.query<PaginatedResponse<MeetingListItem>, { page?: number; page_size?: number }>({
+      query: ({ page = 1, page_size = 10 }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', page_size.toString());
+        return `meetings/my/?${params.toString()}`;
+      },
+      transformResponse: (response: ApiResponse<PaginatedResponse<MeetingListItem>>) => response.data,
       providesTags: ['MyMeetings'],
+    }),
+    getContractMeetings: builder.query<PaginatedResponse<MeetingListItem>, { contractId: string; page?: number; page_size?: number }>({
+      query: ({ contractId, page = 1, page_size = 10 }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('page_size', page_size.toString());
+        return `meetings/list/${contractId}/?${params.toString()}`;
+      },
+      transformResponse: (response: ApiResponse<PaginatedResponse<MeetingListItem>>) => response.data,
+      providesTags: (result, error, { contractId }) => [
+        { type: 'ContractMeetings', id: contractId },
+        'ContractMeetings'
+      ],
     }),
     createMeeting: builder.mutation<MeetingData, CreateMeetingPayload>({
       query: (body) => ({
@@ -93,7 +112,7 @@ export const meetingsApi = createApi({
         body,
       }),
       transformResponse: (response: ApiResponse<MeetingData>) => response.data,
-      invalidatesTags: ['Meetings', 'MyMeetings'],
+      invalidatesTags: ['Meetings', 'MyMeetings', 'ContractMeetings'],
     }),
     joinMeeting: builder.query<JoinMeetingData, string>({
       query: (roomName) => `meetings/join/${roomName}/`,
@@ -105,6 +124,7 @@ export const meetingsApi = createApi({
 export const {
   useGetFreelancerListQuery,
   useGetMyMeetingsQuery,
+  useGetContractMeetingsQuery,
   useCreateMeetingMutation,
   useJoinMeetingQuery,
 } = meetingsApi;

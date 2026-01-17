@@ -16,7 +16,9 @@ import {
   Download,
   Plus,
   X,
-  CalendarDays
+  CalendarDays,
+  Video,
+  LogIn
 } from "lucide-react";
 import DashboardPagination from "../../dashboard/_views/DashboardPagination";
 import { useEffect, useState } from "react";
@@ -25,9 +27,12 @@ import Image from "next/image";
 import UnauthorizedPage from "@/app/unauthorized/page";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload, useGetFreelancerContractByIdQuery, useGetFreelancerMilestonesQuery, useSubmitMilestoneWorkMutation, FreelancerMilestone, Milestone, ContractDetail, FreelancerContractDetail, FreelancerMilestoneSubmissionItem, useUpdateClientMilestoneMutation } from "@/features/api/apiSlice";
+import { useGetContractMeetingsQuery, useCreateMeetingMutation } from "@/features/api/meetingsApi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast-provider";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
 export default function ContractDetailPage() {
@@ -91,12 +96,38 @@ export default function ContractDetailPage() {
     : Boolean((freelancerData as { previous?: string | null } | undefined)?.previous);
   const freelancerTotalPages = Math.max(1, Math.ceil(freelancerCount / Math.max(pageSize, 1)));
 
+  const [milestoneDetailModalOpen, setMilestoneDetailModalOpen] = useState(false);
+  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
+  
+  // Meeting states
+  const [createMeetingModalOpen, setCreateMeetingModalOpen] = useState(false);
+  const [meetingsPage, setMeetingsPage] = useState(1);
+  const [meetingsPageSize] = useState(10);
+  const [meetingForm, setMeetingForm] = useState({
+    topic: "",
+    duration: 60,
+    start_date: "",
+    start_time: "",
+  });
+  const { showToast } = useToast();
+
   // Mutations
   const [createMilestone, { isLoading: isCreatingMilestone }] = useCreateMilestoneMutation();
   const [submitMilestoneWork, { isLoading: isSubmitting }] = useSubmitMilestoneWorkMutation();
   const [updateClientMilestone, { isLoading: isUpdatingClient }] = useUpdateClientMilestoneMutation();
-  const [milestoneDetailModalOpen, setMilestoneDetailModalOpen] = useState(false);
-  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
+  const [createMeeting, { isLoading: isCreatingMeeting }] = useCreateMeetingMutation();
+  
+  // Fetch meetings for this contract
+  const { data: contractMeetingsData, isLoading: isLoadingMeetings } = useGetContractMeetingsQuery(
+    { contractId: params.id as string, page: meetingsPage, page_size: meetingsPageSize },
+    { skip: !params.id }
+  );
+  
+  const contractMeetings = contractMeetingsData?.results || [];
+  const meetingsTotalCount = contractMeetingsData?.count || 0;
+  const meetingsHasNext = !!contractMeetingsData?.next;
+  const meetingsHasPrevious = !!contractMeetingsData?.previous;
+  const meetingsTotalPages = Math.ceil(meetingsTotalCount / meetingsPageSize);
 
   useEffect(() => {
     setMounted(true);
@@ -259,6 +290,29 @@ export default function ContractDetailPage() {
   const handleCreateMilestone = () => {
     if (!isClient) return;
     setMilestoneModalOpen(true);
+  };
+
+  const handleCreateMeeting = async () => {
+    if (!meetingForm.topic || !meetingForm.start_date || !meetingForm.start_time) {
+      showToast({ type: "error", message: "Please fill in all required fields" });
+      return;
+    }
+
+    try {
+      await createMeeting({
+        ...meetingForm,
+        contract: params.id as string,
+      }).unwrap();
+
+      showToast({ type: "success", message: "Meeting created successfully!" });
+      setCreateMeetingModalOpen(false);
+      setMeetingForm({ topic: "", duration: 60, start_date: "", start_time: "" });
+    } catch (error: any) {
+      showToast({
+        type: "error",
+        message: error?.data?.message || "Failed to create meeting"
+      });
+    }
   };
 
   const handleCloseMilestoneModal = () => {
@@ -595,6 +649,109 @@ export default function ContractDetailPage() {
                     <Button onClick={handleCreateMilestone}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create First Milestone
+                    </Button>
+                  )}
+                </div>
+              )}
+            </Card>
+
+            {/* Meetings Section */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Meetings</h2>
+                {isClient && contract.status === 'active' && (
+                  <Button size="sm" onClick={() => setCreateMeetingModalOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Meeting
+                  </Button>
+                )}
+              </div>
+              {isLoadingMeetings ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-sm text-muted-foreground">Loading meetings...</span>
+                </div>
+              ) : contractMeetings.length > 0 ? (
+                <div className="space-y-3">
+                  {contractMeetings.map((meeting) => {
+                    const formatDateTime = (date: string, time: string) => {
+                      const dateObj = new Date(`${date}T${time}`);
+                      return dateObj.toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      });
+                    };
+                    
+                    return (
+                      <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/30 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Video className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <h3 className="font-medium text-sm truncate">{meeting.topic}</h3>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground ml-6">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {formatDateTime(meeting.start_date, meeting.start_time)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {meeting.duration} min
+                            </span>
+                            <span className="text-xs">Room: {meeting.room_name}</span>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => router.push(`/meeting/${meeting.room_name}`)}
+                          className="ml-4 shrink-0"
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Join
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  {/* Pagination for Meetings */}
+                  {meetingsTotalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 pt-4 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setMeetingsPage(prev => Math.max(1, prev - 1))}
+                        disabled={!meetingsHasPrevious}
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        Previous
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        Page {meetingsPage} of {meetingsTotalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setMeetingsPage(prev => Math.min(meetingsTotalPages, prev + 1))}
+                        disabled={!meetingsHasNext}
+                      >
+                        Next
+                        <ArrowLeft className="w-4 h-4 ml-1 rotate-180" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Video className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Meetings Yet</h3>
+                  <p className="text-muted-foreground mb-4">No meetings have been scheduled for this contract yet.</p>
+                  {isClient && contract.status === 'active' && (
+                    <Button onClick={() => setCreateMeetingModalOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create First Meeting
                     </Button>
                   )}
                 </div>
@@ -1053,6 +1210,81 @@ export default function ContractDetailPage() {
           </Card>
         </div>
       )}
+
+      {/* Create Meeting Modal */}
+      <Dialog open={createMeetingModalOpen} onOpenChange={setCreateMeetingModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New Meeting</DialogTitle>
+            <DialogDescription>
+              Schedule a meeting for this contract
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="meeting-topic">Meeting Topic *</Label>
+              <Input
+                id="meeting-topic"
+                placeholder="e.g., Project Discussion"
+                value={meetingForm.topic}
+                onChange={(e) => setMeetingForm({ ...meetingForm, topic: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="meeting-start_date">Start Date *</Label>
+                <Input
+                  id="meeting-start_date"
+                  type="date"
+                  value={meetingForm.start_date}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, start_date: e.target.value })}
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="meeting-start_time">Start Time *</Label>
+                <Input
+                  id="meeting-start_time"
+                  type="time"
+                  value={meetingForm.start_time}
+                  onChange={(e) => setMeetingForm({ ...meetingForm, start_time: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="meeting-duration">Duration (minutes)</Label>
+              <Input
+                id="meeting-duration"
+                type="number"
+                min="1"
+                value={meetingForm.duration}
+                onChange={(e) => setMeetingForm({ ...meetingForm, duration: parseInt(e.target.value) || 60 })}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCreateMeetingModalOpen(false);
+                  setMeetingForm({ topic: "", duration: 60, start_date: "", start_time: "" });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreateMeeting} disabled={isCreatingMeeting}>
+                {isCreatingMeeting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  "Create Meeting"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

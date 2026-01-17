@@ -8,7 +8,7 @@ import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/hooks/useAuth";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
-import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi, ChevronDown, FileText, Briefcase } from "lucide-react";
+import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi, ChevronDown, FileText, Briefcase, Video } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -98,6 +98,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           <nav className="flex items-center gap-6">
             <Link href="/dashboard" className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
+            {isAuthenticated && (
+              <Link href="/meetings" className={cn("hover:text-primary", isActive("/meetings") && "text-primary font-medium")}>Meetings</Link>
+            )}
             {user?.role === "client" && (
               <>
                 <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>

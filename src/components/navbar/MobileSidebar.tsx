@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import { Briefcase, Home, LogOut, MessageSquare, UserCircle2, FileText } from "lucide-react";
+import { Briefcase, Home, LogOut, MessageSquare, UserCircle2, FileText, Video } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 
@@ -109,6 +109,13 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
                     </Link>
                   </>
                 )}
+                <Link
+                  href="/meetings"
+                  className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                  onClick={() => setOpen(false)}
+                >
+                  <Video className="w-5 h-5" /> Meetings
+                </Link>
                 <Link
                   href="/messages"
                   className="flex items-center gap-3 text-base font-medium hover:text-primary"
