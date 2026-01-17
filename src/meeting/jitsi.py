@@ -4,7 +4,7 @@ import jwt
 from django.conf import settings
 
 
-def generate_jitsi_token(user, room):
+def generate_jitsi_token(user, room, is_creator=False):
     payload = {
         "iss": settings.JITSI_ISSUER,
         "aud": settings.JITSI_AUDIENCE,
@@ -15,7 +15,7 @@ def generate_jitsi_token(user, room):
             "user": {
                 "name": user.get_full_name(),
                 "email": user.email,
-                "moderator": False,
+                "moderator": is_creator,
             }
         },
         "features": {"recording": True},

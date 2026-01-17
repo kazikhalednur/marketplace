@@ -9,6 +9,11 @@ from jobs.models import Job
 from .proposal import Proposal
 
 
+class ContractManager(models.Manager):
+    def active(self, **kwargs):
+        return self.filter(status=Contract.ContractStatus.ACTIVE, **kwargs)
+
+
 class Contract(models.Model):
     class ContractStatus(models.TextChoices):
         ACTIVE = "active", "Active"
@@ -40,6 +45,8 @@ class Contract(models.Model):
         max_length=20, choices=ContractStatus.choices, default=ContractStatus.ACTIVE
     )
     history = HistoricalRecords()
+
+    objects = ContractManager()
 
     def __str__(self):
         return f"Contract for {self.job.title} between {self.client_profile.client.username} and {self.freelancer_profile.freelancer.username}"  # noqa: E501

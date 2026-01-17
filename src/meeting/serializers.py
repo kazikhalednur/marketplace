@@ -1,7 +1,9 @@
 from django.conf import settings
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from accounts.models import Client, Freelancer
+from biding.models import Contract
 
 from .models import Meeting, MeetingHistory
 
@@ -35,8 +37,9 @@ class ClientSerializer(serializers.ModelSerializer):
 class MeetingSerializer(serializers.ModelSerializer):
     """Serializer for Meeting model"""
 
-    guest = FreelancerSerializer(read_only=True)
-    guest_username = serializers.CharField(write_only=True, required=True)
+    contract = serializers.PrimaryKeyRelatedField(
+        queryset=Contract.objects.active(), write_only=True
+    )
 
     class Meta:
         model = Meeting
@@ -47,31 +50,32 @@ class MeetingSerializer(serializers.ModelSerializer):
             "duration",
             "start_date",
             "start_time",
-            "guest",
-            "guest_username",
+            "contract",
             "created_at",
             "updated_at",
         ]
         read_only_fields = ["id", "room_name", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        guest_username = validated_data.pop("guest_username")
-        try:
-            guest = Freelancer.objects.get(username=guest_username)
-        except Freelancer.DoesNotExist:
-            raise serializers.ValidationError({"username": "Freelancer not found"})
+        request = self.context.get("request")
+        contract = validated_data["contract"]
 
-        validated_data["guest"] = guest
+        if contract.client_profile != request.user.client_profile:
+            raise serializers.ValidationError(
+                {
+                    "contract": "You are not authorized to create a meeting for this contract"  # noqa: E501
+                }
+            )
+
         return super().create(validated_data)
 
 
 class MeetingListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing meetings"""
 
-    created_by_name = serializers.CharField(
-        source="created_by.get_full_name", read_only=True
-    )
-    guest_name = serializers.CharField(source="guest.get_full_name", read_only=True)
+    created_by = serializers.SerializerMethodField()
+    guest = serializers.SerializerMethodField()
+    job_title = serializers.CharField(source="contract.job.title", read_only=True)
 
     class Meta:
         model = Meeting
@@ -82,10 +86,19 @@ class MeetingListSerializer(serializers.ModelSerializer):
             "duration",
             "start_date",
             "start_time",
-            "created_by_name",
-            "guest_name",
+            "created_by",
+            "guest",
+            "job_title",
             "created_at",
         ]
+
+    @extend_schema_field(serializers.CharField())
+    def get_created_by(self, obj):
+        return obj.contract.client_profile.client.get_full_name()
+
+    @extend_schema_field(serializers.CharField())
+    def get_guest(self, obj):
+        return obj.contract.freelancer_profile.freelancer.get_full_name()
 
 
 class MeetingHistorySerializer(serializers.ModelSerializer):

@@ -1,11 +1,12 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import Client, User
-from accounts.permissions import IsClient, IsFreelancer
+from accounts.models import User
+from accounts.permissions import IsClient
 from biding.models.contract import Contract
 
 from .jitsi import generate_jitsi_token
@@ -19,6 +20,12 @@ from .serializers import (
 )
 
 
+class MeetingPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class CreateMeetingView(CreateAPIView):
     """
     Create a new meeting.
@@ -29,15 +36,14 @@ class CreateMeetingView(CreateAPIView):
     serializer_class = MeetingSerializer
 
     def get_queryset(self):
-        return (
-            Meeting.objects.filter(created_by=self.request.user)
-            .select_related("created_by", "guest")
-            .order_by("-created_at")
-        )
+        return Meeting.objects.filter(
+            contract__client_profile__client=self.request.user
+        ).order_by("-created_at")
 
-    def perform_create(self, serializer):
-        client = Client.objects.get(id=self.request.user.id)
-        serializer.save(created_by=client)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
 
 
 class JoinMeetingView(APIView):
@@ -50,17 +56,15 @@ class JoinMeetingView(APIView):
 
     def get(self, request, room_name):
         try:
-            meeting = Meeting.objects.select_related("created_by", "guest").get(
-                room_name=room_name
-            )
+            meeting = Meeting.objects.get(room_name=room_name)
         except Meeting.DoesNotExist:
             return Response(
                 {"error": "Meeting not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
         user = request.user
-        is_creator = meeting.created_by.id == user.id
-        is_guest = meeting.guest.id == user.id
+        is_creator = meeting.contract.client_profile.client.id == user.id
+        is_guest = meeting.contract.freelancer_profile.freelancer.id == user.id
 
         if not (is_creator or is_guest):
             return Response(
@@ -68,7 +72,7 @@ class JoinMeetingView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        token = generate_jitsi_token(user, meeting.room_name)
+        token = generate_jitsi_token(user, meeting.room_name, is_creator)
 
         MeetingHistory.objects.create(meeting=meeting, user=user)
 
@@ -85,6 +89,7 @@ class MeetingHistoryView(ListAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = MeetingHistorySerializer
+    pagination_class = MeetingPagination
 
     def get_queryset(self):
         return (
@@ -101,39 +106,25 @@ class MyMeetingsView(ListAPIView):
 
     permission_classes = [IsAuthenticated]
     serializer_class = MeetingListSerializer
+    pagination_class = MeetingPagination
 
     def get_queryset(self):
         user = self.request.user
+
         if user.role == User.UserRole.CLIENT:
-            return (
-                Meeting.objects.filter(created_by__id=user.id)
-                .select_related("created_by", "guest")
-                .order_by("-created_at")
-            )
+            queryset = Meeting.objects.filter(
+                contract__client_profile__client__id=user.id
+            ).order_by("-created_at")
+            return queryset
+
         elif user.role == User.UserRole.FREELANCER:
-            return (
-                Meeting.objects.filter(guest__id=user.id)
-                .select_related("created_by", "guest")
-                .order_by("-created_at")
-            )
+            queryset = Meeting.objects.filter(
+                contract__freelancer_profile__freelancer__id=user.id
+            ).order_by("-created_at")
+            return queryset
+
         else:
             return Meeting.objects.none()
-
-
-class GuestMeetingsView(ListAPIView):
-    """
-    List all meetings where the authenticated freelancer is a guest.
-    """
-
-    permission_classes = [IsFreelancer]
-    serializer_class = MeetingListSerializer
-
-    def get_queryset(self):
-        return (
-            Meeting.objects.filter(guest__id=self.request.user.id)
-            .select_related("created_by", "guest")
-            .order_by("-created_at")
-        )
 
 
 class FreelancerListView(APIView):
@@ -171,3 +162,22 @@ class FreelancerListView(APIView):
 
         serializer = ContractFreelancerSerializer(freelancers_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ContractMeetingListView(ListAPIView):
+    """
+    List all meetings for a specific contract.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = MeetingListSerializer
+    pagination_class = MeetingPagination
+
+    def get_queryset(self):
+        contract_id = self.kwargs.get("contract_id")
+        return Meeting.objects.filter(contract__id=contract_id).order_by("-created_at")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
