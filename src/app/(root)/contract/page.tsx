@@ -729,8 +729,9 @@ export default function ContractPage() {
               <DialogTitle>Create New Meeting</DialogTitle>
               <DialogDescription>
                 Schedule a meeting with{" "}
-                {selectedContract?.freelancer_profile?.full_name ||
-                  "the freelancer"}
+                {selectedContract && 'freelancer_profile' in selectedContract
+                  ? (selectedContract as Contract).freelancer_profile?.full_name || "the freelancer"
+                  : "the freelancer"}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
