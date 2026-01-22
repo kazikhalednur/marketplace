@@ -1,0 +1,4 @@
+secrets
+minio/**
+!minio/config
+.env
