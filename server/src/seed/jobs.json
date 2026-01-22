@@ -1,0 +1,1445 @@
+[
+    {
+        "title": "Build E-Commerce Website with React",
+        "description": "Looking for an experienced React developer to build a modern e-commerce website with shopping cart, payment integration, and admin dashboard.",
+        "category": "Web Development",
+        "skills": [
+            "React",
+            "Node.js",
+            "JavaScript"
+        ],
+        "tags": [
+            "ecommerce",
+            "react",
+            "frontend"
+        ],
+        "min_budget": 5000,
+        "max_budget": 8000,
+        "is_fixed": true,
+        "duration": "2-3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 15,
+        "created_by": "techcorp",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Mobile App Development with Flutter",
+        "description": "Need a Flutter developer to create a cross-platform mobile app for food delivery service.",
+        "category": "Mobile Development",
+        "skills": [
+            "Flutter",
+            "Kotlin",
+            "Swift"
+        ],
+        "tags": [
+            "mobile",
+            "flutter",
+            "cross-platform"
+        ],
+        "min_budget": 6000,
+        "max_budget": 10000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "food_delivery",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Python Django Backend API Development",
+        "description": "Seeking a Django expert to develop RESTful APIs for our healthcare platform.",
+        "category": "Web Development",
+        "skills": [
+            "Django",
+            "Python",
+            "SQL"
+        ],
+        "tags": [
+            "backend",
+            "api",
+            "django"
+        ],
+        "min_budget": 4000,
+        "max_budget": 7000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 12,
+        "created_by": "healthcare_tech",
+        "status": "in_progress",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "UI/UX Design for Mobile App",
+        "description": "Looking for a talented UI/UX designer to create modern and intuitive designs for our travel app.",
+        "category": "UI/UX Design",
+        "skills": [
+            "User Interface Design",
+            "Figma",
+            "Prototyping"
+        ],
+        "tags": [
+            "design",
+            "ui",
+            "ux"
+        ],
+        "min_budget": 2000,
+        "max_budget": 3500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "travel_tech",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "DevOps Engineer for AWS Infrastructure",
+        "description": "Need an experienced DevOps engineer to set up and manage AWS infrastructure with Docker and Kubernetes.",
+        "category": "DevOps & Cloud",
+        "skills": [
+            "AWS",
+            "Docker",
+            "Kubernetes"
+        ],
+        "tags": [
+            "devops",
+            "aws",
+            "cloud"
+        ],
+        "min_budget": 30,
+        "max_budget": 50,
+        "is_fixed": false,
+        "min_hourly_rate": 30,
+        "max_hourly_rate": 50,
+        "duration": "3-6 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "cloud_services",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Machine Learning Model Development",
+        "description": "Looking for ML engineer to develop and train machine learning models for image classification.",
+        "category": "AI & Machine Learning",
+        "skills": [
+            "TensorFlow",
+            "PyTorch",
+            "Python"
+        ],
+        "tags": [
+            "ml",
+            "ai",
+            "deep-learning"
+        ],
+        "min_budget": 8000,
+        "max_budget": 12000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 10,
+        "created_by": "ai_research",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Content Writer for Tech Blog",
+        "description": "Seeking experienced tech writer to create engaging blog posts about software development and technology trends.",
+        "category": "Content Writing",
+        "skills": [
+            "Blog Writing",
+            "Technical Writing",
+            "SEO Writing"
+        ],
+        "tags": [
+            "writing",
+            "content",
+            "blog"
+        ],
+        "min_budget": 15,
+        "max_budget": 25,
+        "is_fixed": false,
+        "min_hourly_rate": 15,
+        "max_hourly_rate": 25,
+        "duration": "Ongoing",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "media_co",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Video Editing for YouTube Channel",
+        "description": "Need a video editor to edit educational videos for our YouTube channel.",
+        "category": "Video & Animation",
+        "skills": [
+            "Video Editing",
+            "Adobe Premiere Pro",
+            "After Effects"
+        ],
+        "tags": [
+            "video",
+            "editing",
+            "youtube"
+        ],
+        "min_budget": 500,
+        "max_budget": 1000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "entry",
+        "min_proposal_count": 2,
+        "max_proposal_count": 20,
+        "created_by": "edu_platform",
+        "status": "completed",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "SEO Optimization for E-Commerce Site",
+        "description": "Looking for SEO expert to optimize our e-commerce website for better search engine rankings.",
+        "category": "Digital Marketing",
+        "skills": [
+            "SEO",
+            "Google Ads",
+            "Social Media Marketing"
+        ],
+        "tags": [
+            "seo",
+            "marketing",
+            "optimization"
+        ],
+        "min_budget": 2000,
+        "max_budget": 4000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "ecommerce_store",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": false
+    },
+    {
+        "title": "iOS App Development",
+        "description": "Need an iOS developer to build a fitness tracking app with HealthKit integration.",
+        "category": "Mobile Development",
+        "skills": [
+            "Swift",
+            "iOS Development"
+        ],
+        "tags": [
+            "ios",
+            "mobile",
+            "swift"
+        ],
+        "min_budget": 7000,
+        "max_budget": 10000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "sports_platform",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Data Analysis and Visualization",
+        "description": "Looking for data analyst to analyze sales data and create interactive dashboards using Tableau.",
+        "category": "Data Science & Analytics",
+        "skills": [
+            "Tableau",
+            "SQL",
+            "Python Data Analysis"
+        ],
+        "tags": [
+            "data",
+            "analytics",
+            "visualization"
+        ],
+        "min_budget": 3000,
+        "max_budget": 5000,
+        "is_fixed": true,
+        "duration": "1-2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "data_analytics",
+        "status": "in_progress",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Logo Design for Startup",
+        "description": "Need a creative designer to create a modern logo and brand identity for our tech startup.",
+        "category": "Graphic Design",
+        "skills": [
+            "Logo Design",
+            "Adobe Illustrator",
+            "Brand Identity"
+        ],
+        "tags": [
+            "logo",
+            "design",
+            "branding"
+        ],
+        "min_budget": 500,
+        "max_budget": 1500,
+        "is_fixed": true,
+        "duration": "2 weeks",
+        "experience_level": "intermediate",
+        "min_proposal_count": 3,
+        "max_proposal_count": 20,
+        "created_by": "startup_inc",
+        "status": "completed",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Full Stack Web Application",
+        "description": "Seeking full stack developer to build a SaaS application with React frontend and Node.js backend.",
+        "category": "Web Development",
+        "skills": [
+            "React",
+            "Node.js",
+            "JavaScript",
+            "SQL"
+        ],
+        "tags": [
+            "fullstack",
+            "saas",
+            "web"
+        ],
+        "min_budget": 10000,
+        "max_budget": 15000,
+        "is_fixed": true,
+        "duration": "4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 10,
+        "created_by": "software_house",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Android App with Kotlin",
+        "description": "Need Android developer to create a social networking app using Kotlin.",
+        "category": "Mobile Development",
+        "skills": [
+            "Kotlin",
+            "Android Development"
+        ],
+        "tags": [
+            "android",
+            "kotlin",
+            "mobile"
+        ],
+        "min_budget": 6000,
+        "max_budget": 9000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "social_network",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "WordPress Website Development",
+        "description": "Looking for WordPress developer to create a business website with custom theme.",
+        "category": "Web Development",
+        "skills": [
+            "PHP",
+            "HTML5",
+            "CSS3"
+        ],
+        "tags": [
+            "wordpress",
+            "website",
+            "cms"
+        ],
+        "min_budget": 2000,
+        "max_budget": 3500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "consulting_firm",
+        "status": "closed",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "3D Animation for Product Demo",
+        "description": "Need 3D animator to create product demonstration video.",
+        "category": "Video & Animation",
+        "skills": [
+            "3D Animation",
+            "Motion Graphics"
+        ],
+        "tags": [
+            "3d",
+            "animation",
+            "product"
+        ],
+        "min_budget": 2500,
+        "max_budget": 4000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "retail_biz",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Social Media Marketing Campaign",
+        "description": "Looking for social media expert to manage our marketing campaigns across platforms.",
+        "category": "Digital Marketing",
+        "skills": [
+            "Social Media Marketing",
+            "Facebook Ads",
+            "Email Marketing"
+        ],
+        "tags": [
+            "social-media",
+            "marketing",
+            "campaign"
+        ],
+        "min_budget": 20,
+        "max_budget": 35,
+        "is_fixed": false,
+        "min_hourly_rate": 20,
+        "max_hourly_rate": 35,
+        "duration": "3 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "marketing_hub",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Laravel E-Commerce Platform",
+        "description": "Need Laravel developer to build a multi-vendor e-commerce platform.",
+        "category": "Web Development",
+        "skills": [
+            "Laravel",
+            "PHP",
+            "SQL"
+        ],
+        "tags": [
+            "laravel",
+            "ecommerce",
+            "php"
+        ],
+        "min_budget": 8000,
+        "max_budget": 12000,
+        "is_fixed": true,
+        "duration": "3-4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 10,
+        "created_by": "fashion_brand",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Blockchain Smart Contract Development",
+        "description": "Looking for blockchain developer to create smart contracts for our crypto platform.",
+        "category": "Web Development",
+        "skills": [
+            "JavaScript",
+            "TypeScript"
+        ],
+        "tags": [
+            "blockchain",
+            "crypto",
+            "smart-contracts"
+        ],
+        "min_budget": 10000,
+        "max_budget": 15000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "crypto_exchange",
+        "status": "in_progress",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Copywriting for Marketing Materials",
+        "description": "Need creative copywriter to write compelling marketing copy for our campaigns.",
+        "category": "Content Writing",
+        "skills": [
+            "Copywriting",
+            "Creative Writing"
+        ],
+        "tags": [
+            "copywriting",
+            "marketing",
+            "content"
+        ],
+        "min_budget": 1000,
+        "max_budget": 2000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 3,
+        "max_proposal_count": 20,
+        "created_by": "digital_agency",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Vue.js Frontend Development",
+        "description": "Looking for Vue.js developer to build responsive frontend for our web application.",
+        "category": "Web Development",
+        "skills": [
+            "Vue.js",
+            "JavaScript",
+            "CSS3"
+        ],
+        "tags": [
+            "vue",
+            "frontend",
+            "web"
+        ],
+        "min_budget": 4000,
+        "max_budget": 6000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "fintech_sol",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Business Strategy Consulting",
+        "description": "Need business consultant to help develop growth strategy for our startup.",
+        "category": "Business Consulting",
+        "skills": [
+            "Business Strategy",
+            "Market Research"
+        ],
+        "tags": [
+            "consulting",
+            "strategy",
+            "business"
+        ],
+        "min_budget": 5000,
+        "max_budget": 8000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "startup_inc",
+        "status": "completed",
+        "connect": 2,
+        "privacy": "private",
+        "is_payment_verified": true
+    },
+    {
+        "title": "CI/CD Pipeline Setup",
+        "description": "Looking for DevOps engineer to set up CI/CD pipeline using Jenkins and Docker.",
+        "category": "DevOps & Cloud",
+        "skills": [
+            "Jenkins",
+            "Docker",
+            "CI/CD"
+        ],
+        "tags": [
+            "devops",
+            "cicd",
+            "automation"
+        ],
+        "min_budget": 3000,
+        "max_budget": 5000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "software_house",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Natural Language Processing Project",
+        "description": "Need NLP expert to develop text classification and sentiment analysis system.",
+        "category": "AI & Machine Learning",
+        "skills": [
+            "Natural Language Processing",
+            "Python",
+            "TensorFlow"
+        ],
+        "tags": [
+            "nlp",
+            "ai",
+            "ml"
+        ],
+        "min_budget": 7000,
+        "max_budget": 10000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "ai_research",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Graphic Design for Social Media",
+        "description": "Looking for graphic designer to create social media graphics and posts.",
+        "category": "Graphic Design",
+        "skills": [
+            "Adobe Photoshop",
+            "Adobe Illustrator"
+        ],
+        "tags": [
+            "design",
+            "social-media",
+            "graphics"
+        ],
+        "min_budget": 800,
+        "max_budget": 1500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "entry",
+        "min_proposal_count": 3,
+        "max_proposal_count": 25,
+        "created_by": "marketing_hub",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "React Native Mobile App",
+        "description": "Need React Native developer to build cross-platform mobile app for music streaming.",
+        "category": "Mobile Development",
+        "skills": [
+            "React Native",
+            "JavaScript",
+            "React"
+        ],
+        "tags": [
+            "react-native",
+            "mobile",
+            "cross-platform"
+        ],
+        "min_budget": 7000,
+        "max_budget": 11000,
+        "is_fixed": true,
+        "duration": "3-4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "music_streaming",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Azure Cloud Migration",
+        "description": "Looking for Azure expert to migrate our infrastructure to Azure cloud.",
+        "category": "DevOps & Cloud",
+        "skills": [
+            "Azure",
+            "Terraform",
+            "Docker"
+        ],
+        "tags": [
+            "azure",
+            "cloud",
+            "migration"
+        ],
+        "min_budget": 8000,
+        "max_budget": 12000,
+        "is_fixed": true,
+        "duration": "2-3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "insurance_tech",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Financial Analysis and Reporting",
+        "description": "Need financial analyst to analyze data and create comprehensive reports.",
+        "category": "Accounting & Finance",
+        "skills": [
+            "Financial Analysis",
+            "Bookkeeping"
+        ],
+        "tags": [
+            "finance",
+            "analysis",
+            "reporting"
+        ],
+        "min_budget": 2500,
+        "max_budget": 4000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "fintech_sol",
+        "status": "open",
+        "connect": 2,
+        "privacy": "private",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Angular Web Application",
+        "description": "Looking for Angular developer to build enterprise web application.",
+        "category": "Web Development",
+        "skills": [
+            "Angular",
+            "TypeScript",
+            "HTML5"
+        ],
+        "tags": [
+            "angular",
+            "frontend",
+            "web"
+        ],
+        "min_budget": 6000,
+        "max_budget": 9000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "hr_solutions",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": false
+    },
+    {
+        "title": "Computer Vision Application",
+        "description": "Need computer vision expert to develop object detection system.",
+        "category": "AI & Machine Learning",
+        "skills": [
+            "Computer Vision",
+            "PyTorch",
+            "Python"
+        ],
+        "tags": [
+            "cv",
+            "ai",
+            "object-detection"
+        ],
+        "min_budget": 9000,
+        "max_budget": 13000,
+        "is_fixed": true,
+        "duration": "3-4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "ai_research",
+        "status": "in_progress",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "UX Research and Testing",
+        "description": "Looking for UX researcher to conduct user research and usability testing.",
+        "category": "UI/UX Design",
+        "skills": [
+            "User Experience Design",
+            "Wireframing"
+        ],
+        "tags": [
+            "ux",
+            "research",
+            "testing"
+        ],
+        "min_budget": 2000,
+        "max_budget": 3500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "design_studio",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Google Cloud Platform Setup",
+        "description": "Need GCP expert to set up cloud infrastructure and services.",
+        "category": "DevOps & Cloud",
+        "skills": [
+            "Google Cloud Platform",
+            "Kubernetes",
+            "Docker"
+        ],
+        "tags": [
+            "gcp",
+            "cloud",
+            "infrastructure"
+        ],
+        "min_budget": 5000,
+        "max_budget": 8000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "cloud_services",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Technical Documentation Writing",
+        "description": "Looking for technical writer to create API documentation and user guides.",
+        "category": "Content Writing",
+        "skills": [
+            "Technical Writing"
+        ],
+        "tags": [
+            "documentation",
+            "technical",
+            "writing"
+        ],
+        "min_budget": 1500,
+        "max_budget": 2500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "software_house",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Data Science Project",
+        "description": "Need data scientist to analyze customer data and build predictive models.",
+        "category": "Data Science & Analytics",
+        "skills": [
+            "Python Data Analysis",
+            "Scikit-learn",
+            "Pandas"
+        ],
+        "tags": [
+            "data-science",
+            "ml",
+            "analytics"
+        ],
+        "min_budget": 6000,
+        "max_budget": 9000,
+        "is_fixed": true,
+        "duration": "2-3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "data_analytics",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Motion Graphics Video",
+        "description": "Looking for motion graphics designer to create explainer video.",
+        "category": "Video & Animation",
+        "skills": [
+            "Motion Graphics",
+            "After Effects"
+        ],
+        "tags": [
+            "motion-graphics",
+            "video",
+            "animation"
+        ],
+        "min_budget": 1500,
+        "max_budget": 2500,
+        "is_fixed": true,
+        "duration": "2 weeks",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "startup_inc",
+        "status": "completed",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Flask API Development",
+        "description": "Need Flask developer to build RESTful API for our application.",
+        "category": "Web Development",
+        "skills": [
+            "Flask",
+            "Python",
+            "SQL"
+        ],
+        "tags": [
+            "flask",
+            "api",
+            "backend"
+        ],
+        "min_budget": 3000,
+        "max_budget": 5000,
+        "is_fixed": true,
+        "duration": "1-2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "mobile_apps",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Email Marketing Campaign",
+        "description": "Looking for email marketing expert to create and manage email campaigns.",
+        "category": "Digital Marketing",
+        "skills": [
+            "Email Marketing",
+            "Copywriting"
+        ],
+        "tags": [
+            "email",
+            "marketing",
+            "campaign"
+        ],
+        "min_budget": 1200,
+        "max_budget": 2000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "ecommerce_store",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": false
+    },
+    {
+        "title": "Desktop Application Development",
+        "description": "Need desktop developer to build cross-platform desktop app using Electron.",
+        "category": "Desktop Software Development",
+        "skills": [
+            "Electron",
+            "JavaScript",
+            "Node.js"
+        ],
+        "tags": [
+            "desktop",
+            "electron",
+            "cross-platform"
+        ],
+        "min_budget": 5000,
+        "max_budget": 8000,
+        "is_fixed": true,
+        "duration": "2-3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "software_house",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Power BI Dashboard Development",
+        "description": "Looking for Power BI expert to create interactive business dashboards.",
+        "category": "Data Science & Analytics",
+        "skills": [
+            "Power BI",
+            "SQL"
+        ],
+        "tags": [
+            "powerbi",
+            "dashboard",
+            "analytics"
+        ],
+        "min_budget": 2500,
+        "max_budget": 4000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "retail_biz",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Brand Identity Design",
+        "description": "Need designer to create complete brand identity including logo, colors, and guidelines.",
+        "category": "Graphic Design",
+        "skills": [
+            "Brand Identity",
+            "Logo Design",
+            "Adobe Illustrator"
+        ],
+        "tags": [
+            "branding",
+            "identity",
+            "design"
+        ],
+        "min_budget": 3000,
+        "max_budget": 5000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "expert",
+        "min_proposal_count": 3,
+        "max_proposal_count": 15,
+        "created_by": "fashion_brand",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Deep Learning Research",
+        "description": "Looking for deep learning researcher to work on neural network optimization.",
+        "category": "AI & Machine Learning",
+        "skills": [
+            "Deep Learning",
+            "TensorFlow",
+            "PyTorch"
+        ],
+        "tags": [
+            "deep-learning",
+            "research",
+            "ai"
+        ],
+        "min_budget": 10000,
+        "max_budget": 15000,
+        "is_fixed": true,
+        "duration": "4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 6,
+        "created_by": "ai_research",
+        "status": "open",
+        "connect": 3,
+        "privacy": "private",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Ionic Mobile App Development",
+        "description": "Need Ionic developer to build hybrid mobile app for our service.",
+        "category": "Mobile Development",
+        "skills": [
+            "Ionic",
+            "Angular",
+            "TypeScript"
+        ],
+        "tags": [
+            "ionic",
+            "mobile",
+            "hybrid"
+        ],
+        "min_budget": 4000,
+        "max_budget": 6000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "travel_tech",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Project Management Consulting",
+        "description": "Looking for project manager to help manage our software development projects.",
+        "category": "Business Consulting",
+        "skills": [
+            "Project Management"
+        ],
+        "tags": [
+            "pm",
+            "consulting",
+            "management"
+        ],
+        "min_budget": 40,
+        "max_budget": 60,
+        "is_fixed": false,
+        "min_hourly_rate": 40,
+        "max_hourly_rate": 60,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "software_house",
+        "status": "in_progress",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Ruby on Rails Development",
+        "description": "Need Rails developer to build web application with complex business logic.",
+        "category": "Web Development",
+        "skills": [
+            "Ruby on Rails",
+            "SQL"
+        ],
+        "tags": [
+            "rails",
+            "ruby",
+            "backend"
+        ],
+        "min_budget": 7000,
+        "max_budget": 10000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "startup_inc",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "R Programming for Statistical Analysis",
+        "description": "Looking for R programmer to perform statistical analysis on research data.",
+        "category": "Data Science & Analytics",
+        "skills": [
+            "R Programming",
+            "SQL"
+        ],
+        "tags": [
+            "r",
+            "statistics",
+            "analysis"
+        ],
+        "min_budget": 2000,
+        "max_budget": 3500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "healthcare_tech",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Adobe XD UI Design",
+        "description": "Need UI designer to create modern interface designs using Adobe XD.",
+        "category": "UI/UX Design",
+        "skills": [
+            "Adobe XD",
+            "User Interface Design"
+        ],
+        "tags": [
+            "ui",
+            "design",
+            "adobe-xd"
+        ],
+        "min_budget": 1800,
+        "max_budget": 3000,
+        "is_fixed": true,
+        "duration": "3 weeks",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "mobile_apps",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "C++ Desktop Software",
+        "description": "Looking for C++ developer to build high-performance desktop application.",
+        "category": "Desktop Software Development",
+        "skills": [
+            "C++",
+            "Qt"
+        ],
+        "tags": [
+            "cpp",
+            "desktop",
+            "software"
+        ],
+        "min_budget": 8000,
+        "max_budget": 12000,
+        "is_fixed": true,
+        "duration": "3-4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 8,
+        "created_by": "gaming_studio",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": ".NET Application Development",
+        "description": "Need .NET developer to build enterprise application with C#.",
+        "category": "Desktop Software Development",
+        "skills": [
+            ".NET",
+            "C#",
+            "SQL"
+        ],
+        "tags": [
+            "dotnet",
+            "csharp",
+            "enterprise"
+        ],
+        "min_budget": 7000,
+        "max_budget": 10000,
+        "is_fixed": true,
+        "duration": "3 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "hr_solutions",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": false
+    },
+    {
+        "title": "Sketch Design for Website",
+        "description": "Looking for designer to create website mockups using Sketch.",
+        "category": "Graphic Design",
+        "skills": [
+            "Sketch",
+            "User Interface Design"
+        ],
+        "tags": [
+            "sketch",
+            "design",
+            "website"
+        ],
+        "min_budget": 1500,
+        "max_budget": 2500,
+        "is_fixed": true,
+        "duration": "2 weeks",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 15,
+        "created_by": "design_studio",
+        "status": "completed",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Java Enterprise Application",
+        "description": "Need Java developer to build enterprise-level application.",
+        "category": "Desktop Software Development",
+        "skills": [
+            "Java",
+            "SQL"
+        ],
+        "tags": [
+            "java",
+            "enterprise",
+            "backend"
+        ],
+        "min_budget": 8000,
+        "max_budget": 12000,
+        "is_fixed": true,
+        "duration": "4 months",
+        "experience_level": "expert",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "legal_tech",
+        "status": "open",
+        "connect": 3,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "NumPy Data Processing",
+        "description": "Looking for Python developer to process large datasets using NumPy.",
+        "category": "Data Science & Analytics",
+        "skills": [
+            "NumPy",
+            "Python Data Analysis",
+            "Pandas"
+        ],
+        "tags": [
+            "numpy",
+            "python",
+            "data"
+        ],
+        "min_budget": 2000,
+        "max_budget": 3500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 12,
+        "created_by": "data_analytics",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Scikit-learn ML Models",
+        "description": "Need ML engineer to build classification models using scikit-learn.",
+        "category": "AI & Machine Learning",
+        "skills": [
+            "Scikit-learn",
+            "Python",
+            "Python Data Analysis"
+        ],
+        "tags": [
+            "ml",
+            "scikit-learn",
+            "classification"
+        ],
+        "min_budget": 4000,
+        "max_budget": 6000,
+        "is_fixed": true,
+        "duration": "2 months",
+        "experience_level": "intermediate",
+        "min_proposal_count": 2,
+        "max_proposal_count": 10,
+        "created_by": "fintech_sol",
+        "status": "open",
+        "connect": 2,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "SEO Content Writing",
+        "description": "Looking for SEO writer to create optimized content for our website.",
+        "category": "Content Writing",
+        "skills": [
+            "SEO Writing",
+            "Blog Writing"
+        ],
+        "tags": [
+            "seo",
+            "content",
+            "writing"
+        ],
+        "min_budget": 800,
+        "max_budget": 1500,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "entry",
+        "min_proposal_count": 3,
+        "max_proposal_count": 20,
+        "created_by": "digital_agency",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    },
+    {
+        "title": "Creative Writing for Blog",
+        "description": "Need creative writer to write engaging stories and articles for our blog.",
+        "category": "Content Writing",
+        "skills": [
+            "Creative Writing",
+            "Blog Writing"
+        ],
+        "tags": [
+            "creative",
+            "writing",
+            "blog"
+        ],
+        "min_budget": 1000,
+        "max_budget": 2000,
+        "is_fixed": true,
+        "duration": "1 month",
+        "experience_level": "intermediate",
+        "min_proposal_count": 3,
+        "max_proposal_count": 18,
+        "created_by": "media_co",
+        "status": "open",
+        "connect": 1,
+        "privacy": "public",
+        "is_payment_verified": true
+    }
+]

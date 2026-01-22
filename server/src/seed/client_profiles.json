@@ -1,0 +1,212 @@
+[
+    {
+        "username": "techcorp",
+        "company_name": "Tech Corp Solutions",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Leading technology solutions provider"
+    },
+    {
+        "username": "startup_inc",
+        "company_name": "Startup Inc",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Innovative startup building the future"
+    },
+    {
+        "username": "digital_agency",
+        "company_name": "Digital Agency Pro",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Full-service digital marketing agency"
+    },
+    {
+        "username": "ecommerce_store",
+        "company_name": "E-Commerce Store",
+        "is_payment_verified": true,
+        "is_phone_verified": false,
+        "bio": "Online retail platform"
+    },
+    {
+        "username": "fintech_sol",
+        "company_name": "Fintech Solutions Ltd",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Financial technology innovations"
+    },
+    {
+        "username": "healthcare_tech",
+        "company_name": "Healthcare Tech",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Healthcare technology solutions"
+    },
+    {
+        "username": "edu_platform",
+        "company_name": "Education Platform",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Online learning platform"
+    },
+    {
+        "username": "media_co",
+        "company_name": "Media Company",
+        "is_payment_verified": true,
+        "is_phone_verified": false,
+        "bio": "Digital media and content creation"
+    },
+    {
+        "username": "retail_biz",
+        "company_name": "Retail Business Group",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Retail business solutions"
+    },
+    {
+        "username": "consulting_firm",
+        "company_name": "Consulting Firm LLC",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Business consulting services"
+    },
+    {
+        "username": "marketing_hub",
+        "company_name": "Marketing Hub",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Marketing and advertising agency"
+    },
+    {
+        "username": "software_house",
+        "company_name": "Software House",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Custom software development"
+    },
+    {
+        "username": "design_studio",
+        "company_name": "Design Studio",
+        "is_payment_verified": true,
+        "is_phone_verified": false,
+        "bio": "Creative design studio"
+    },
+    {
+        "username": "mobile_apps",
+        "company_name": "Mobile Apps Co",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Mobile application development"
+    },
+    {
+        "username": "cloud_services",
+        "company_name": "Cloud Services Inc",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Cloud infrastructure services"
+    },
+    {
+        "username": "ai_research",
+        "company_name": "AI Research Lab",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Artificial intelligence research"
+    },
+    {
+        "username": "data_analytics",
+        "company_name": "Data Analytics Corp",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Data analytics and insights"
+    },
+    {
+        "username": "gaming_studio",
+        "company_name": "Gaming Studio",
+        "is_payment_verified": true,
+        "is_phone_verified": false,
+        "bio": "Game development studio"
+    },
+    {
+        "username": "travel_tech",
+        "company_name": "Travel Tech",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Travel technology platform"
+    },
+    {
+        "username": "food_delivery",
+        "company_name": "Food Delivery Service",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Food delivery platform"
+    },
+    {
+        "username": "real_estate",
+        "company_name": "Real Estate Tech",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Real estate technology"
+    },
+    {
+        "username": "logistics_tech",
+        "company_name": "Logistics Tech",
+        "is_payment_verified": false,
+        "is_phone_verified": false,
+        "bio": "Logistics and supply chain"
+    },
+    {
+        "username": "fashion_brand",
+        "company_name": "Fashion Brand",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Fashion e-commerce brand"
+    },
+    {
+        "username": "sports_platform",
+        "company_name": "Sports Platform",
+        "is_payment_verified": true,
+        "is_phone_verified": false,
+        "bio": "Sports and fitness platform"
+    },
+    {
+        "username": "music_streaming",
+        "company_name": "Music Streaming",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Music streaming service"
+    },
+    {
+        "username": "social_network",
+        "company_name": "Social Network",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Social networking platform"
+    },
+    {
+        "username": "crypto_exchange",
+        "company_name": "Crypto Exchange",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Cryptocurrency exchange"
+    },
+    {
+        "username": "insurance_tech",
+        "company_name": "Insurance Tech",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Insurance technology"
+    },
+    {
+        "username": "hr_solutions",
+        "company_name": "HR Solutions",
+        "is_payment_verified": false,
+        "is_phone_verified": false,
+        "bio": "Human resources solutions"
+    },
+    {
+        "username": "legal_tech",
+        "company_name": "Legal Tech",
+        "is_payment_verified": true,
+        "is_phone_verified": true,
+        "bio": "Legal technology services"
+    }
+]

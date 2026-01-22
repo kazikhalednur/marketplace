@@ -1,0 +1,397 @@
+[
+    {
+        "category": "Web Development",
+        "name": "JavaScript",
+        "description": "Programming language for web development"
+    },
+    {
+        "category": "Web Development",
+        "name": "React",
+        "description": "JavaScript library for building user interfaces"
+    },
+    {
+        "category": "Web Development",
+        "name": "Vue.js",
+        "description": "Progressive JavaScript framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "Angular",
+        "description": "TypeScript-based web application framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "Node.js",
+        "description": "JavaScript runtime for server-side development"
+    },
+    {
+        "category": "Web Development",
+        "name": "Python",
+        "description": "High-level programming language"
+    },
+    {
+        "category": "Web Development",
+        "name": "Django",
+        "description": "Python web framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "Flask",
+        "description": "Lightweight Python web framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "PHP",
+        "description": "Server-side scripting language"
+    },
+    {
+        "category": "Web Development",
+        "name": "Laravel",
+        "description": "PHP web application framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "Ruby on Rails",
+        "description": "Ruby web application framework"
+    },
+    {
+        "category": "Web Development",
+        "name": "HTML5",
+        "description": "Markup language for web pages"
+    },
+    {
+        "category": "Web Development",
+        "name": "CSS3",
+        "description": "Style sheet language for web pages"
+    },
+    {
+        "category": "Web Development",
+        "name": "TypeScript",
+        "description": "Typed superset of JavaScript"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "React Native",
+        "description": "Framework for building native mobile apps using React"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "Flutter",
+        "description": "UI toolkit for building natively compiled applications"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "Swift",
+        "description": "Programming language for iOS development"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "Kotlin",
+        "description": "Programming language for Android development"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "iOS Development",
+        "description": "Development for Apple mobile devices"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "Android Development",
+        "description": "Development for Android devices"
+    },
+    {
+        "category": "Mobile Development",
+        "name": "Ionic",
+        "description": "Hybrid mobile app development framework"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": "C++",
+        "description": "General-purpose programming language"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": "C#",
+        "description": "Object-oriented programming language"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": ".NET",
+        "description": "Developer platform for building applications"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": "Java",
+        "description": "Object-oriented programming language"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": "Electron",
+        "description": "Framework for building desktop apps with web technologies"
+    },
+    {
+        "category": "Desktop Software Development",
+        "name": "Qt",
+        "description": "Cross-platform application framework"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "TensorFlow",
+        "description": "Machine learning framework"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "PyTorch",
+        "description": "Machine learning library"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "Scikit-learn",
+        "description": "Machine learning library for Python"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "Natural Language Processing",
+        "description": "AI for understanding human language"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "Computer Vision",
+        "description": "AI for image and video analysis"
+    },
+    {
+        "category": "AI & Machine Learning",
+        "name": "Deep Learning",
+        "description": "Neural network-based machine learning"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "Python Data Analysis",
+        "description": "Data analysis using Python"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "R Programming",
+        "description": "Statistical computing language"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "SQL",
+        "description": "Database query language"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "Tableau",
+        "description": "Data visualization software"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "Power BI",
+        "description": "Business analytics service"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "Pandas",
+        "description": "Data manipulation library for Python"
+    },
+    {
+        "category": "Data Science & Analytics",
+        "name": "NumPy",
+        "description": "Numerical computing library for Python"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Docker",
+        "description": "Containerization platform"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Kubernetes",
+        "description": "Container orchestration platform"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "AWS",
+        "description": "Amazon Web Services cloud platform"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Azure",
+        "description": "Microsoft cloud platform"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Google Cloud Platform",
+        "description": "Google's cloud computing services"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "CI/CD",
+        "description": "Continuous Integration and Deployment"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Jenkins",
+        "description": "Automation server for CI/CD"
+    },
+    {
+        "category": "DevOps & Cloud",
+        "name": "Terraform",
+        "description": "Infrastructure as code tool"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Adobe Photoshop",
+        "description": "Image editing software"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Adobe Illustrator",
+        "description": "Vector graphics editor"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Figma",
+        "description": "Collaborative design tool"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Sketch",
+        "description": "Digital design toolkit"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Logo Design",
+        "description": "Creating brand identity logos"
+    },
+    {
+        "category": "Graphic Design",
+        "name": "Brand Identity",
+        "description": "Visual elements representing a brand"
+    },
+    {
+        "category": "UI/UX Design",
+        "name": "User Interface Design",
+        "description": "Designing user interfaces"
+    },
+    {
+        "category": "UI/UX Design",
+        "name": "User Experience Design",
+        "description": "Designing user experiences"
+    },
+    {
+        "category": "UI/UX Design",
+        "name": "Wireframing",
+        "description": "Creating layout blueprints"
+    },
+    {
+        "category": "UI/UX Design",
+        "name": "Prototyping",
+        "description": "Creating interactive mockups"
+    },
+    {
+        "category": "UI/UX Design",
+        "name": "Adobe XD",
+        "description": "UX/UI design and collaboration tool"
+    },
+    {
+        "category": "Content Writing",
+        "name": "Blog Writing",
+        "description": "Writing blog posts and articles"
+    },
+    {
+        "category": "Content Writing",
+        "name": "Copywriting",
+        "description": "Writing marketing and advertising copy"
+    },
+    {
+        "category": "Content Writing",
+        "name": "Technical Writing",
+        "description": "Writing technical documentation"
+    },
+    {
+        "category": "Content Writing",
+        "name": "SEO Writing",
+        "description": "Search engine optimized content writing"
+    },
+    {
+        "category": "Content Writing",
+        "name": "Creative Writing",
+        "description": "Fiction and creative content writing"
+    },
+    {
+        "category": "Digital Marketing",
+        "name": "SEO",
+        "description": "Search Engine Optimization"
+    },
+    {
+        "category": "Digital Marketing",
+        "name": "Social Media Marketing",
+        "description": "Marketing through social media platforms"
+    },
+    {
+        "category": "Digital Marketing",
+        "name": "Google Ads",
+        "description": "Pay-per-click advertising platform"
+    },
+    {
+        "category": "Digital Marketing",
+        "name": "Facebook Ads",
+        "description": "Social media advertising"
+    },
+    {
+        "category": "Digital Marketing",
+        "name": "Email Marketing",
+        "description": "Marketing through email campaigns"
+    },
+    {
+        "category": "Video & Animation",
+        "name": "Video Editing",
+        "description": "Editing and post-production of videos"
+    },
+    {
+        "category": "Video & Animation",
+        "name": "Adobe Premiere Pro",
+        "description": "Video editing software"
+    },
+    {
+        "category": "Video & Animation",
+        "name": "After Effects",
+        "description": "Motion graphics and visual effects"
+    },
+    {
+        "category": "Video & Animation",
+        "name": "3D Animation",
+        "description": "Creating three-dimensional animations"
+    },
+    {
+        "category": "Video & Animation",
+        "name": "Motion Graphics",
+        "description": "Animated graphic design"
+    },
+    {
+        "category": "Business Consulting",
+        "name": "Business Strategy",
+        "description": "Strategic planning and consulting"
+    },
+    {
+        "category": "Business Consulting",
+        "name": "Project Management",
+        "description": "Managing projects and teams"
+    },
+    {
+        "category": "Business Consulting",
+        "name": "Market Research",
+        "description": "Researching market trends and opportunities"
+    },
+    {
+        "category": "Accounting & Finance",
+        "name": "Bookkeeping",
+        "description": "Recording financial transactions"
+    },
+    {
+        "category": "Accounting & Finance",
+        "name": "Financial Analysis",
+        "description": "Analyzing financial data"
+    }
+]

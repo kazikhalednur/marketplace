@@ -1,0 +1,23 @@
+[
+    {
+        "email": "cpchub@example.com",
+        "username": "cpchub",
+        "password": "GHzy2g4gPmiLQTn",
+        "role": "admin",
+        "email_verified": true
+    },
+    {
+        "email": "admin@example.com",
+        "username": "admin",
+        "password": "0000",
+        "role": "admin",
+        "email_verified": true
+    },
+    {
+        "email": "biplob@example.com",
+        "username": "biplob",
+        "password": "password123",
+        "role": "admin",
+        "email_verified": true
+    }
+]

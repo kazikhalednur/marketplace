@@ -1,0 +1,51 @@
+"""
+URL configuration for config project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+from base import views as base_views
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema")),
+    # local apps
+    path("accounts/", include("accounts.urls")),
+    path("jobs/", include("jobs.urls")),
+    path("images/", include("images.urls")),
+    path("biding/", include("biding.urls")),
+    path("notifications/", include("notifications.urls")),
+    path("chat/", include("chat.urls")),
+    path("work-diary/", include("work_diary.urls")),
+    path("payments/", include("payments.urls")),
+    path("meetings/", include("meeting.urls")),
+    path("health_check/", base_views.health_check),
+    path("admin-api/", include("custom_admin.urls")),
+]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.SERVER_TYPE == "local":
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
+    if not settings.TESTING:
+        urlpatterns += debug_toolbar_urls()

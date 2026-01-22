@@ -1,0 +1,602 @@
+[
+    {
+        "email": "john.developer@email.com",
+        "username": "john_dev",
+        "first_name": "John",
+        "last_name": "Developer",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "sarah.designer@email.com",
+        "username": "sarah_design",
+        "first_name": "Sarah",
+        "last_name": "Designer",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "mike.fullstack@email.com",
+        "username": "mike_fullstack",
+        "first_name": "Mike",
+        "last_name": "Johnson",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "emma.react@email.com",
+        "username": "emma_react",
+        "first_name": "Emma",
+        "last_name": "Wilson",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "david.python@email.com",
+        "username": "david_python",
+        "first_name": "David",
+        "last_name": "Brown",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "lisa.mobile@email.com",
+        "username": "lisa_mobile",
+        "first_name": "Lisa",
+        "last_name": "Anderson",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "james.backend@email.com",
+        "username": "james_backend",
+        "first_name": "James",
+        "last_name": "Taylor",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "maria.frontend@email.com",
+        "username": "maria_frontend",
+        "first_name": "Maria",
+        "last_name": "Garcia",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "robert.devops@email.com",
+        "username": "robert_devops",
+        "first_name": "Robert",
+        "last_name": "Martinez",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "jennifer.ux@email.com",
+        "username": "jennifer_ux",
+        "first_name": "Jennifer",
+        "last_name": "Rodriguez",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "william.ai@email.com",
+        "username": "william_ai",
+        "first_name": "William",
+        "last_name": "Lee",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "linda.data@email.com",
+        "username": "linda_data",
+        "first_name": "Linda",
+        "last_name": "Walker",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "richard.cloud@email.com",
+        "username": "richard_cloud",
+        "first_name": "Richard",
+        "last_name": "Hall",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "patricia.writer@email.com",
+        "username": "patricia_writer",
+        "first_name": "Patricia",
+        "last_name": "Allen",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "charles.video@email.com",
+        "username": "charles_video",
+        "first_name": "Charles",
+        "last_name": "Young",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "susan.marketing@email.com",
+        "username": "susan_marketing",
+        "first_name": "Susan",
+        "last_name": "King",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "joseph.flutter@email.com",
+        "username": "joseph_flutter",
+        "first_name": "Joseph",
+        "last_name": "Wright",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "jessica.angular@email.com",
+        "username": "jessica_angular",
+        "first_name": "Jessica",
+        "last_name": "Lopez",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "thomas.django@email.com",
+        "username": "thomas_django",
+        "first_name": "Thomas",
+        "last_name": "Hill",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "nancy.vue@email.com",
+        "username": "nancy_vue",
+        "first_name": "Nancy",
+        "last_name": "Scott",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "daniel.node@email.com",
+        "username": "daniel_node",
+        "first_name": "Daniel",
+        "last_name": "Green",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "karen.php@email.com",
+        "username": "karen_php",
+        "first_name": "Karen",
+        "last_name": "Adams",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "matthew.ios@email.com",
+        "username": "matthew_ios",
+        "first_name": "Matthew",
+        "last_name": "Baker",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "betty.android@email.com",
+        "username": "betty_android",
+        "first_name": "Betty",
+        "last_name": "Nelson",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "anthony.ml@email.com",
+        "username": "anthony_ml",
+        "first_name": "Anthony",
+        "last_name": "Carter",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "dorothy.graphics@email.com",
+        "username": "dorothy_graphics",
+        "first_name": "Dorothy",
+        "last_name": "Mitchell",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "mark.aws@email.com",
+        "username": "mark_aws",
+        "first_name": "Mark",
+        "last_name": "Perez",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "sandra.seo@email.com",
+        "username": "sandra_seo",
+        "first_name": "Sandra",
+        "last_name": "Roberts",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "steven.docker@email.com",
+        "username": "steven_docker",
+        "first_name": "Steven",
+        "last_name": "Turner",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "ashley.figma@email.com",
+        "username": "ashley_figma",
+        "first_name": "Ashley",
+        "last_name": "Phillips",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "paul.laravel@email.com",
+        "username": "paul_laravel",
+        "first_name": "Paul",
+        "last_name": "Campbell",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "kimberly.copywriter@email.com",
+        "username": "kimberly_copy",
+        "first_name": "Kimberly",
+        "last_name": "Parker",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "andrew.kubernetes@email.com",
+        "username": "andrew_k8s",
+        "first_name": "Andrew",
+        "last_name": "Evans",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "donna.photoshop@email.com",
+        "username": "donna_photoshop",
+        "first_name": "Donna",
+        "last_name": "Edwards",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "joshua.tensorflow@email.com",
+        "username": "joshua_tf",
+        "first_name": "Joshua",
+        "last_name": "Collins",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "carol.illustrator@email.com",
+        "username": "carol_illustrator",
+        "first_name": "Carol",
+        "last_name": "Stewart",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "kenneth.pytorch@email.com",
+        "username": "kenneth_pytorch",
+        "first_name": "Kenneth",
+        "last_name": "Sanchez",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "michelle.premiere@email.com",
+        "username": "michelle_premiere",
+        "first_name": "Michelle",
+        "last_name": "Morris",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "kevin.azure@email.com",
+        "username": "kevin_azure",
+        "first_name": "Kevin",
+        "last_name": "Rogers",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "sarah.tableau@email.com",
+        "username": "sarah_tableau",
+        "first_name": "Sarah",
+        "last_name": "Reed",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "brian.sql@email.com",
+        "username": "brian_sql",
+        "first_name": "Brian",
+        "last_name": "Cook",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "deborah.social@email.com",
+        "username": "deborah_social",
+        "first_name": "Deborah",
+        "last_name": "Morgan",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "george.swift@email.com",
+        "username": "george_swift",
+        "first_name": "George",
+        "last_name": "Bell",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "laura.kotlin@email.com",
+        "username": "laura_kotlin",
+        "first_name": "Laura",
+        "last_name": "Murphy",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "edward.unity@email.com",
+        "username": "edward_unity",
+        "first_name": "Edward",
+        "last_name": "Bailey",
+        "role": "freelancer",
+        "email_verified": true
+    },
+    {
+        "email": "techcorp@company.com",
+        "username": "techcorp",
+        "first_name": "Tech",
+        "last_name": "Corp",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "startup.inc@company.com",
+        "username": "startup_inc",
+        "first_name": "Startup",
+        "last_name": "Inc",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "digital.agency@company.com",
+        "username": "digital_agency",
+        "first_name": "Digital",
+        "last_name": "Agency",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "ecommerce.store@company.com",
+        "username": "ecommerce_store",
+        "first_name": "Ecommerce",
+        "last_name": "Store",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "fintech.solutions@company.com",
+        "username": "fintech_sol",
+        "first_name": "Fintech",
+        "last_name": "Solutions",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "healthcare.tech@company.com",
+        "username": "healthcare_tech",
+        "first_name": "Healthcare",
+        "last_name": "Tech",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "edu.platform@company.com",
+        "username": "edu_platform",
+        "first_name": "Education",
+        "last_name": "Platform",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "media.company@company.com",
+        "username": "media_co",
+        "first_name": "Media",
+        "last_name": "Company",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "retail.business@company.com",
+        "username": "retail_biz",
+        "first_name": "Retail",
+        "last_name": "Business",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "consulting.firm@company.com",
+        "username": "consulting_firm",
+        "first_name": "Consulting",
+        "last_name": "Firm",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "marketing.hub@company.com",
+        "username": "marketing_hub",
+        "first_name": "Marketing",
+        "last_name": "Hub",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "software.house@company.com",
+        "username": "software_house",
+        "first_name": "Software",
+        "last_name": "House",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "design.studio@company.com",
+        "username": "design_studio",
+        "first_name": "Design",
+        "last_name": "Studio",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "mobile.apps@company.com",
+        "username": "mobile_apps",
+        "first_name": "Mobile",
+        "last_name": "Apps",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "cloud.services@company.com",
+        "username": "cloud_services",
+        "first_name": "Cloud",
+        "last_name": "Services",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "ai.research@company.com",
+        "username": "ai_research",
+        "first_name": "AI",
+        "last_name": "Research",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "data.analytics@company.com",
+        "username": "data_analytics",
+        "first_name": "Data",
+        "last_name": "Analytics",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "gaming.studio@company.com",
+        "username": "gaming_studio",
+        "first_name": "Gaming",
+        "last_name": "Studio",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "travel.tech@company.com",
+        "username": "travel_tech",
+        "first_name": "Travel",
+        "last_name": "Tech",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "food.delivery@company.com",
+        "username": "food_delivery",
+        "first_name": "Food",
+        "last_name": "Delivery",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "real.estate@company.com",
+        "username": "real_estate",
+        "first_name": "Real",
+        "last_name": "Estate",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "logistics.tech@company.com",
+        "username": "logistics_tech",
+        "first_name": "Logistics",
+        "last_name": "Tech",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "fashion.brand@company.com",
+        "username": "fashion_brand",
+        "first_name": "Fashion",
+        "last_name": "Brand",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "sports.platform@company.com",
+        "username": "sports_platform",
+        "first_name": "Sports",
+        "last_name": "Platform",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "music.streaming@company.com",
+        "username": "music_streaming",
+        "first_name": "Music",
+        "last_name": "Streaming",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "social.network@company.com",
+        "username": "social_network",
+        "first_name": "Social",
+        "last_name": "Network",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "crypto.exchange@company.com",
+        "username": "crypto_exchange",
+        "first_name": "Crypto",
+        "last_name": "Exchange",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "insurance.tech@company.com",
+        "username": "insurance_tech",
+        "first_name": "Insurance",
+        "last_name": "Tech",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "hr.solutions@company.com",
+        "username": "hr_solutions",
+        "first_name": "HR",
+        "last_name": "Solutions",
+        "role": "client",
+        "email_verified": true
+    },
+    {
+        "email": "legal.tech@company.com",
+        "username": "legal_tech",
+        "first_name": "Legal",
+        "last_name": "Tech",
+        "role": "client",
+        "email_verified": true
+    }
+]
