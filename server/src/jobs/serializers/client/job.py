@@ -28,6 +28,7 @@ class ClientJobSerializer(serializers.ModelSerializer):
             "status",
             "created_by",
             "created_at",
+            "is_payment_verified",
         ]
 
     def to_representation(self, instance):
