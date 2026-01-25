@@ -14,7 +14,9 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useApplyToJobMutation } from '@/features/api/jobsApi';
+import { usePayForJobMutation } from '@/features/api/paymentsApi';
 import BidsList from './BidsList';
+import { useRouter } from 'next/navigation';
 
 
 // Utility for file validation
@@ -331,11 +333,14 @@ interface JobDetailModalProps {
 }
 
 export default function JobDetailModal({ open, onClose, job, onJobApplied }: JobDetailModalProps) {
+  const router = useRouter();
   const modalRef = React.useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { showToast } = useToast();
   const [showApplyForm, setShowApplyForm] = React.useState(false);
   const [showBids, setShowBids] = React.useState(false);
+  const [payForJob, { isLoading: isPaying }] = usePayForJobMutation();
 
   // Remove local applied state, use job.is_applied
 
@@ -522,15 +527,48 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                     Member since <span className="font-medium">{new Date(job.created_by.date_joined).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                   </div>
                 )}
-                {job.created_by?.is_payment_verified ? (
+                {job.is_payment_verified ? (
                   <div className="flex items-center gap-2 text-green-600 font-medium ml-6">
                     <CheckCircle className="w-4 h-4" />
                     Payment method verified
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <XCircle className="w-4 h-4" />
-                    Payment not verified
+                  <div className="ml-6 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <XCircle className="w-4 h-4" />
+                      Payment method not verified
+                    </div>
+                    <Button
+                      className="w-fit mt-1"
+                      size="sm"
+                      disabled={isPaying || !job?.id}
+                      onClick={async () => {
+                        if (!job?.id) {
+                          showToast({ type: "error", message: "Job ID is missing" });
+                          return;
+                        }
+                        try {
+                          const result = await payForJob({
+                            job_id: job.id,
+                          }).unwrap();
+                          
+                          if (result.data?.payment_url) {
+                            // Redirect to payment URL
+                            window.location.href = result.data.payment_url;
+                          } else {
+                            showToast({ type: "error", message: "Payment URL not received" });
+                          }
+                        } catch (error: any) {
+                          const errorMessage = error?.data?.message || error?.message || "Failed to create payment link. Please try again.";
+                          showToast({ 
+                            type: "error", 
+                            message: errorMessage
+                          });
+                        }
+                      }}
+                    >
+                      {isPaying ? "Processing..." : "Pay Now"}
+                    </Button>
                   </div>
                 )}
               </div>
