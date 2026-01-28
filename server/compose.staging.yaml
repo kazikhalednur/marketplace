@@ -6,13 +6,6 @@ services:
     image: marketplace-staging-server
     container_name: marketplace-staging-server
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-      mailcatcher:
-        condition: service_started
-      redis:
-        condition: service_started
     env_file:
       - .env
     environment:
