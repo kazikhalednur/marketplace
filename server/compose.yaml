@@ -1,66 +1,4 @@
 services:
-  db:
-    image: postgres:17
-    container_name: marketplace-db
-    restart: always
-    user: postgres
-    secrets:
-      - db-password
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-    expose:
-      - 5432
-    networks:
-      - private-net
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7.4
-    container_name: marketplace-redis
-    restart: always
-    expose:
-      - 6379
-    volumes:
-      - redis-data:/data
-    command: >
-      redis-server
-      --appendonly yes
-      --appendfsync everysec
-      --auto-aof-rewrite-percentage 100
-      --auto-aof-rewrite-min-size 64mb
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --lazyfree-lazy-eviction yes
-      --lazyfree-lazy-expire yes
-      --lazyfree-lazy-server-del yes
-      --activedefrag yes
-    networks:
-      - private-net
-    healthcheck:
-      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mailcatcher:
-    image: sj26/mailcatcher
-    container_name: marketplace-mailcatcher
-    expose:
-      - 1025
-    ports:
-      - 1080:1080
-    networks:
-      - private-net
-      - public-net
-
   django: &django
     build:
       context: .
@@ -75,28 +13,9 @@ services:
         condition: service_started
       redis:
         condition: service_started
-    secrets:
-      - secret-password
-      - db-password
-      - smtp-password
-      - minio-access-key
-      - minio-secret-key
-      - paystation-marchant-id
-      - paystation-password
-      - jitsi-app-id
-      - jitsi-app-secret
     env_file:
       - .env
     environment:
-      SECRET_KEY_FILE: /run/secrets/secret-password
-      EMAIL_HOST_PASSWORD_FILE: /run/secrets/smtp-password
-      DB_PASSWORD_FILE: /run/secrets/db-password
-      MINIO_ACCESS_KEY_FILE: /run/secrets/minio-access-key
-      MINIO_SECRET_KEY_FILE: /run/secrets/minio-secret-key
-      PAYSTATION_MARCHANT_ID_FILE: /run/secrets/paystation-marchant-id
-      PAYSTATION_PASSWORD_FILE: /run/secrets/paystation-password
-      JITSI_APP_ID_FILE: /run/secrets/jitsi-app-id
-      JITSI_APP_SECRET_FILE: /run/secrets/jitsi-app-secret
       DEBUG: true
       SERVER_TYPE: local
       UID: "${UID}"
@@ -106,9 +25,7 @@ services:
     ports:
       - 8000:8000
     networks:
-      - private-net
-      - public-net
-      - s3-net
+      - backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health_check/"]
       interval: 10s
@@ -122,34 +39,5 @@ services:
     ports: []
 
 networks:
-  public-net:
-    driver: bridge
-  private-net:
-    driver: bridge
-    internal: true
-  s3-net:
+  backend:
     external: true
-
-volumes:
-  db-data:
-  redis-data:
-
-secrets:
-  secret-password:
-    file: secrets/django/secret_key.txt
-  smtp-password:
-    file: secrets/django/smtp_password.txt
-  db-password:
-    file: secrets/db/password.txt
-  minio-access-key:
-    file: secrets/minio/access_key.txt
-  minio-secret-key:
-    file: secrets/minio/secret_key.txt
-  paystation-marchant-id:
-    file: secrets/paystation/marchant_id.txt
-  paystation-password:
-    file: secrets/paystation/password.txt
-  jitsi-app-id:
-    file: secrets/jitsi/app_id.txt
-  jitsi-app-secret:
-    file: secrets/jitsi/app_secret.txt

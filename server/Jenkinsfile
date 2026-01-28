@@ -8,6 +8,26 @@ pipeline {
             }
         }
 
+        stage('Create env file') {
+            steps {
+                withCredentials([
+                    file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
+                    string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
+                ]) {
+                    sh '''
+                        export GNUPGHOME=$(mktemp -d)
+
+                        gpg --batch --import "$GPG_KEY"
+
+                        gpg --batch --yes \
+                            --pinentry-mode loopback \
+                            --passphrase "$GPG_PASSPHRASE" \
+                            --decrypt server/.env.gpg > server/.env
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'docker compose -f server/compose.yaml build'

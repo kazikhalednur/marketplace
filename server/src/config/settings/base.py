@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = open(BASE_DIR / config("SECRET_KEY_FILE", cast=str), "r").read().strip()
+SECRET_KEY = config("SECRET_KEY", cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
@@ -120,9 +120,7 @@ DATABASES = {
         "ENGINE": config("DB_ENGINE", cast=str),
         "NAME": config("DB_NAME", cast=str),
         "USER": config("DB_USER", cast=str),
-        "PASSWORD": open(BASE_DIR / config("DB_PASSWORD_FILE", cast=str), "r")
-        .read()
-        .strip(),
+        "PASSWORD": config("DB_PASSWORD", cast=str),
         "HOST": config("DB_HOST", cast=str),
         "PORT": config("DB_PORT", cast=int),
     }
@@ -182,9 +180,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = config("EMAIL_BACKEND")
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = (
-    open(BASE_DIR / config("EMAIL_HOST_PASSWORD_FILE", cast=str), "r").read().strip()
-)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 EMAIL_PORT = config("EMAIL_PORT", cast=int)
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
@@ -204,16 +200,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())
 
-ZOOM_ACCOUNT_ID = config("ZOOM_ACCOUNT_ID", cast=str)
-ZOOM_CLIENT_ID = config("ZOOM_CLIENT_ID", cast=str)
-ZOOM_CLIENT_SECRET = config("ZOOM_CLIENT_SECRET", cast=str)
-
-PAYSTATION_MARCHANT_ID = (
-    open(BASE_DIR / config("PAYSTATION_MARCHANT_ID_FILE", cast=str), "r").read().strip()
-)
-PAYSTATION_PASSWORD = (
-    open(BASE_DIR / config("PAYSTATION_PASSWORD_FILE", cast=str), "r").read().strip()
-)
+PAYSTATION_MARCHANT_ID = config("PAYSTATION_MARCHANT_ID")
+PAYSTATION_PASSWORD = config("PAYSTATION_PASSWORD")
 
 
 from .celery import *

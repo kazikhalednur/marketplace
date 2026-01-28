@@ -1,16 +1,8 @@
-from pathlib import Path
-
 from decouple import config
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
 OPTIONS = {
-    "access_key": open(BASE_DIR / config("MINIO_ACCESS_KEY_FILE", cast=str), "r")
-    .read()
-    .strip(),
-    "secret_key": open(BASE_DIR / config("MINIO_SECRET_KEY_FILE", cast=str), "r")
-    .read()
-    .strip(),
+    "access_key": config("MINIO_ACCESS_KEY", cast=str),
+    "secret_key": config("MINIO_SECRET_KEY", cast=str),
     "bucket_name": config("MINIO_BUCKET_NAME", cast=str),
     "signature_version": config("MINIO_SIGNATURE_VERSION", cast=str),
     "endpoint_url": config("MINIO_ENDPOINT_URL", cast=str),
