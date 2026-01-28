@@ -6,13 +6,6 @@ services:
     image: marketplace-server
     container_name: marketplace-server
     user: "${UID}:${GID}"
-    depends_on:
-      db:
-        condition: service_healthy
-      mailcatcher:
-        condition: service_started
-      redis:
-        condition: service_started
     env_file:
       - .env
     environment:

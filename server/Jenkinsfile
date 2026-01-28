@@ -30,13 +30,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker compose -f server/compose.yaml build'
+                sh 'docker compose -f server/compose.staging.yaml build'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'docker compose -f server/compose.yaml up -d'
+                sh 'docker compose -f server/compose.staging.yaml up -d'
             }
         }
     }
