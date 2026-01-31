@@ -22,7 +22,7 @@ pipeline {
                         gpg --batch --yes \
                             --pinentry-mode loopback \
                             --passphrase "$GPG_PASSPHRASE" \
-                            --decrypt server/.env.gpg > server/.env
+                            --decrypt server/compose/staging/.env.gpg > server/.env
                     '''
                 }
             }

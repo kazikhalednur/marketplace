@@ -11,8 +11,6 @@ services:
     environment:
       DEBUG: true
       SERVER_TYPE: local
-      UID: "${UID}"
-      GID: "${GID}"
     volumes:
       - ./src:/app
     ports:
