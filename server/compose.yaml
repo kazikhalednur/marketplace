@@ -20,10 +20,11 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://127.0.0.1:8000/health_check/" ]
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 40s
 
   celeryworker:
     <<: *django
