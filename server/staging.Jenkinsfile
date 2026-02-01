@@ -39,12 +39,12 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
-                    timeout=30
+                    timeout=300
                     sleep_time=2
                     counter=0
                     max_attempts=$((timeout/sleep_time))
                     
-                    echo "Waiting for marketplace-staging-server to be healthy..."
+                    echo "Waiting for marketplace-staging-server to be healthy (max 5 minutes)..."
                     
                     while [ $counter -lt $max_attempts ]; do
                         status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-staging-server 2>/dev/null || echo "not-found")
@@ -59,7 +59,7 @@ pipeline {
                         counter=$((counter+1))
                     done
                     
-                    echo "Timeout: marketplace-staging-server did not become healthy."
+                    echo "Timeout: marketplace-staging-server did not become healthy within 5 minutes."
                     exit 1
                 '''
             }
