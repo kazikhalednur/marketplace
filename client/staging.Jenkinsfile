@@ -30,15 +30,9 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build and Deploy') {
             steps {
-                sh 'docker compose -f client/compose.staging.yaml build'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh 'docker compose -f client/compose.staging.yaml up -d'
+                sh 'docker compose -f client/compose.staging.yaml up --build -d'
             }
         }
     }
