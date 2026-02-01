@@ -7,7 +7,7 @@ services:
     container_name: marketplace-server
     user: "${UID}:${GID}"
     env_file:
-      - .env
+      - compose/local/.env
     environment:
       DEBUG: true
       SERVER_TYPE: local

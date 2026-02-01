@@ -7,12 +7,10 @@ services:
     container_name: marketplace-staging-server
     restart: unless-stopped
     env_file:
-      - .env
+      - compose/staging/.env
     environment:
       DEBUG: true
       SERVER_TYPE: staging
-    volumes:
-      - ./src:/app
     networks:
       - backend
     ports:

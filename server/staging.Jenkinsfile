@@ -15,6 +15,8 @@ pipeline {
                     string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
                 ]) {
                     sh '''
+                        cd server/compose/staging
+                        
                         export GNUPGHOME=$(mktemp -d)
 
                         gpg --batch --import "$GPG_KEY"
@@ -22,7 +24,7 @@ pipeline {
                         gpg --batch --yes \
                             --pinentry-mode loopback \
                             --passphrase "$GPG_PASSPHRASE" \
-                            --decrypt server/compose/staging/.env.gpg > server/.env
+                            --decrypt .env.gpg > .env
                     '''
                 }
             }
