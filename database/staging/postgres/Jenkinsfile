@@ -58,7 +58,7 @@ pipeline {
                         counter=$((counter+1))
                     done
                     
-                    echo "Timeout: marketplace-db did not become healthy."
+                    echo "Timeout: marketplace-staging-db did not become healthy."
                     exit 1
                 '''
             }
