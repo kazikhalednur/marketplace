@@ -16,7 +16,7 @@ pipeline {
                 ]) {
                     sh '''
                         cd database/staging/redis
-                        
+
                         export GNUPGHOME=$(mktemp -d)
 
                         gpg --batch --import "$GPG_KEY"
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker compose -f database/redis/compose.yaml up -d'
+                sh 'docker compose -f database/staging/redis/compose.yaml up -d'
             }
         }
 
@@ -47,10 +47,10 @@ pipeline {
                     echo "Waiting for marketplace-redis to be healthy..."
                     
                     while [ $counter -lt $max_attempts ]; do
-                        status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-redis 2>/dev/null || echo "not-found")
+                        status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-staging-redis 2>/dev/null || echo "not-found")
                         
                         if [ "$status" == "healthy" ]; then
-                            echo "Container marketplace-redis is healthy!"
+                            echo "Container marketplace-staging-redis is healthy!"
                             exit 0
                         fi
                         
