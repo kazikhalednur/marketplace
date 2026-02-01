@@ -27,7 +27,7 @@ pipeline {
                     while [ $counter -lt $max_attempts ]; do
                         status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-mailcatcher 2>/dev/null || echo "not-found")
                         
-                        if [ "$status" == "healthy" ]; then
+                        if [ "$status" = "healthy" ]; then
                             echo "Container marketplace-mailcatcher is healthy!"
                             exit 0
                         fi
