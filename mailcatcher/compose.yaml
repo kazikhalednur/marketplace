@@ -1,0 +1,19 @@
+services:
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: marketplace-mailcatcher
+    expose:
+      - 1025
+    ports:
+      - 1080:1080
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://0.0.0.0:1080" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend:
+    external: true
