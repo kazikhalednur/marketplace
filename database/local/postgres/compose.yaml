@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:17
+    container_name: marketplace-db
+    restart: unless-stopped
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend:
+    external: true
+
+volumes:
+  db-data:
+    name: marketplace-db-data
