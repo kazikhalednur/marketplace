@@ -48,7 +48,7 @@ pipeline {
                     while [ $counter -lt $max_attempts ]; do
                         status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-staging-db 2>/dev/null || echo "not-found")
                         
-                        if [ "$status" == "healthy" ]; then
+                        if [ "$status" = "healthy" ]; then
                             echo "Container marketplace-staging-db is healthy!"
                             exit 0
                         fi
