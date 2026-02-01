@@ -3,6 +3,8 @@ services:
     image: redis:7.4
     container_name: marketplace-redis
     restart: always
+    env_file:
+      - .env
     expose:
       - ${REDIS_PORT}
     volumes:
