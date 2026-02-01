@@ -11,6 +11,8 @@ services:
     environment:
       DEBUG: true
       SERVER_TYPE: local
+      UID: "${UID}"
+      GID: "${GID}"
     volumes:
       - ./src:/app
     ports:
@@ -18,7 +20,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health_check/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health_check/" ]
       interval: 10s
       timeout: 5s
       retries: 5
