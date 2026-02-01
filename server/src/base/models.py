@@ -14,6 +14,7 @@ class Settings(models.Model):
         "Email Verification Timeout", default=120
     )
     frontend_url = models.URLField("Frontend URL", default="http://localhost:3000")
+    backend_url = models.URLField("Backend URL", default="http://localhost:8000")
 
     class Meta:
         verbose_name = "Setting"
@@ -37,6 +38,10 @@ class Settings(models.Model):
     @classproperty
     def EMAIL_VERIFIY_TIMEOUT(cls):
         return cls.get_data().email_verify_timeout
+
+    @classproperty
+    def BACKEND_URL(cls):
+        return cls.get_data().backend_url
 
     def __str__(self):
         return "Application Settings"

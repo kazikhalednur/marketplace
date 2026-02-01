@@ -1,5 +1,7 @@
-from rest_framework.response import Response
+from django.http import HttpResponsePermanentRedirect
 from rest_framework.views import APIView
+
+from base.models import Settings
 
 from ..models import PaymentCallbackLog, PaymentRequest
 from ..utils import PaymentUtility
@@ -28,4 +30,6 @@ class CallbackPaymentView(APIView):
         payment_utility = PaymentUtility(request, payment_request.payment_history)
         payment_utility.handle_payment_callback()
 
-        return Response()
+        url = Settings.FRONTEND_URL + f"/payments/{invoice_number}"
+
+        return HttpResponsePermanentRedirect(url)

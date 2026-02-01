@@ -2,6 +2,8 @@ import requests
 from django.conf import settings
 from django.urls import reverse
 
+from base.models import Settings
+
 from .models import PaymentHistory, PaymentRequest, PaymentTransaction
 
 
@@ -16,7 +18,7 @@ class PaymentUtility:
         self.payment_request: PaymentRequest = payment_history.payment_request
         self.__paystation_marchant_id = settings.PAYSTATION_MARCHANT_ID
         self.__paystation_password = settings.PAYSTATION_PASSWORD
-        self.callback_url = request.build_absolute_uri(reverse("payments:callback"))
+        self.callback_url = Settings.BACKEND_URL + reverse("payments:callback")
         self.initiate_payment_url = "https://api.paystation.com.bd/initiate-payment"
         self.transaction_status_url = "https://api.paystation.com.bd/transaction-status"
 
@@ -131,7 +133,11 @@ class PaymentUtility:
         transaction: PaymentTransaction = self.payment_request.transaction
         trx_status = self.callback_response["data"].get("trx_status").upper()
         transaction.trx_status = trx_status if trx_status != "CANCELLED" else "CANCELED"
-        transaction.trx_id = self.callback_response["data"].get("trx_id")
+        transaction.trx_id = (
+            None
+            if self.callback_response["data"].get("trx_id") == ""
+            else self.callback_response["data"].get("trx_id")
+        )
         transaction.payment_amount = self.callback_response["data"].get(
             "payment_amount"
         )

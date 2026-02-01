@@ -28,6 +28,14 @@ def payment_transaction_post_save(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=PaymentCallbackLog)
-def payment_callback_log_post_save(sender, instance, created, **kwargs):
-    instance.payment_request.payment_transaction.trx_status = instance.status
-    instance.payment_request.payment_transaction.save(update_fields=["status"])
+def payment_callback_log_post_save(
+    sender, instance: PaymentCallbackLog, created, **kwargs
+):
+    instance.payment_request.transaction.trx_status = instance.status
+    instance.payment_request.transaction.save(update_fields=["trx_status"])
+
+    if instance.status == "SUCCESSFUL":
+        instance.payment_request.payment_history.job.is_payment_verified = True
+        instance.payment_request.payment_history.job.save(
+            update_fields=["is_payment_verified"]
+        )
