@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Create env file') {
+            steps {
+                withCredentials([
+                    file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
+                    string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
+                ]) {
+                    sh '''
+                        export GNUPGHOME=$(mktemp -d)
+
+                        gpg --batch --import "$GPG_KEY"
+
+                        gpg --batch --yes \
+                            --pinentry-mode loopback \
+                            --passphrase "$GPG_PASSPHRASE" \
+                            --decrypt database/redis/.env.gpg > database/redis/.env
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker compose -f database/redis/compose.yaml up -d'
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    timeout=30
+                    sleep_time=2
+                    counter=0
+                    max_attempts=$((timeout/sleep_time))
+                    
+                    echo "Waiting for marketplace-redis to be healthy..."
+                    
+                    while [ $counter -lt $max_attempts ]; do
+                        status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-redis 2>/dev/null || echo "not-found")
+                        
+                        if [ "$status" == "healthy" ]; then
+                            echo "Container marketplace-redis is healthy!"
+                            exit 0
+                        fi
+                        
+                        echo "Status: $status. Retrying in ${sleep_time}s... ($((counter+1))/$max_attempts)"
+                        sleep $sleep_time
+                        counter=$((counter+1))
+                    done
+                    
+                    echo "Timeout: marketplace-redis did not become healthy."
+                    exit 1
+                '''
+            }
+        }
+    }
+}
