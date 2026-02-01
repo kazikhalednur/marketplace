@@ -24,4 +24,3 @@ networks:
 
 volumes:
   db-data:
-    name: marketplace-db-data
