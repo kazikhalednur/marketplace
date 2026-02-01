@@ -2,12 +2,16 @@ services:
   client:
     build:
       context: .
+      dockerfile: compose/local/Dockerfile
     image: marketplace-client
     container_name: marketplace-client
     restart: unless-stopped
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
-      NODE_ENV: production
+      - WATCHPACK_POLLING=true
     env_file:
-      - .env
+      - compose/local/.env
     ports:
       - 3000:3000
