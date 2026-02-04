@@ -1,73 +1,76 @@
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Detect changes') {
-      steps {
-        script {
-          def changes = sh(
-            script: "git diff --name-only origin/main...HEAD",
-            returnStdout: true
-          ).trim().split("\n")
-
-          env.SERVER_CHANGED = changes.any { it.startsWith('server/') }.toString()
-          env.CLIENT_CHANGED = changes.any { it.startsWith('client/') }.toString()
-          env.S3_CHANGED  = changes.any { it.startsWith('s3/')  }.toString()
-          env.JITSI_CHANGED  = changes.any { it.startsWith('jitsi/')  }.toString()
-          env.POSTGRES_CHANGED  = changes.any { it.startsWith('database/staging/postgres/')  }.toString()
-          env.REDIS_CHANGED  = changes.any { it.startsWith('database/staging/redis/')  }.toString()
-          env.MAILCATCHER_CHANGED  = changes.any { it.startsWith('mailcatcher/')  }.toString()
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Build staging server') {
-      when { expression { env.SERVER_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-server-pipeline'
-      }
-    }
+        stage('Detect Changes') {
+            steps {
+                script {
+                    CHANGED = sh(
+                        script: "git diff --name-only origin/main...HEAD",
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
 
-    stage('Build staging client') {
-      when { expression { env.CLIENT_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-client-pipeline'
-      }
-    }
+        stage('Run Services') {
+            parallel {
+                // stage('Client') {
+                //     when { expression { CHANGED.contains('client/') } }
+                //     steps {
+                //         script {
+                //             def client = load 'client/pipeline.groovy'
+                //             client.run()
+                //         }
+                //     }
+                // }
 
-    stage('Build staging s3') {
-      when { expression { env.S3_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-s3-pipeline'
-      }
-    }
+                stage('Server') {
+                    when { expression { CHANGED.contains('server/') } }
+                    steps {
+                        script {
+                            def server = load 'server/compose/staging/pipline.groovy'
+                            server.run()
+                        }
+                    }
+                }
 
-    stage('Build staging jitsi') {
-      when { expression { env.JITSI_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-jitsi-pipeline'
-      }
-    }
+                stage('Postgres') {
+                    when { expression { CHANGED.contains('database/staging/postgres/') } }
+                    steps {
+                        script {
+                            def postgres = load 'database/staging/postgres/pipeline.groovy'
+                            postgres.run()
+                        }
+                    }
+                }
 
-    stage('Build staging postgres') {
-      when { expression { env.POSTGRES_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-postgres-pipeline'
-      }
-    }
+                stage('Redis') {
+                    when { expression { CHANGED.contains('database/staging/redis/') } }
+                    steps {
+                        script {
+                            def redis = load 'database/staging/redis/pipeline.groovy'
+                            redis.run()
+                        }
+                    }
+                }
 
-    stage('Build staging redis') {
-      when { expression { env.REDIS_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-redis-pipeline'
-      }
+                stage('Mailcatcher') {
+                    when { expression { CHANGED.contains('mailcatcher/') } }
+                    steps {
+                        script {
+                            def mailcatcher = load 'mailcatcher/pipeline.groovy'
+                            mailcatcher.run()
+                        }
+                    }
+                }
+            }
+        }
     }
-
-    stage('Build staging mailcatcher') {
-      when { expression { env.MAILCATCHER_CHANGED == 'true' } }
-      steps {
-        build job: 'staging-mailcatcher-pipeline'
-      }
-    }
-  }
 }

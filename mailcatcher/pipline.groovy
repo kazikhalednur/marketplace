@@ -1,0 +1,45 @@
+def run() {
+
+    stage('Checkout') {
+        steps {
+            checkout scm
+        }
+    }
+
+    stage('Deploy') {
+        steps {
+            sh 'docker compose -f mailcatcher/compose.yaml up -d'
+        }
+    }
+
+    stage('Health Check') {
+        steps {
+            sh '''
+                timeout=30
+                sleep_time=2
+                counter=0
+                max_attempts=$((timeout/sleep_time))
+                
+                echo "Waiting for marketplace-mailcatcher to be healthy..."
+                
+                while [ $counter -lt $max_attempts ]; do
+                    status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-mailcatcher 2>/dev/null || echo "not-found")
+                    
+                    if [ "$status" = "healthy" ]; then
+                        echo "Container marketplace-mailcatcher is healthy!"
+                        exit 0
+                    fi
+                    
+                    echo "Status: $status. Retrying in ${sleep_time}s... ($((counter+1))/$max_attempts)"
+                    sleep $sleep_time
+                    counter=$((counter+1))
+                done
+                
+                echo "Timeout: marketplace-mailcatcher did not become healthy."
+                exit 1
+            '''
+        }
+    }
+}
+
+return this
