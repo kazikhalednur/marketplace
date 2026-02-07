@@ -1,7 +1,0 @@
-MINIO_LICENSE="/mnt/minio/minio.license"
-MINIO_VOLUMES="/mnt/minio/data"
-MINIO_OPTS=""
-MINIO_CONFIG_ENV_FILE="/mnt/minio/config"
-
-# Optional (must be set on first run if needed)
-MINIO_OBJECT_NAMING=extended

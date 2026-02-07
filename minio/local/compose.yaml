@@ -1,0 +1,28 @@
+services:
+  aistor-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aistor-server
+    command: minio server /data --console-address ":9001"
+    env_file:
+      - .env
+    environment:
+      MINIO_VOLUMES: /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
