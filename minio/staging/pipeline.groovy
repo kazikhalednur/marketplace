@@ -10,7 +10,7 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd s3/staging
+                cd minio/staging
                 
                 export GNUPGHOME=$(mktemp -d)
 
@@ -30,7 +30,7 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd s3/staging/
+                cd minio/staging
                 
                 export GNUPGHOME=$(mktemp -d)
 
@@ -45,7 +45,7 @@ def call() {
     }
 
     stage('Deploy') {
-        sh 'docker compose -f s3/staging/compose.yaml up --build -d'
+        sh 'docker compose -f minio/staging/compose.yaml up --build -d'
     }
 }
 
