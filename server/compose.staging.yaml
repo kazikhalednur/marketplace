@@ -32,6 +32,12 @@ services:
     container_name: marketplace-staging-celeryworker
     command: /start-celeryworker
     ports: []
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
 
 networks:
   staging-backend:

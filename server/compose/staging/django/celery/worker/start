@@ -3,5 +3,14 @@
 set -o errexit
 set -o nounset
 
-
-exec celery -A config.celery worker -l INFO
+# Optimized Celery worker for minimal RAM usage
+exec celery -A config.celery worker \
+    --pool=solo \
+    --concurrency=1 \
+    --prefetch-multiplier=1 \
+    --max-tasks-per-child=50 \
+    --max-memory-per-child=100000 \
+    --loglevel=WARNING \
+    --without-gossip \
+    --without-mingle \
+    --without-heartbeat
