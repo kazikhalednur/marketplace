@@ -140,6 +140,21 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Jitsi') {
+                    when { 
+                        expression { 
+                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
+                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('jitsi/staging/') }
+                        } 
+                    }
+                    steps {
+                        script {
+                            def jitsi = load 'jitsi/staging/pipeline.groovy'
+                            jitsi()
+                        }
+                    }
+                }
             }
         }
     }
