@@ -39,35 +39,35 @@ def call() {
             
             while [ $counter -lt $max_attempts ]; do
                 # Check if web container is running
-                web_running=$(docker inspect --format '{{.State.Running}}' jitsi-web 2>/dev/null || echo "false")
+                web_running=$(docker inspect --format '{{.State.Running}}' jitsi-web-1 2>/dev/null || echo "false")
                 
                 if [ "$web_running" != "true" ]; then
-                    echo "Container jitsi-web is not running!"
+                    echo "Container jitsi-web-1 is not running!"
                     exit 1
                 fi
                 
                 # Check if web service is responding
-                if curl -f http://127.0.0.1:8000 2>/dev/null; then
+                if curl -f http://127.0.0.1:8001 2>/dev/null; then
                     echo "Jitsi web is responding!"
                     
                     # Check prosody
-                    prosody_running=$(docker inspect --format '{{.State.Running}}' jitsi-prosody 2>/dev/null || echo "false")
+                    prosody_running=$(docker inspect --format '{{.State.Running}}' jitsi-prosody-1 2>/dev/null || echo "false")
                     if [ "$prosody_running" != "true" ]; then
-                        echo "Container jitsi-prosody is not running!"
+                        echo "Container jitsi-prosody-1 is not running!"
                         exit 1
                     fi
                     
                     # Check jicofo
-                    jicofo_running=$(docker inspect --format '{{.State.Running}}' jitsi-jicofo 2>/dev/null || echo "false")
+                    jicofo_running=$(docker inspect --format '{{.State.Running}}' jitsi-jicofo-1 2>/dev/null || echo "false")
                     if [ "$jicofo_running" != "true" ]; then
-                        echo "Container jitsi-jicofo is not running!"
+                        echo "Container jitsi-jicofo-1 is not running!"
                         exit 1
                     fi
                     
                     # Check jvb
-                    jvb_running=$(docker inspect --format '{{.State.Running}}' jitsi-jvb 2>/dev/null || echo "false")
+                    jvb_running=$(docker inspect --format '{{.State.Running}}' jitsi-jvb-1 2>/dev/null || echo "false")
                     if [ "$jvb_running" != "true" ]; then
-                        echo "Container jitsi-jvb is not running!"
+                        echo "Container jitsi-jvb-1 is not running!"
                         exit 1
                     fi
                     
@@ -81,14 +81,14 @@ def call() {
             done
             
             echo "Timeout: Jitsi services did not become healthy within ${timeout}s."
-            echo "=== jitsi-web logs ==="
-            docker logs --tail 50 jitsi-web
-            echo "=== jitsi-prosody logs ==="
-            docker logs --tail 50 jitsi-prosody
-            echo "=== jitsi-jicofo logs ==="
-            docker logs --tail 50 jitsi-jicofo
-            echo "=== jitsi-jvb logs ==="
-            docker logs --tail 50 jitsi-jvb
+            echo "=== jitsi-web-1 logs ==="
+            docker logs --tail 50 jitsi-web-1
+            echo "=== jitsi-prosody-1 logs ==="
+            docker logs --tail 50 jitsi-prosody-1
+            echo "=== jitsi-jicofo-1 logs ==="
+            docker logs --tail 50 jitsi-jicofo-1
+            echo "=== jitsi-jvb-1 logs ==="
+            docker logs --tail 50 jitsi-jvb-1
             exit 1
         '''
     }
