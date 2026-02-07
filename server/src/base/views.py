@@ -10,11 +10,11 @@ from rest_framework.response import Response
     responses={
         200: inline_serializer(
             name="HealthCheckResponse",
-            fields={"status": drf_serializers.CharField(default="ok")},
+            fields={"status": drf_serializers.CharField(default="healthy")},
         )
     },
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def health_check(request):
-    return Response({"status": "ok"})
+    return Response({"status": "healthy"})

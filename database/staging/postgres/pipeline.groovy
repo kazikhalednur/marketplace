@@ -1,4 +1,4 @@
-def run() {
+def call() {
 
     stage('Checkout') {
         checkout scm

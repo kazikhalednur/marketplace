@@ -62,7 +62,7 @@ pipeline {
                 //     steps {
                 //         script {
                 //             def client = load 'client/pipeline.groovy'
-                //             client.run()
+                //             client()
                 //         }
                 //     }
                 // }
@@ -77,7 +77,7 @@ pipeline {
                     steps {
                         script {
                             def server = load 'server/compose/staging/pipeline.groovy'
-                            server.run()
+                            server()
                         }
                     }
                 }
@@ -92,7 +92,7 @@ pipeline {
                     steps {
                         script {
                             def postgres = load 'database/staging/postgres/pipeline.groovy'
-                            postgres.run()
+                            postgres()
                         }
                     }
                 }
@@ -107,7 +107,7 @@ pipeline {
                     steps {
                         script {
                             def redis = load 'database/staging/redis/pipeline.groovy'
-                            redis.run()
+                            redis()
                         }
                     }
                 }
@@ -122,7 +122,7 @@ pipeline {
                     steps {
                         script {
                             def mailcatcher = load 'mailcatcher/pipeline.groovy'
-                            mailcatcher.run()
+                            mailcatcher()
                         }
                     }
                 }
