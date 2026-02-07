@@ -126,6 +126,20 @@ pipeline {
                         }
                     }
                 }
+                stage('Minio') {
+                    when { 
+                        expression { 
+                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
+                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('minio/staging/') }
+                        } 
+                    }
+                    steps {
+                        script {
+                            def minio = load 'minio/staging/pipeline.groovy'
+                            minio()
+                        }
+                    }
+                }
             }
         }
     }

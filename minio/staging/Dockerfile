@@ -1,0 +1,1 @@
+FROM quay.io/minio/aistor/minio:latest
