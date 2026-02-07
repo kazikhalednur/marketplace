@@ -10,7 +10,7 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd jitsi/staging
+                cd jitsi/compose/staging
                 
                 export GNUPGHOME=$(mktemp -d)
 
@@ -25,7 +25,7 @@ def call() {
     }
 
     stage('Deploy') {
-        sh 'docker compose -f jitsi/compose.yaml up --build -d'
+        sh 'docker compose -f jitsi/compose/staging/compose.yaml up --build -d'
     }
 
     stage('Health Check') {

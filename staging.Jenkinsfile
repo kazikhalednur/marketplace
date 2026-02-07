@@ -150,7 +150,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            def jitsi = load 'jitsi/staging/pipeline.groovy'
+                            def jitsi = load 'jitsi/compose/staging/pipeline.groovy'
                             jitsi()
                         }
                     }
