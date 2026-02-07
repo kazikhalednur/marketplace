@@ -25,7 +25,7 @@ def call() {
     }
 
     stage('Deploy') {
-        sh 'docker compose -f jitsi/compose/staging/compose.yaml up --build -d'
+        sh 'docker compose -f jitsi/compose.yaml up --build -d'
     }
 
     stage('Health Check') {
