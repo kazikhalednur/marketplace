@@ -145,7 +145,7 @@ pipeline {
                     when { 
                         expression { 
                             def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('jitsi/staging/') }
+                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('jitsi/') }
                         } 
                     }
                     steps {
