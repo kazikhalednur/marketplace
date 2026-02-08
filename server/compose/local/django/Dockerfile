@@ -37,7 +37,7 @@ RUN sed -i 's/\r$//g' /start \
     && chmod +x /start \
     && chmod +x /start-celeryworker
 
-ARG UID=10001
+ARG UID=1000
 RUN adduser \
     --disabled-password \
     --gecos "" \
