@@ -20,6 +20,7 @@ export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { isOnline } = useNetworkStatus();
   const pathname = usePathname();
+  const isDev = process.env.NODE_ENV === "development";
   const [scrolled, setScrolled] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -100,6 +101,9 @@ export default function Navbar() {
             <Link href="/dashboard" className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
             {isAuthenticated && (
               <Link href="/meetings" className={cn("hover:text-primary", isActive("/meetings") && "text-primary font-medium")}>Meetings</Link>
+            )}
+            {isDev && (
+              <Link href="/admin" className={cn("hover:text-primary", isActive("/admin") && "text-primary font-medium")}>Admin Panel (Temp)</Link>
             )}
             {user?.role === "client" && (
               <>

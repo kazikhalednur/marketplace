@@ -18,12 +18,13 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
   const { isAuthenticated, user, logout } = useAuth();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const isDev = process.env.NODE_ENV === "development";
 
   const roleDashboard =
     user?.role === "employer"
       ? "/dashboard/employer"
       : user?.role === "admin"
-      ? "/dashboard/admin"
+      ? "/admin"
       : "/dashboard";
 
   return (
@@ -50,6 +51,15 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
             >
               <Home className="w-5 h-5" /> Home
             </Link>
+            {isDev && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-3 text-base font-medium hover:text-primary"
+                onClick={() => setOpen(false)}
+              >
+                <UserCircle2 className="w-5 h-5" /> Admin Panel (Temp)
+              </Link>
+            )}
             <Link
               href="/jobs"
               className="flex items-center gap-3 text-base font-medium hover:text-primary"
