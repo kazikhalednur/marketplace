@@ -52,20 +52,20 @@ pipeline {
 
         stage('Run Services') {
             parallel {
-                // stage('Client') {
-                //     when { 
-                //         expression { 
-                //             def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                //             changedFiles.any { it.replaceFirst('^\\./','').startsWith('client/') }
-                //         } 
-                //     }
-                //     steps {
-                //         script {
-                //             def client = load 'client/pipeline.groovy'
-                //             client()
-                //         }
-                //     }
-                // }
+                stage('Client') {
+                    when { 
+                        expression { 
+                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
+                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('client/') }
+                        } 
+                    }
+                    steps {
+                        script {
+                            def client = load 'client/compose/staging/pipeline.groovy'
+                            client()
+                        }
+                    }
+                }
 
                 stage('Server') {
                     when { 
