@@ -23,6 +23,7 @@ export interface JobDetail {
   created_by?: JobCreator;
   created_at?: string;
   is_applied?: boolean;
+  is_payment_verified?: boolean;
 }
 
 export interface DropdownCategory {

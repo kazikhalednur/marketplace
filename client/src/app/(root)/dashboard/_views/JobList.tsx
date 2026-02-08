@@ -139,7 +139,7 @@ function JobCard({ job, onClick, showEditButton, onEditJob, onDeleteJob }: {
               )}
             </div>
             {/* Payment verified badge */}
-            {job.created_by?.is_payment_verified && (
+            {job.is_payment_verified && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-200">
                 <CheckCircle className="w-3 h-3" /> Payment verified
               </span>

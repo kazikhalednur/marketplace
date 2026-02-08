@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: compose/staging/Dockerfile
     image: marketplace-staging-client
-    container_name: marketplace-staging-client
+    container_name: marketplace-client
     restart: unless-stopped
     environment:
       NODE_ENV: production
