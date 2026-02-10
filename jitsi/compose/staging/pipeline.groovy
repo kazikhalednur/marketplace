@@ -4,6 +4,29 @@ def call() {
         checkout scm
     }
 
+    stage('decrypt certificate files') {
+        withCredentials([
+            file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
+            string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
+        ]) {
+            sh '''
+                export GNUPGHOME=$(mktemp -d)
+
+                gpg --batch --import "$GPG_KEY"
+
+                gpg --batch --yes \
+                    --pinentry-mode loopback \
+                    --passphrase "$GPG_PASSPHRASE" \
+                    --decrypt ssl/cpchub_diu_edu_bd.crt.gpg > jitsi/web/keys/cert.crt
+
+                gpg --batch --yes \
+                    --pinentry-mode loopback \
+                    --passphrase "$GPG_PASSPHRASE" \
+                    --decrypt ssl/cpchub_diu_edu_bd.key.gpg > jitsi/web/keys/cert.key
+            '''
+        }
+    }
+
     stage('Create env file') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
