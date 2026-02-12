@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: compose/local/Dockerfile
-    image: marketplace-local-client
-    container_name: marketplace-local-client
+    image: local-marketplace-client
+    container_name: local-marketplace-client
     restart: unless-stopped
     env_file:
       - compose/local/.env
@@ -15,8 +15,8 @@ services:
     ports:
       - 3000:3000
     networks:
-      - local
+      - local-marketplace
 
 networks:
-  local:
+  local-marketplace:
     external: true
