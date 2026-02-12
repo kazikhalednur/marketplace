@@ -13,8 +13,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - ./data:/data
-      - ./minio.license:/minio.license
+      - ${MINIO_PATH}:/data
+      - ${MINIO_LICENSE_PATH}:/minio.license
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -22,8 +22,11 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - backend
+      - local-marketplace-backend
+      - local-marketplace
 
 networks:
-  backend:
+  local-marketplace-backend:
+    external: true
+  local-marketplace:
     external: true
