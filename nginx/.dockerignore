@@ -1,0 +1,40 @@
+# Docker ignore file for NGINX build context
+
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs (we want fresh logs in container)
+logs/
+*.log
+
+# Docker files (not needed in image)
+compose.yaml
+.dockerignore
+
+# Jenkins files
+Jenkinsfile
+pipeline.groovy
+*.groovy
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.old
+.env*
