@@ -1,14 +1,14 @@
 services:
   redis:
     image: redis:7.4
-    container_name: marketplace-redis
+    container_name: local-marketplace-redis
     restart: always
     env_file:
       - .env
     expose:
       - ${REDIS_PORT}
     volumes:
-      - redis-data:/data
+      - ${REDIS_PATH}:/data
     command: >
       redis-server
       --appendonly yes
@@ -22,17 +22,13 @@ services:
       --lazyfree-lazy-server-del yes
       --activedefrag yes
     networks:
-      - backend
+      - local-marketplace-database
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-volumes:
-  redis-data:
-    name: marketplace-redis-data
-
 networks:
-  backend:
+  local-marketplace-database:
     external: true
