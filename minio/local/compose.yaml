@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: aistor-server
+    image: local-aistor-server
+    container_name: local-aistor-server
     command: minio server /data --console-address ":9001"
     env_file:
       - .env
