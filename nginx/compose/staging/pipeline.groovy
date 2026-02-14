@@ -136,7 +136,6 @@ def call() {
     stage('Create Logs Directory') {
         sh '''
             mkdir -p nginx/logs
-            chmod 755 nginx/logs
         '''
     }
 
