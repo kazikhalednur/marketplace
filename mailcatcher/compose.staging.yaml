@@ -1,19 +1,26 @@
 services:
   mailcatcher:
     image: sj26/mailcatcher
-    container_name: marketplace-mailcatcher
+    container_name: staging-mailcatcher
+    restart: unless-stopped
     expose:
       - 1025
     ports:
       - 1080:1080
     networks:
-      - staging-backend
+      - staging-marketplace-backend
+      - staging-marketplace
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://0.0.0.0:1080" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
 
 networks:
-  staging-backend:
+  staging-marketplace-backend:
+    external: true
+  staging-marketplace:
     external: true

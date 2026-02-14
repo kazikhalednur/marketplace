@@ -4,7 +4,7 @@ def call() {
         checkout scm
     }
 
-    stage('Create env file') {
+    stage('Create env and license file') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
@@ -20,22 +20,7 @@ def call() {
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
                     --decrypt .env.gpg > .env
-            '''
-        }
-    }
-
-    stage('Create license file') {
-        withCredentials([
-            file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
-            string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
-        ]) {
-            sh '''
-                cd minio/staging
                 
-                export GNUPGHOME=$(mktemp -d)
-
-                gpg --batch --import "$GPG_KEY"
-
                 gpg --batch --yes \
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \

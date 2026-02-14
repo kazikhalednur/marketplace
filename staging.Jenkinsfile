@@ -155,6 +155,21 @@ pipeline {
                         }
                     }
                 }
+
+                stage('NGINX') {
+                    when { 
+                        expression { 
+                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
+                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('nginx/') }
+                        } 
+                    }
+                    steps {
+                        script {
+                            def nginx = load 'nginx/compose/staging/pipeline.groovy'
+                            nginx()
+                        }
+                    }
+                }
             }
         }
     }

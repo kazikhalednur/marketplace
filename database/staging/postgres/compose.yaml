@@ -2,26 +2,32 @@ services:
   db:
     build:
       context: .
-    image: marketplace-staging-postgres
-    container_name: marketplace-staging-db
-    restart: always
+      dockerfile: Dockerfile
+    image: staging-marketplace-postgres
+    container_name: staging-marketplace-db
+    restart: unless-stopped
     volumes:
       - staging-db-data:/var/lib/postgresql/18/docker
       - staging-db-backups:/backups
-    expose:
-      - 5432
     env_file:
       - .env
     networks:
-      - staging-backend
+      - staging-marketplace-database
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
 
 networks:
-  staging-backend:
+  staging-marketplace-database:
     external: true
 
 volumes:

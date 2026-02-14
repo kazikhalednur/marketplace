@@ -1,29 +1,33 @@
 services:
-  aistor-server:
+  minio:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: aistor-server
+    image: staging-aistor-server
+    container_name: staging-aistor-server
     command: minio server /data --console-address ":9001"
     env_file:
       - .env
     environment:
       MINIO_VOLUMES: /data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     volumes:
       - ${HOME}/minio/data:/data
       - ./minio.license:/minio.license
     restart: unless-stopped
+    networks:
+      - staging-marketplace-backend
+      - staging-marketplace
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
-    networks:
-      - staging-backend
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
 
 networks:
-  staging-backend:
+  staging-marketplace-backend:
+    external: true
+  staging-marketplace:
     external: true
