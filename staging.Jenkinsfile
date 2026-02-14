@@ -8,6 +8,49 @@ pipeline {
             }
         }
 
+        stage('Create Docker Networks') {
+            steps {
+                script {
+                    echo "=========================================="
+                    echo "Creating Docker networks..."
+                    echo "=========================================="
+                    
+                    sh '''
+                        # Function to create network if it doesn't exist
+                        create_network_if_not_exists() {
+                            network_name=$1
+                            network_flags=$2
+                            
+                            if docker network inspect "$network_name" >/dev/null 2>&1; then
+                                echo "✓ Network '$network_name' already exists"
+                            else
+                                docker network create $network_flags "$network_name"
+                                echo "✓ Network '$network_name' created"
+                            fi
+                        }
+                        
+                        # Create internal database network
+                        create_network_if_not_exists "staging-marketplace-database" "--internal"
+                        
+                        # Create internal backend network
+                        create_network_if_not_exists "staging-marketplace-backend" "--internal"
+                        
+                        # Create internal marketplace network
+                        create_network_if_not_exists "staging-marketplace" "--internal"
+                        
+                        # Create public network
+                        create_network_if_not_exists "staging-public" ""
+                        
+                        echo ""
+                        echo "=========================================="
+                        echo "✓ All networks ready"
+                        echo "=========================================="
+                        docker network ls | grep staging
+                    '''
+                }
+            }
+        }
+
         stage('Detect Changes') {
             steps {
                 script {
@@ -50,13 +93,72 @@ pipeline {
             }
         }
 
+        stage('Check Service Status') {
+            steps {
+                script {
+                    echo "=========================================="
+                    echo "Checking service status and determining build requirements..."
+                    echo "=========================================="
+                    
+                    // Define services with their container names and folder paths
+                    def services = [
+                        [name: 'Client', container: 'staging-marketplace-client', folder: 'client/'],
+                        [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
+                        [name: 'Postgres', container: 'staging-marketplace-postgres', folder: 'database/staging/postgres/'],
+                        [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
+                        [name: 'Mailcatcher', container: 'staging-marketplace-mailcatcher', folder: 'mailcatcher/'],
+                        [name: 'Minio', container: 'staging-marketplace-minio', folder: 'minio/staging/'],
+                        [name: 'Jitsi', container: 'staging-marketplace-jitsi', folder: 'jitsi/'],
+                        [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
+                    ]
+                    
+                    def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
+                    
+                    services.each { service ->
+                        // Check if container is running
+                        def isRunning = sh(
+                            script: "docker ps --filter 'name=${service.container}' --filter 'status=running' --format '{{.Names}}' | grep -q '${service.container}' && echo 'true' || echo 'false'",
+                            returnStdout: true
+                        ).trim()
+                        
+                        // Check if folder has changes
+                        def hasChanges = changedFiles.any { 
+                            it.replaceFirst('^\\./','').startsWith(service.folder) 
+                        }
+                        
+                        // Build logic: Always build if service is not running OR has changes
+                        def needsBuild = (isRunning == 'false') || hasChanges
+                        
+                        // Set environment variable for this service
+                        env."BUILD_${service.name.toUpperCase()}" = needsBuild.toString()
+                        
+                        // Log status with clear reasoning
+                        def status = isRunning == 'true' ? '✓ Running' : '✗ Not Running'
+                        def changeStatus = hasChanges ? '✓ Has Changes' : '○ No Changes'
+                        
+                        def buildReason = ''
+                        if (isRunning == 'false') {
+                            buildReason = '→ BUILD (Not Running)'
+                        } else if (hasChanges) {
+                            buildReason = '→ BUILD (Has Changes)'
+                        } else {
+                            buildReason = '○ Skip'
+                        }
+                        
+                        echo "${service.name.padRight(15)} | ${status.padRight(15)} | ${changeStatus.padRight(15)} | ${buildReason}"
+                    }
+                    
+                    echo "=========================================="
+                }
+            }
+        }
+
         stage('Run Services') {
             parallel {
                 stage('Client') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('client/') }
+                            env.BUILD_CLIENT == 'true'
                         } 
                     }
                     steps {
@@ -70,8 +172,7 @@ pipeline {
                 stage('Server') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('server/') }
+                            env.BUILD_SERVER == 'true'
                         } 
                     }
                     steps {
@@ -85,8 +186,7 @@ pipeline {
                 stage('Postgres') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('database/staging/postgres/') }
+                            env.BUILD_POSTGRES == 'true'
                         } 
                     }
                     steps {
@@ -100,8 +200,7 @@ pipeline {
                 stage('Redis') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('database/staging/redis/') }
+                            env.BUILD_REDIS == 'true'
                         } 
                     }
                     steps {
@@ -115,8 +214,7 @@ pipeline {
                 stage('Mailcatcher') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('mailcatcher/') }
+                            env.BUILD_MAILCATCHER == 'true'
                         } 
                     }
                     steps {
@@ -126,11 +224,11 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Minio') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('minio/staging/') }
+                            env.BUILD_MINIO == 'true'
                         } 
                     }
                     steps {
@@ -144,8 +242,7 @@ pipeline {
                 stage('Jitsi') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('jitsi/') }
+                            env.BUILD_JITSI == 'true'
                         } 
                     }
                     steps {
@@ -159,8 +256,7 @@ pipeline {
                 stage('NGINX') {
                     when { 
                         expression { 
-                            def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
-                            changedFiles.any { it.replaceFirst('^\\./','').startsWith('nginx/') }
+                            env.BUILD_NGINX == 'true'
                         } 
                     }
                     steps {
@@ -169,6 +265,26 @@ pipeline {
                             nginx()
                         }
                     }
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    echo "=========================================="
+                    echo "Verifying All Services..."
+                    echo "=========================================="
+                    
+                    sh '''
+                        echo "Running containers:"
+                        docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep staging || true
+                        
+                        echo ""
+                        echo "=========================================="
+                        echo "✓ Full deployment complete!"
+                        echo "=========================================="
+                    '''
                 }
             }
         }
