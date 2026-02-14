@@ -1,9 +1,5 @@
 def call() {
 
-    stage('Checkout') {
-        checkout scm
-    }
-
     stage('Deploy') {
         sh 'docker compose -f mailcatcher/compose.staging.yaml up -d'
     }

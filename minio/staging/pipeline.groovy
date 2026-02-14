@@ -1,9 +1,5 @@
 def call() {
 
-    stage('Checkout') {
-        checkout scm
-    }
-
     stage('Create env and license file') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
@@ -40,29 +36,36 @@ def call() {
             counter=0
             max_attempts=$((timeout/sleep_time))
             
-            echo "Waiting for aistor-server to be healthy..."
+            echo "Waiting for staging-aistor-server to be healthy..."
             
             while [ $counter -lt $max_attempts ]; do
-                # Check if container is running
-                is_running=$(docker inspect --format '{{.State.Running}}' aistor-server 2>/dev/null || echo "false")
+                # Check if container exists and is running
+                if ! docker inspect staging-aistor-server >/dev/null 2>&1; then
+                    echo "Container staging-aistor-server does not exist!"
+                    exit 1
+                fi
+                
+                is_running=$(docker inspect --format '{{.State.Running}}' staging-aistor-server 2>/dev/null || echo "false")
                 
                 if [ "$is_running" != "true" ]; then
-                    echo "Container aistor-server is not running!"
+                    echo "Container staging-aistor-server is not running!"
+                    echo "=== Container logs ==="
+                    docker logs --tail 50 staging-aistor-server 2>/dev/null || true
                     exit 1
                 fi
                 
                 # Check health status
-                status=$(docker inspect --format '{{.State.Health.Status}}' aistor-server 2>/dev/null || echo "no-healthcheck")
+                status=$(docker inspect --format '{{.State.Health.Status}}' staging-aistor-server 2>/dev/null || echo "no-healthcheck")
                 
                 if [ "$status" = "healthy" ]; then
-                    echo "Container aistor-server is healthy!"
+                    echo "Container staging-aistor-server is healthy!"
                     exit 0
                 fi
                 
                 # If no healthcheck defined, verify MinIO is responding
                 if [ "$status" = "no-healthcheck" ]; then
-                    if curl -f http://127.0.0.1:9000/minio/health/live 2>/dev/null; then
-                        echo "MinIO is responding to health checks!"
+                    if docker exec staging-aistor-server mc ready local 2>/dev/null; then
+                        echo "MinIO is ready and responding!"
                         exit 0
                     fi
                 fi
@@ -72,8 +75,9 @@ def call() {
                 counter=$((counter+1))
             done
             
-            echo "Timeout: aistor-server did not become healthy within ${timeout}s."
-            docker logs --tail 50 aistor-server
+            echo "Timeout: staging-aistor-server did not become healthy within ${timeout}s."
+            echo "=== Final container logs ==="
+            docker logs --tail 100 staging-aistor-server
             exit 1
         '''
     }

@@ -1,9 +1,5 @@
 def call() {
 
-    stage('Checkout') {
-        checkout scm
-    }
-
     stage('Create env file') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
@@ -34,13 +30,13 @@ def call() {
             counter=0
             max_attempts=$((timeout/sleep_time))
             
-            echo "Waiting for marketplace-staging-db to be healthy..."
+            echo "Waiting for staging-marketplace-db to be healthy..."
             
             while [ $counter -lt $max_attempts ]; do
-                status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-staging-db 2>/dev/null || echo "not-found")
+                status=$(docker inspect --format '{{.State.Health.Status}}' staging-marketplace-db 2>/dev/null || echo "not-found")
                 
                 if [ "$status" = "healthy" ]; then
-                    echo "Container marketplace-staging-db is healthy!"
+                    echo "Container staging-marketplace-db is healthy!"
                     exit 0
                 fi
                 
@@ -49,7 +45,7 @@ def call() {
                 counter=$((counter+1))
             done
             
-            echo "Timeout: marketplace-staging-db did not become healthy."
+            echo "Timeout: staging-marketplace-db did not become healthy."
             exit 1
         '''
     }

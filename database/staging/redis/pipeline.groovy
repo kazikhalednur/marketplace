@@ -1,9 +1,5 @@
 def call() {
 
-    stage('Checkout') {
-        checkout scm
-    }
-
     stage('Create env file') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
