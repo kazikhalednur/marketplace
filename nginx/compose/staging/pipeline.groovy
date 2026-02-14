@@ -34,7 +34,17 @@ def call() {
                     echo "SSL private key decrypted successfully"
                 fi
 
-                ls -la cpchub_diu_edu_bd.{crt,key}
+                # Verify the decrypted files exist before listing
+                if [ -f cpchub_diu_edu_bd.crt ] && [ -f cpchub_diu_edu_bd.key ]; then
+                    ls -la cpchub_diu_edu_bd.crt cpchub_diu_edu_bd.key
+                    echo "✓ SSL certificate files ready"
+                else
+                    echo "ERROR: SSL certificate files not found after decryption"
+                    echo "Expected files: cpchub_diu_edu_bd.crt and cpchub_diu_edu_bd.key"
+                    echo "Current directory contents:"
+                    ls -la
+                    exit 1
+                fi
             '''
         }
     }
