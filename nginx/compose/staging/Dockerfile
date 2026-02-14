@@ -47,7 +47,7 @@ RUN mkdir -p /etc/nginx/ssl && \
 # 8445: MinIO Console (HTTPS)
 # 8447: Jenkins (HTTPS)
 # 8448: MailCatcher (HTTPS)
-EXPOSE 80 443 8443 8444 8445 8447 8448
+EXPOSE 80 443 8443 8444 8445 8448
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

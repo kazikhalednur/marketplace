@@ -24,8 +24,6 @@ services:
       - "8444:8444"
       # MinIO Console
       - "8445:8445"
-      # Jenkins
-      - "8447:8447"
       # MailCatcher
       - "8448:8448"
     
