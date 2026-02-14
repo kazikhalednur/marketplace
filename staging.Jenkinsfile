@@ -269,6 +269,70 @@ pipeline {
             }
         }
 
+        stage('Restart NGINX After Changes') {
+            when {
+                expression {
+                    // Check if any service (except NGINX) was built
+                    def anyServiceBuilt = (
+                        env.BUILD_CLIENT == 'true' ||
+                        env.BUILD_SERVER == 'true' ||
+                        env.BUILD_POSTGRES == 'true' ||
+                        env.BUILD_REDIS == 'true' ||
+                        env.BUILD_MAILCATCHER == 'true' ||
+                        env.BUILD_MINIO == 'true' ||
+                        env.BUILD_JITSI == 'true'
+                    )
+                    return anyServiceBuilt
+                }
+            }
+            steps {
+                script {
+                    echo "=========================================="
+                    echo "Restarting NGINX after service changes..."
+                    echo "=========================================="
+                    
+                    sh '''
+                        # Check if NGINX container exists
+                        if docker ps -a --filter 'name=staging-marketplace-nginx' --format '{{.Names}}' | grep -q 'staging-marketplace-nginx'; then
+                            echo "Restarting NGINX container..."
+                            docker restart staging-marketplace-nginx
+                            
+                            # Wait for NGINX to be healthy
+                            echo "Waiting for NGINX to be healthy..."
+                            timeout=30
+                            counter=0
+                            
+                            while [ $counter -lt $timeout ]; do
+                                if docker inspect --format '{{.State.Health.Status}}' staging-marketplace-nginx 2>/dev/null | grep -q 'healthy'; then
+                                    echo "✓ NGINX is healthy and ready"
+                                    break
+                                fi
+                                
+                                # If no healthcheck, just check if it's running
+                                if docker inspect --format '{{.State.Running}}' staging-marketplace-nginx 2>/dev/null | grep -q 'true'; then
+                                    if [ $counter -gt 5 ]; then
+                                        echo "✓ NGINX is running"
+                                        break
+                                    fi
+                                fi
+                                
+                                echo "Waiting... ($counter/$timeout)"
+                                sleep 1
+                                counter=$((counter+1))
+                            done
+                            
+                            echo ""
+                            echo "=========================================="
+                            echo "✓ NGINX restarted successfully"
+                            echo "=========================================="
+                        else
+                            echo "⚠ NGINX container not found - skipping restart"
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Verify Deployment') {
             steps {
                 script {
