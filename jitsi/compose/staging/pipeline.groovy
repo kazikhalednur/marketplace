@@ -68,7 +68,7 @@ def call() {
                 fi
                 
                 # Check if web service is responding
-                if curl -f http://127.0.0.1:8001 2>/dev/null; then
+                if curl -f -s -o /dev/null http://127.0.0.1:8001 2>/dev/null; then
                     echo "Jitsi web is responding!"
                     
                     # Check prosody
