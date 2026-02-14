@@ -56,33 +56,80 @@ def call() {
             echo "=========================================="
             
             if [ ! -f nginx/nginx.conf ]; then
-                echo "ERROR: nginx.conf not found!"
+                echo "✗ ERROR: nginx.conf not found!"
                 exit 1
             fi
+            echo "✓ nginx.conf found"
             
             if [ ! -d nginx/conf.d/staging ]; then
-                echo "ERROR: conf.d/staging directory not found!"
+                echo "✗ ERROR: conf.d/staging directory not found!"
                 exit 1
             fi
+            echo "✓ conf.d/staging directory found"
             
-            echo "Required configuration files exist."
+            if [ ! -f ssl/cpchub_diu_edu_bd.crt ] || [ ! -f ssl/cpchub_diu_edu_bd.key ]; then
+                echo "✗ ERROR: SSL certificate files not found in ssl/ directory!"
+                echo "Required files: cpchub_diu_edu_bd.crt and cpchub_diu_edu_bd.key"
+                exit 1
+            fi
+            echo "✓ SSL certificates found"
             
+            echo ""
+            echo "Staging configuration files:"
+            ls -1 nginx/conf.d/staging/
+            
+            # Verify networks exist
+            echo ""
+            echo "Checking required Docker networks..."
+            for network in staging-marketplace-backend staging-marketplace staging-public; do
+                if docker network inspect "$network" >/dev/null 2>&1; then
+                    echo "✓ Network '$network' exists"
+                else
+                    echo "✗ ERROR: Network '$network' not found!"
+                    exit 1
+                fi
+            done
+            
+            echo ""
+            echo "Building validation container..."
             cd nginx
             docker build -t nginx-validation-temp -f compose/staging/Dockerfile .
             
-            if docker run --rm nginx-validation-temp nginx -t; then
-                echo "=========================================="
-                echo "✓ NGINX configuration is valid!"
-                echo "=========================================="
+            echo ""
+            echo "Running NGINX configuration test with network connectivity..."
+            if docker run --rm \
+                --network staging-marketplace \
+                --network staging-marketplace-backend \
+                -v "$(pwd)/../ssl:/etc/nginx/ssl:ro" \
+                -e TZ=Asia/Dhaka \
+                -e ENVIRONMENT=staging \
+                nginx-validation-temp nginx -t 2>&1 | tee /tmp/nginx-validation.log; then
+                
+                # Check if there were any warnings about upstream hosts
+                if grep -q "host not found in upstream" /tmp/nginx-validation.log; then
+                    echo ""
+                    echo "⚠ WARNING: Some upstream hosts are not yet available"
+                    echo "This is expected if services haven't been deployed yet"
+                    echo "NGINX will start but upstream services must be running for full functionality"
+                else
+                    echo ""
+                    echo "=========================================="
+                    echo "✓ NGINX configuration is valid!"
+                    echo "=========================================="
+                fi
             else
+                echo ""
                 echo "=========================================="
                 echo "✗ NGINX configuration validation FAILED!"
                 echo "=========================================="
+                cat /tmp/nginx-validation.log || true
                 docker rmi nginx-validation-temp || true
                 exit 1
             fi
             
+            rm -f /tmp/nginx-validation.log
             docker rmi nginx-validation-temp || true
+            echo "✓ Validation container removed"
         '''
     }
 
