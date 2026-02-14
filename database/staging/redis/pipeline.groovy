@@ -31,13 +31,13 @@ def call() {
             counter=0
             max_attempts=$((timeout/sleep_time))
             
-            echo "Waiting for marketplace-redis to be healthy..."
+            echo "Waiting for staging-marketplace-redis to be healthy..."
             
             while [ $counter -lt $max_attempts ]; do
-                status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-staging-redis 2>/dev/null || echo "not-found")
+                status=$(docker inspect --format '{{.State.Health.Status}}' staging-marketplace-redis 2>/dev/null || echo "not-found")
                 
                 if [ "$status" = "healthy" ]; then
-                    echo "Container marketplace-staging-redis is healthy!"
+                    echo "Container staging-marketplace-redis is healthy!"
                     exit 0
                 fi
                 
@@ -46,7 +46,7 @@ def call() {
                 counter=$((counter+1))
             done
             
-            echo "Timeout: marketplace-redis did not become healthy."
+            echo "Timeout: staging-marketplace-redis did not become healthy."
             exit 1
         '''
     }
