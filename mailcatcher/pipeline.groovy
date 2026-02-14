@@ -5,7 +5,7 @@ def call() {
     }
 
     stage('Deploy') {
-        sh 'docker compose -f mailcatcher/compose.yaml up -d'
+        sh 'docker compose -f mailcatcher/compose.staging.yaml up -d'
     }
 
     stage('Health Check') {
