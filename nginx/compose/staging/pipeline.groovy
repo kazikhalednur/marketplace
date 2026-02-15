@@ -41,7 +41,7 @@ def call() {
                 -e TZ=Asia/Dhaka \
                 -e ENVIRONMENT=staging \
                 nginx-validation-temp nginx -t 2>&1 | tee /tmp/nginx-validation.log; then
-                
+                echo "✓ NGINX configuration is valid!"
             else
                 echo "NGINX configuration validation FAILED!"
                 cat /tmp/nginx-validation.log || true
