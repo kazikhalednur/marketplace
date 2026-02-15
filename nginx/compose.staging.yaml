@@ -1,9 +1,3 @@
-# Docker Compose configuration for NGINX reverse proxy
-# Staging Environment configuration
-# 
-# This is a symlink/copy of compose.yaml for explicit staging deployment
-# Use: docker compose -f compose.staging.yaml up -d
-
 services:
   nginx:
     build:
@@ -28,10 +22,7 @@ services:
       - "8448:8448"
     
     volumes:
-      # Mount SSL certificates from host (read-only)
       - ../ssl:/etc/nginx/ssl:ro
-      
-      # Mount NGINX logs to host for persistence
       - ./logs:/var/log/nginx
     
     networks:
@@ -40,7 +31,6 @@ services:
       - staging-public
     
     environment:
-      # Set timezone
       - TZ=Asia/Dhaka
       - ENVIRONMENT=staging
     
