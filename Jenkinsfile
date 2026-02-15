@@ -95,7 +95,7 @@ pipeline {
                     def services = [
                         [name: 'Client', container: 'staging-marketplace-client', folder: 'client/'],
                         [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
-                        [name: 'Postgres', container: 'staging-marketplace-postgres', folder: 'database/staging/postgres/'],
+                        [name: 'Postgres', container: 'staging-marketplace-db', folder: 'database/staging/postgres/'],
                         [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
                         [name: 'Mailcatcher', container: 'staging-mailcatcher', folder: 'mailcatcher/'],
                         [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
