@@ -11,10 +11,6 @@ pipeline {
         stage('Create Docker Networks') {
             steps {
                 script {
-                    echo "=========================================="
-                    echo "Creating Docker networks..."
-                    echo "=========================================="
-                    
                     sh '''
                         # Function to create network if it doesn't exist
                         create_network_if_not_exists() {
@@ -96,11 +92,6 @@ pipeline {
         stage('Check Service Status') {
             steps {
                 script {
-                    echo "=========================================="
-                    echo "Checking service status and determining build requirements..."
-                    echo "=========================================="
-                    
-                    // Define services with their container names and folder paths
                     def services = [
                         [name: 'Client', container: 'staging-marketplace-client', folder: 'client/'],
                         [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
@@ -108,31 +99,29 @@ pipeline {
                         [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
                         [name: 'Mailcatcher', container: 'staging-mailcatcher', folder: 'mailcatcher/'],
                         [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
-                        [name: 'Jitsi', container: 'staging-marketplace-jitsi', folder: 'jitsi/'],
+                        [name: 'Jitsi-Web', container: 'jitsi-web-1', folder: 'jitsi/'],
+                        [name: 'Jitsi-JVB', container: 'jitsi-jvb-1', folder: 'jitsi/'],
+                        [name: 'Jitsi-Jicofo', container: 'jitsi-jicofo-1', folder: 'jitsi/'],
+                        [name: 'Jitsi-Prosody', container: 'jitsi-prosody-1', folder: 'jitsi/'],
                         [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
                     ]
                     
                     def changedFiles = env.CHANGED.split('\n').findAll { it.trim() }
                     
                     services.each { service ->
-                        // Check if container is running
                         def isRunning = sh(
                             script: "docker ps --filter 'name=${service.container}' --filter 'status=running' --format '{{.Names}}' | grep -q '${service.container}' && echo 'true' || echo 'false'",
                             returnStdout: true
                         ).trim()
                         
-                        // Check if folder has changes
                         def hasChanges = changedFiles.any { 
                             it.replaceFirst('^\\./','').startsWith(service.folder) 
                         }
                         
-                        // Build logic: Always build if service is not running OR has changes
                         def needsBuild = (isRunning == 'false') || hasChanges
                         
-                        // Set environment variable for this service
                         env."BUILD_${service.name.toUpperCase()}" = needsBuild.toString()
                         
-                        // Log status with clear reasoning
                         def status = isRunning == 'true' ? '✓ Running' : '✗ Not Running'
                         def changeStatus = hasChanges ? '✓ Has Changes' : '○ No Changes'
                         
@@ -148,7 +137,6 @@ pipeline {
                         echo "${service.name.padRight(15)} | ${status.padRight(15)} | ${changeStatus.padRight(15)} | ${buildReason}"
                     }
                     
-                    echo "=========================================="
                 }
             }
         }
@@ -272,7 +260,6 @@ pipeline {
         stage('Restart NGINX After Changes') {
             when {
                 expression {
-                    // Check if any service (except NGINX) was built
                     def anyServiceBuilt = (
                         env.BUILD_CLIENT == 'true' ||
                         env.BUILD_SERVER == 'true' ||
@@ -280,24 +267,21 @@ pipeline {
                         env.BUILD_REDIS == 'true' ||
                         env.BUILD_MAILCATCHER == 'true' ||
                         env.BUILD_MINIO == 'true' ||
-                        env.BUILD_JITSI == 'true'
+                        env.BUILD_JITSI_WEB == 'true' ||
+                        env.BUILD_JITSI_JVB == 'true' ||
+                        env.BUILD_JITSI_JICOFO == 'true' ||
+                        env.BUILD_JITSI_PROSODY == 'true'
                     )
                     return anyServiceBuilt
                 }
             }
             steps {
                 script {
-                    echo "=========================================="
-                    echo "Restarting NGINX after service changes..."
-                    echo "=========================================="
-                    
                     sh '''
-                        # Check if NGINX container exists
                         if docker ps -a --filter 'name=staging-marketplace-nginx' --format '{{.Names}}' | grep -q 'staging-marketplace-nginx'; then
                             echo "Restarting NGINX container..."
                             docker restart staging-marketplace-nginx
                             
-                            # Wait for NGINX to be healthy
                             echo "Waiting for NGINX to be healthy..."
                             timeout=30
                             counter=0
@@ -308,7 +292,6 @@ pipeline {
                                     break
                                 fi
                                 
-                                # If no healthcheck, just check if it's running
                                 if docker inspect --format '{{.State.Running}}' staging-marketplace-nginx 2>/dev/null | grep -q 'true'; then
                                     if [ $counter -gt 5 ]; then
                                         echo "✓ NGINX is running"
@@ -322,9 +305,7 @@ pipeline {
                             done
                             
                             echo ""
-                            echo "=========================================="
                             echo "✓ NGINX restarted successfully"
-                            echo "=========================================="
                         else
                             echo "⚠ NGINX container not found - skipping restart"
                         fi
@@ -336,18 +317,12 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    echo "=========================================="
-                    echo "Verifying All Services..."
-                    echo "=========================================="
-                    
                     sh '''
                         echo "Running containers:"
                         docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep staging || true
                         
                         echo ""
-                        echo "=========================================="
                         echo "✓ Full deployment complete!"
-                        echo "=========================================="
                     '''
                 }
             }
