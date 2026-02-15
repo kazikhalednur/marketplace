@@ -12,36 +12,23 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        # Function to create network if it doesn't exist
                         create_network_if_not_exists() {
                             network_name=$1
                             network_flags=$2
                             
-                            if docker network inspect "$network_name" >/dev/null 2>&1; then
-                                echo "✓ Network '$network_name' already exists"
-                            else
+                            if ! docker network inspect "$network_name" >/dev/null 2>&1; then
                                 docker network create $network_flags "$network_name"
-                                echo "✓ Network '$network_name' created"
                             fi
                         }
                         
-                        # Create internal database network
                         create_network_if_not_exists "staging-marketplace-database" "--internal"
                         
-                        # Create internal backend network
                         create_network_if_not_exists "staging-marketplace-backend" "--internal"
                         
-                        # Create internal marketplace network
                         create_network_if_not_exists "staging-marketplace" "--internal"
                         
-                        # Create public network
                         create_network_if_not_exists "staging-public" ""
                         
-                        echo ""
-                        echo "=========================================="
-                        echo "✓ All networks ready"
-                        echo "=========================================="
-                        docker network ls | grep staging
                     '''
                 }
             }
@@ -279,10 +266,7 @@ pipeline {
                 script {
                     sh '''
                         if docker ps -a --filter 'name=staging-marketplace-nginx' --format '{{.Names}}' | grep -q 'staging-marketplace-nginx'; then
-                            echo "Restarting NGINX container..."
                             docker restart staging-marketplace-nginx
-                            
-                            echo "Waiting for NGINX to be healthy..."
                             timeout=30
                             counter=0
                             
@@ -304,10 +288,9 @@ pipeline {
                                 counter=$((counter+1))
                             done
                             
-                            echo ""
                             echo "✓ NGINX restarted successfully"
                         else
-                            echo "⚠ NGINX container not found - skipping restart"
+                            echo "✗ NGINX container not found - skipping restart"
                         fi
                     '''
                 }
@@ -318,11 +301,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        echo "Running containers:"
                         docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep staging || true
-                        
-                        echo ""
-                        echo "✓ Full deployment complete!"
                     '''
                 }
             }
