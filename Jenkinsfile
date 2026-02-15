@@ -106,8 +106,8 @@ pipeline {
                         [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
                         [name: 'Postgres', container: 'staging-marketplace-postgres', folder: 'database/staging/postgres/'],
                         [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
-                        [name: 'Mailcatcher', container: 'staging-marketplace-mailcatcher', folder: 'mailcatcher/'],
-                        [name: 'Minio', container: 'staging-marketplace-minio', folder: 'minio/staging/'],
+                        [name: 'Mailcatcher', container: 'staging-mailcatcher', folder: 'mailcatcher/'],
+                        [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
                         [name: 'Jitsi', container: 'staging-marketplace-jitsi', folder: 'jitsi/'],
                         [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
                     ]
