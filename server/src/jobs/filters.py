@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Q
 
 from .models import Job
 
@@ -23,6 +24,20 @@ class JobFilter(django_filters.FilterSet):
         field_name="skills__name", lookup_expr="icontains"
     )
     tags = django_filters.CharFilter(field_name="tags", lookup_expr="icontains")
+    search = django_filters.CharFilter(method="filter_search")
+
+    def filter_search(self, queryset, name, value):
+        if not value:
+            return queryset
+        
+        return queryset.filter(
+            Q(title__icontains=value) |
+            Q(description__icontains=value) |
+            Q(tags__icontains=value) |
+            Q(category__name__icontains=value) |
+            Q(skills__name__icontains=value) |
+            Q(experience_level__icontains=value)
+        ).distinct()
 
     class Meta:
         model = Job
