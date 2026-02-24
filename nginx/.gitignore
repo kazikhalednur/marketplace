@@ -1,0 +1,32 @@
+# NGINX .gitignore
+
+# Log files
+logs/
+*.log
+
+# SSL certificates (should not be committed)
+ssl/
+*.crt
+*.key
+*.pem
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Docker volumes
+/var/log/nginx/
+
+# Environment-specific overrides (if any)
+compose.override.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo

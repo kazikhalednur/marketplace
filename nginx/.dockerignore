@@ -1,0 +1,17 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs (we want fresh logs in container)
+logs/
+*.log
+
+# Docker files (not needed in image)
+compose.yaml
+compose.*.yaml
+.dockerignore
+
+# Jenkins files
+Jenkinsfile
+pipeline.groovy
+*.groovy

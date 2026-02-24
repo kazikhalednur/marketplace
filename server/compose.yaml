@@ -3,22 +3,21 @@ services:
     build:
       context: .
       dockerfile: compose/local/django/Dockerfile
-    image: marketplace-server
-    container_name: marketplace-server
-    user: "${UID}:${GID}"
+    image: local-marketplace-server
+    container_name: local-marketplace-server
     env_file:
       - compose/local/.env
     environment:
       DEBUG: true
       SERVER_TYPE: local
-      UID: "${UID}"
-      GID: "${GID}"
     volumes:
       - ./src:/app
     ports:
       - 8000:8000
     networks:
-      - backend
+      - local-marketplace-database
+      - local-marketplace-backend
+      - local-marketplace
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
       interval: 10s
@@ -28,10 +27,14 @@ services:
 
   celeryworker:
     <<: *django
-    container_name: marketplace-celeryworker
+    container_name: local-marketplace-celeryworker
     command: /start-celeryworker
     ports: []
 
 networks:
-  backend:
+  local-marketplace-database:
+    external: true
+  local-marketplace-backend:
+    external: true
+  local-marketplace:
     external: true

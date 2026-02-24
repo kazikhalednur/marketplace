@@ -1,0 +1,60 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: compose/Dockerfile
+    image: local-marketplace-nginx
+    container_name: local-marketplace-nginx
+    restart: unless-stopped
+    
+    ports:
+      # Client application (HTTP only for local)
+      - "80:80"
+      # Backend server API (HTTP)
+      - "8000:8000"
+      # MinIO API (HTTP)
+      - "9000:9000"
+      # MinIO Console (HTTP)
+      - "9001:9001"
+      # MailCatcher Web UI (HTTP)
+      - "1080:1080"
+    
+    volumes:
+      - ./logs/local:/var/log/nginx
+      - ./conf.d/local:/etc/nginx/conf.d:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    
+    networks:
+      - local-marketplace-backend
+      - local-marketplace
+      - local-public
+    
+    environment:
+      - TZ=Asia/Dhaka
+      - ENVIRONMENT=local
+    
+    labels:
+      - "com.cpchub.description=NGINX reverse proxy"
+      - "com.cpchub.service=nginx"
+      - "com.cpchub.environment=local"
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  local-marketplace-backend:
+    external: true
+  local-marketplace:
+    external: true
+  local-public:
+    external: true

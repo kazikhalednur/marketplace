@@ -1,14 +1,14 @@
 services:
   redis:
     image: redis:7.4
-    container_name: marketplace-staging-redis
+    container_name: staging-marketplace-redis
     restart: always
     env_file:
       - .env
     expose:
       - ${REDIS_PORT}
     volumes:
-      - redis-staging-data:/data
+      - staging-redis-data:/data
     command: >
       redis-server
       --appendonly yes
@@ -22,7 +22,7 @@ services:
       --lazyfree-lazy-server-del yes
       --activedefrag yes
     networks:
-      - staging-backend
+      - staging-marketplace-database
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 10s
@@ -30,8 +30,8 @@ services:
       retries: 5
 
 volumes:
-  redis-staging-data:
+  staging-redis-data:
 
 networks:
-  staging-backend:
+  staging-marketplace-database:
     external: true

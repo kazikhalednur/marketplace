@@ -8,6 +8,7 @@ from .password_reset_mail import PasswordResetMailView
 from .signin import SigninView
 from .signin_google import SigninGoogleView
 from .token_verify import TokenVerifyView
+from .user_info import UsernameInfoView
 
 __all__ = [
     "LogoutView",
@@ -20,4 +21,5 @@ __all__ = [
     "EmailVerifyView",
     "EmailResendView",
     "SigninGoogleView",
+    "UsernameInfoView",
 ]

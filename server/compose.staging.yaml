@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: compose/staging/django/Dockerfile
-    image: marketplace-staging-server
-    container_name: marketplace-staging-server
+    image: staging-marketplace-server
+    container_name: staging-marketplace-server
     restart: unless-stopped
     env_file:
       - compose/staging/.env
@@ -12,26 +12,32 @@ services:
       DEBUG: true
       SERVER_TYPE: staging
     networks:
-      - staging-backend
-    ports:
-      - 8000:8000
+      - staging-marketplace-database
+      - staging-marketplace-backend
+      - staging-marketplace
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 40s
-    # read_only: true
-    # cap_drop:
-    #   - ALL
-    # security_opt:
-    #   - no-new-privileges:true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
 
   celeryworker:
     <<: *django
-    container_name: marketplace-staging-celeryworker
+    container_name: staging-marketplace-celeryworker
     command: /start-celeryworker
-    ports: []
+    healthcheck:
+      test: [ "CMD", "celery", "-A", "config", "inspect", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     deploy:
       resources:
         limits:
@@ -40,5 +46,9 @@ services:
           memory: 128M
 
 networks:
-  staging-backend:
+  staging-marketplace-database:
+    external: true
+  staging-marketplace-backend:
+    external: true
+  staging-marketplace:
     external: true

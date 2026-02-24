@@ -1,11 +1,7 @@
 def call() {
 
-    stage('Checkout') {
-        checkout scm
-    }
-
     stage('Deploy') {
-        sh 'docker compose -f mailcatcher/compose.yaml up -d'
+        sh 'docker compose -f mailcatcher/compose.staging.yaml up -d'
     }
 
     stage('Health Check') {
@@ -15,13 +11,13 @@ def call() {
             counter=0
             max_attempts=$((timeout/sleep_time))
             
-            echo "Waiting for marketplace-mailcatcher to be healthy..."
+            echo "Waiting for staging-mailcatcher to be healthy..."
             
             while [ $counter -lt $max_attempts ]; do
-                status=$(docker inspect --format '{{.State.Health.Status}}' marketplace-mailcatcher 2>/dev/null || echo "not-found")
+                status=$(docker inspect --format '{{.State.Health.Status}}' staging-mailcatcher 2>/dev/null || echo "not-found")
                 
                 if [ "$status" = "healthy" ]; then
-                    echo "Container marketplace-mailcatcher is healthy!"
+                    echo "Container staging-mailcatcher is healthy!"
                     exit 0
                 fi
                 
@@ -30,7 +26,7 @@ def call() {
                 counter=$((counter+1))
             done
             
-            echo "Timeout: marketplace-mailcatcher did not become healthy."
+            echo "Timeout: staging-mailcatcher did not become healthy."
             exit 1
         '''
     }

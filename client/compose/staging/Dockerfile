@@ -50,6 +50,9 @@ RUN npm run build
 # where the necessary files are copied from the build stage.
 FROM base as final
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 # Use production node environment by default.
 ENV NODE_ENV production
 
