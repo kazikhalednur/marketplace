@@ -51,5 +51,6 @@ class JobFilter(django_filters.FilterSet):
             "max_hourly_rate",
             "skills",
             "tags",
+            "search",
         ]
         order_by = ["created_at", "updated_at"]
