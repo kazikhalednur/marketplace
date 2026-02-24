@@ -174,6 +174,47 @@ export interface CreateAdminProposalPayload {
 
 export type UpdateAdminProposalPayload = Partial<CreateAdminProposalPayload>;
 
+// --- Admin Biding Contracts types (from /admin-api/biding/contracts/) ---
+export type AdminContractStatus = 'active' | 'completed' | 'pending' | 'cancelled' | string;
+
+export interface AdminContract {
+  id: string;
+  budget: string;
+  start_date: string;
+  end_date: string;
+  status: AdminContractStatus;
+  freelancer_profile: number;
+  freelancer_sub_profile: number;
+  client_profile: number;
+  proposal: string;
+  job: string;
+}
+
+export interface AdminContractsListParams {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  status?: string;
+  job?: string;
+  proposal?: string;
+  client_profile?: number;
+  freelancer_profile?: number;
+  freelancer_sub_profile?: number;
+}
+
+export interface CreateAdminContractPayload {
+  budget: string;
+  end_date: string;
+  status: AdminContractStatus;
+  freelancer_profile: number;
+  freelancer_sub_profile: number;
+  client_profile: number;
+  proposal: string;
+  job: string;
+}
+
+export type UpdateAdminContractPayload = Partial<CreateAdminContractPayload>;
+
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
@@ -194,6 +235,8 @@ export const adminApi = createApi({
     'AdminJobDetail',
     'AdminProposals',
     'AdminProposalDetail',
+    'AdminContracts',
+    'AdminContractDetail',
   ],
   endpoints: (builder) => ({
     // Get users list with pagination
@@ -363,6 +406,67 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ['AdminProposals'],
     }),
+
+    // --- Admin Biding Contracts ---
+    getAdminContracts: builder.query<PaginatedResponse<AdminContract>, AdminContractsListParams>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params.page) searchParams.append('page', params.page.toString());
+        if (params.page_size) searchParams.append('page_size', params.page_size.toString());
+        if (params.search) searchParams.append('search', params.search);
+        if (params.status) searchParams.append('status', params.status);
+        if (params.job) searchParams.append('job', params.job);
+        if (params.proposal) searchParams.append('proposal', params.proposal);
+        if (params.client_profile != null) searchParams.append('client_profile', params.client_profile.toString());
+        if (params.freelancer_profile != null) searchParams.append('freelancer_profile', params.freelancer_profile.toString());
+        if (params.freelancer_sub_profile != null) {
+          searchParams.append('freelancer_sub_profile', params.freelancer_sub_profile.toString());
+        }
+        const queryString = searchParams.toString();
+        return `admin-api/biding/contracts/${queryString ? `?${queryString}` : ''}`;
+      },
+      transformResponse: (response: ApiResponse<PaginatedResponse<AdminContract>>) => response.data,
+      providesTags: ['AdminContracts'],
+    }),
+    getAdminContractById: builder.query<AdminContract, string>({
+      query: (id) => `admin-api/biding/contracts/${id}/`,
+      transformResponse: (response: ApiResponse<AdminContract>) => response.data,
+      providesTags: (result, error, id) => [{ type: 'AdminContractDetail', id }],
+    }),
+    createAdminContract: builder.mutation<AdminContract, CreateAdminContractPayload>({
+      query: (body) => ({
+        url: 'admin-api/biding/contracts/',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiResponse<AdminContract>) => response.data,
+      invalidatesTags: ['AdminContracts'],
+    }),
+    updateAdminContract: builder.mutation<AdminContract, { id: string; data: CreateAdminContractPayload }>({
+      query: ({ id, data }) => ({
+        url: `admin-api/biding/contracts/${id}/`,
+        method: 'PUT',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<AdminContract>) => response.data,
+      invalidatesTags: (result, error, { id }) => ['AdminContracts', { type: 'AdminContractDetail', id }],
+    }),
+    patchAdminContract: builder.mutation<AdminContract, { id: string; data: UpdateAdminContractPayload }>({
+      query: ({ id, data }) => ({
+        url: `admin-api/biding/contracts/${id}/`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<AdminContract>) => response.data,
+      invalidatesTags: (result, error, { id }) => ['AdminContracts', { type: 'AdminContractDetail', id }],
+    }),
+    deleteAdminContract: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `admin-api/biding/contracts/${id}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['AdminContracts'],
+    }),
   }),
 });
 
@@ -383,4 +487,10 @@ export const {
   useUpdateAdminProposalMutation,
   usePatchAdminProposalMutation,
   useDeleteAdminProposalMutation,
+  useGetAdminContractsQuery,
+  useGetAdminContractByIdQuery,
+  useCreateAdminContractMutation,
+  useUpdateAdminContractMutation,
+  usePatchAdminContractMutation,
+  useDeleteAdminContractMutation,
 } = adminApi;
