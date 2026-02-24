@@ -140,6 +140,40 @@ export interface AdminJobPatchPayload {
   skills?: number[];
 }
 
+// --- Admin Biding Proposals types (from /admin-api/biding/proposals/) ---
+export type AdminProposalStatus = 'pending' | 'accepted' | 'rejected' | string;
+
+export interface AdminProposal {
+  id: string;
+  cover_letter: string;
+  bid_amount: string;
+  used_connects: number;
+  status: AdminProposalStatus;
+  submitted_at: string;
+  freelancer_sub_profile: number;
+  job: string;
+}
+
+export interface AdminProposalsListParams {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  status?: string;
+  job?: string;
+  freelancer_sub_profile?: number;
+}
+
+export interface CreateAdminProposalPayload {
+  cover_letter: string;
+  bid_amount: string;
+  used_connects: number;
+  status: AdminProposalStatus;
+  freelancer_sub_profile: number;
+  job: string;
+}
+
+export type UpdateAdminProposalPayload = Partial<CreateAdminProposalPayload>;
+
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
@@ -153,7 +187,14 @@ export const adminApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['AdminUsers', 'AdminUserDetail', 'AdminJobs', 'AdminJobDetail'],
+  tagTypes: [
+    'AdminUsers',
+    'AdminUserDetail',
+    'AdminJobs',
+    'AdminJobDetail',
+    'AdminProposals',
+    'AdminProposalDetail',
+  ],
   endpoints: (builder) => ({
     // Get users list with pagination
     getUsers: builder.query<PaginatedResponse<AdminUser>, UsersListParams>({
@@ -264,6 +305,64 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ['AdminJobs'],
     }),
+
+    // --- Admin Biding Proposals ---
+    getAdminProposals: builder.query<PaginatedResponse<AdminProposal>, AdminProposalsListParams>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params.page) searchParams.append('page', params.page.toString());
+        if (params.page_size) searchParams.append('page_size', params.page_size.toString());
+        if (params.search) searchParams.append('search', params.search);
+        if (params.status) searchParams.append('status', params.status);
+        if (params.job) searchParams.append('job', params.job);
+        if (params.freelancer_sub_profile != null) {
+          searchParams.append('freelancer_sub_profile', params.freelancer_sub_profile.toString());
+        }
+        const queryString = searchParams.toString();
+        return `admin-api/biding/proposals/${queryString ? `?${queryString}` : ''}`;
+      },
+      transformResponse: (response: ApiResponse<PaginatedResponse<AdminProposal>>) => response.data,
+      providesTags: ['AdminProposals'],
+    }),
+    getAdminProposalById: builder.query<AdminProposal, string>({
+      query: (id) => `admin-api/biding/proposals/${id}/`,
+      transformResponse: (response: ApiResponse<AdminProposal>) => response.data,
+      providesTags: (result, error, id) => [{ type: 'AdminProposalDetail', id }],
+    }),
+    createAdminProposal: builder.mutation<AdminProposal, CreateAdminProposalPayload>({
+      query: (body) => ({
+        url: 'admin-api/biding/proposals/',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiResponse<AdminProposal>) => response.data,
+      invalidatesTags: ['AdminProposals'],
+    }),
+    updateAdminProposal: builder.mutation<AdminProposal, { id: string; data: CreateAdminProposalPayload }>({
+      query: ({ id, data }) => ({
+        url: `admin-api/biding/proposals/${id}/`,
+        method: 'PUT',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<AdminProposal>) => response.data,
+      invalidatesTags: (result, error, { id }) => ['AdminProposals', { type: 'AdminProposalDetail', id }],
+    }),
+    patchAdminProposal: builder.mutation<AdminProposal, { id: string; data: UpdateAdminProposalPayload }>({
+      query: ({ id, data }) => ({
+        url: `admin-api/biding/proposals/${id}/`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<AdminProposal>) => response.data,
+      invalidatesTags: (result, error, { id }) => ['AdminProposals', { type: 'AdminProposalDetail', id }],
+    }),
+    deleteAdminProposal: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `admin-api/biding/proposals/${id}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['AdminProposals'],
+    }),
   }),
 });
 
@@ -278,4 +377,10 @@ export const {
   useGetAdminJobByIdQuery,
   usePatchAdminJobMutation,
   useDeleteAdminJobMutation,
+  useGetAdminProposalsQuery,
+  useGetAdminProposalByIdQuery,
+  useCreateAdminProposalMutation,
+  useUpdateAdminProposalMutation,
+  usePatchAdminProposalMutation,
+  useDeleteAdminProposalMutation,
 } = adminApi;
