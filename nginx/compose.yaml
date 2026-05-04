@@ -2,7 +2,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: compose/Dockerfile
+      dockerfile: compose/local/Dockerfile
     image: local-marketplace-nginx
     container_name: local-marketplace-nginx
     restart: unless-stopped
