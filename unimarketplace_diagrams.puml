@@ -1,0 +1,775 @@
+'==============================================================
+' UniMarketplace — PlantUML diagram set
+' Each @startuml ... @enduml block is self-contained.
+' Copy ONE block at a time into https://www.plantuml.com
+'==============================================================
+
+
+'==============================================================
+' 1) USE CASE DIAGRAM  (maps to §5 of the design doc)
+'==============================================================
+@startuml UniMarketplace_UseCases
+title UniMarketplace — Use Case Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor "Student\n(Freelancer)" as S
+actor "Client\n(Employer)"   as C
+actor "Admin / Ops"          as A
+actor "Payment System\n(bKash/Nagad/Card/Bank)" as P
+actor "Risk / Fraud\nEngine" as R
+actor "Notification\nService" as N
+
+rectangle "UniMarketplace" {
+
+  package "Auth & Identity" {
+    usecase "Sign up"               as UC_Signup
+    usecase "Sign in / OAuth"       as UC_Signin
+    usecase "Reset password"        as UC_Reset
+    usecase "Verify email"          as UC_VEmail
+    usecase "Verify phone OTP"      as UC_VPhone
+    usecase "Manage devices /\nsessions" as UC_Devices
+    usecase "Logout / revoke token" as UC_Logout
+  }
+
+  package "Verification & KYC" {
+    usecase "Upload student ID (L3)"     as UC_StudentID
+    usecase "Submit NID for L4"          as UC_NID
+    usecase "Liveness selfie check"      as UC_Liveness
+    usecase "Link bKash / bank for payout" as UC_LinkPayout
+    usecase "Auto-downgrade after\ngrad + 24mo" as UC_Downgrade
+    usecase "Verify business / individual\n(client)" as UC_ClientKYC
+  }
+
+  package "Profile & Skills" {
+    usecase "Build profile"        as UC_Profile
+    usecase "Add portfolio item"   as UC_Portfolio
+    usecase "Take skill test"      as UC_SkillTest
+    usecase "Earn skill badge"     as UC_Badge
+    usecase "Update availability"  as UC_Avail
+  }
+
+  package "Jobs" {
+    usecase "Post job"             as UC_PostJob
+    usecase "Edit / pause / close" as UC_EditJob
+    usecase "Browse / search jobs" as UC_BrowseJobs
+    usecase "Save job /\nfollow client" as UC_SaveJob
+    usecase "Boost / feature job"  as UC_BoostJob
+    usecase "Budget validation"    as UC_BudgetVal
+  }
+
+  package "Bidding" {
+    usecase "Submit proposal"      as UC_Bid
+    usecase "Anti-spam check"      as UC_AntiSpam
+    usecase "Withdraw proposal"    as UC_BidWithdraw
+    usecase "Shortlist proposal"   as UC_Shortlist
+    usecase "Reject proposal"      as UC_Reject
+    usecase "Send counter-offer"   as UC_Counter
+    usecase "Accept offer"         as UC_AcceptOffer
+  }
+
+  package "Contracts & Milestones" {
+    usecase "Create contract"           as UC_Contract
+    usecase "Define / approve milestones" as UC_Milestones
+    usecase "Submit deliverable"        as UC_Deliver
+    usecase "Request revision"          as UC_Revision
+    usecase "Approve milestone"         as UC_Approve
+    usecase "Auto-release on timer"     as UC_AutoRelease
+  }
+
+  package "Payments / Wallet / Escrow" {
+    usecase "Deposit funds"     as UC_Deposit
+    usecase "Fund escrow"       as UC_FundEscrow
+    usecase "Release escrow"    as UC_Release
+    usecase "Refund escrow"     as UC_Refund
+    usecase "Cancel contract"   as UC_Cancel
+    usecase "Request payout"    as UC_Payout
+    usecase "Process payout"    as UC_PayoutDo
+    usecase "View statement /\nledger" as UC_Statement
+    usecase "Risk check on\nmoney movement" as UC_RiskCheck
+  }
+
+  package "Disputes" {
+    usecase "Open dispute"        as UC_OpenDispute
+    usecase "Submit evidence"     as UC_Evidence
+    usecase "Mediate"             as UC_Mediate
+    usecase "Issue decision"      as UC_Decision
+    usecase "Appeal decision"     as UC_Appeal
+    usecase "Post journal entry\n(decision settlement)" as UC_JournalDec
+  }
+
+  package "Communication" {
+    usecase "Pre-bid restricted chat" as UC_PreChat
+    usecase "Contact-info filter"     as UC_Filter
+    usecase "Post-contract chat"      as UC_Chat
+    usecase "Schedule meeting"        as UC_Schedule
+    usecase "Join meeting"            as UC_Join
+    usecase "Record meeting"          as UC_Record
+  }
+
+  package "Reputation" {
+    usecase "Leave review"        as UC_Review
+    usecase "Report fake review"  as UC_ReportReview
+    usecase "Compute TrustScore"  as UC_Trust
+  }
+
+  package "Notifications" {
+    usecase "Receive in-app /\nemail / SMS" as UC_Notify
+    usecase "Manage preferences"            as UC_NotifyPrefs
+  }
+
+  package "Risk & Fraud" {
+    usecase "Detect anomaly"        as UC_Anomaly
+    usecase "Step-up authenticate"  as UC_StepUp
+    usecase "Freeze account"        as UC_Freeze
+    usecase "Unfreeze after review" as UC_Unfreeze
+  }
+
+  package "Admin Ops" {
+    usecase "KYC review queue"       as UC_KYCQ
+    usecase "Fraud queue"            as UC_FraudQ
+    usecase "Recon exceptions"       as UC_Recon
+    usecase "Manage taxonomy"        as UC_Taxonomy
+    usecase "View reports"           as UC_Reports
+    usecase "Manage feature flags"   as UC_Flags
+    usecase "Audit logs"             as UC_Audit
+  }
+
+  package "External Payments" {
+    usecase "Authorize charge"   as UC_Auth
+    usecase "Send callback"      as UC_Callback
+    usecase "Provide statement"  as UC_StmtIn
+  }
+}
+
+' === Student associations ===
+S --> UC_Signup
+S --> UC_Signin
+S --> UC_Reset
+S --> UC_VEmail
+S --> UC_VPhone
+S --> UC_Devices
+S --> UC_Logout
+S --> UC_StudentID
+S --> UC_NID
+S --> UC_Liveness
+S --> UC_LinkPayout
+S --> UC_Profile
+S --> UC_Portfolio
+S --> UC_SkillTest
+S --> UC_Avail
+S --> UC_BrowseJobs
+S --> UC_SaveJob
+S --> UC_Bid
+S --> UC_BidWithdraw
+S --> UC_Counter
+S --> UC_AcceptOffer
+S --> UC_Milestones
+S --> UC_Deliver
+S --> UC_Payout
+S --> UC_Statement
+S --> UC_OpenDispute
+S --> UC_Evidence
+S --> UC_Appeal
+S --> UC_PreChat
+S --> UC_Chat
+S --> UC_Schedule
+S --> UC_Join
+S --> UC_Record
+S --> UC_Review
+S --> UC_ReportReview
+S --> UC_Notify
+S --> UC_NotifyPrefs
+S --> UC_StepUp
+
+' === Client associations ===
+C --> UC_Signup
+C --> UC_Signin
+C --> UC_Reset
+C --> UC_VEmail
+C --> UC_VPhone
+C --> UC_Devices
+C --> UC_Logout
+C --> UC_ClientKYC
+C --> UC_PostJob
+C --> UC_EditJob
+C --> UC_BrowseJobs
+C --> UC_BoostJob
+C --> UC_Shortlist
+C --> UC_Reject
+C --> UC_Counter
+C --> UC_Milestones
+C --> UC_Revision
+C --> UC_Approve
+C --> UC_Deposit
+C --> UC_FundEscrow
+C --> UC_Release
+C --> UC_Cancel
+C --> UC_Statement
+C --> UC_OpenDispute
+C --> UC_Evidence
+C --> UC_Appeal
+C --> UC_PreChat
+C --> UC_Chat
+C --> UC_Schedule
+C --> UC_Join
+C --> UC_Record
+C --> UC_Review
+C --> UC_ReportReview
+C --> UC_Notify
+C --> UC_NotifyPrefs
+C --> UC_StepUp
+
+' === Admin associations ===
+A --> UC_KYCQ
+A --> UC_FraudQ
+A --> UC_Recon
+A --> UC_Taxonomy
+A --> UC_Reports
+A --> UC_Flags
+A --> UC_Audit
+A --> UC_Mediate
+A --> UC_Decision
+A --> UC_Refund
+A --> UC_Freeze
+A --> UC_Unfreeze
+A --> UC_Join
+
+' === Payment System (P) ===
+P --> UC_Auth
+P --> UC_Callback
+P --> UC_StmtIn
+UC_Deposit  ..> P : <<uses>>
+UC_PayoutDo ..> P : <<uses>>
+
+' === Risk Engine (R) — system actor ===
+R --> UC_Anomaly
+UC_Bid          ..> UC_AntiSpam : <<include>>
+UC_Payout       ..> UC_RiskCheck : <<include>>
+UC_Deposit      ..> UC_RiskCheck : <<include>>
+UC_PreChat      ..> UC_Filter   : <<include>>
+UC_Anomaly      ..> UC_Freeze   : <<extend>>
+
+' === Notification Service (N) ===
+N --> UC_Notify
+
+' === System-driven & include/extend relations ===
+UC_StudentID   ..> UC_Liveness  : <<include>>
+UC_NID         ..> UC_Liveness  : <<include>>
+UC_LinkPayout  ..> UC_NID       : <<include>>
+UC_PostJob     ..> UC_BudgetVal : <<include>>
+UC_BoostJob    ..> UC_PostJob   : <<extend>>
+UC_AutoRelease ..> UC_Release   : <<extend>>
+UC_Decision    ..> UC_JournalDec: <<include>>
+UC_Review      ..> UC_Trust     : <<include>>
+UC_Trust       ..> UC_Bid       : <<extend>>
+UC_Downgrade   ..> S            : <<system action>>
+@enduml
+
+
+'==============================================================
+' 2) SYSTEM ARCHITECTURE  (maps to §6 of the design doc)
+'==============================================================
+@startuml UniMarketplace_Architecture
+title UniMarketplace — System Architecture (Component View)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+actor "Students" as US
+actor "Clients"  as UC
+actor "Admins"   as UA
+
+package "Clients" {
+  [Web (Next.js)]      as FE_WEB
+  [Mobile (RN/Expo)]   as FE_MOB
+  [Admin UI (Next.js)] as FE_ADM
+}
+
+cloud "Edge" {
+  [CDN]   as CDN
+  [WAF]   as WAF
+  [Nginx] as NGX
+}
+
+package "API Gateway (Django ASGI)" {
+  [REST (DRF)]            as API_REST
+  [WebSocket (Channels)]  as API_WS
+  [JWT auth + middleware] as API_AUTH
+  [Idempotency middleware] as API_IDEMP
+}
+
+package "Domain Services / Apps" {
+  package "Identity" {
+    [accounts] as SVC_ACC
+    [kyc]      as SVC_KYC
+    [devices]  as SVC_DEV
+  }
+  package "Marketplace Core" {
+    [jobs]       as SVC_JOBS
+    [biding]     as SVC_BID
+    [work_diary] as SVC_WD
+    [search]     as SVC_SEARCH
+  }
+  package "Communication" {
+    [messaging]     as SVC_MSG
+    [meetings]      as SVC_MEET
+    [notifications] as SVC_NOTIF
+  }
+  package "Fintech Core" {
+    [wallet]            as SVC_WAL
+    [ledger]            as SVC_LED
+    [escrow]            as SVC_ESC
+    [payments_gateway]  as SVC_PG
+    [payouts]           as SVC_POUT
+  }
+  package "Trust" {
+    [disputes]   as SVC_DIS
+    [reputation] as SVC_REP
+    [risk]       as SVC_RISK
+  }
+  package "Ops" {
+    [admin_ops]        as SVC_OPS
+    [analytics_events] as SVC_AN
+  }
+}
+
+database "PostgreSQL\n(primary + replicas)\nschemas: core, ledger,\nrisk, audit" as DB_PG
+database "Redis\n(cache, channels,\ncelery broker, OTP,\nidempotency, ratelim)" as DB_RD
+database "MinIO / S3\n(general media)"     as DB_S3
+database "MinIO-KYC vault\n(encrypted)"    as DB_KYC
+database "Search index\n(PG FTS / OpenSearch)" as DB_SR
+database "ClickHouse / BigQuery\n(analytics, Phase 2)" as DB_DW
+
+package "Async Plane" {
+  [Celery workers]     as Q_WORK
+  [Celery beat]        as Q_BEAT
+  [Outbox dispatcher]  as Q_OUTBOX
+  [DLQ]                as Q_DLQ
+}
+
+cloud "External Systems" {
+  [bKash / Nagad / Rocket]      as EXT_MFS
+  [SSLCommerz / ShurjoPay /\nAamarPay (cards)] as EXT_AGG
+  [Bank BEFTN / NPSB]           as EXT_BANK
+  [SMS gateways\n(SSL Wireless / Twilio)] as EXT_SMS
+  [Email (SES / Postmark)]      as EXT_EMAIL
+  [FCM / APNs]                  as EXT_PUSH
+  [KYC vendors\n(Smile ID / IDfy / in-house)] as EXT_KYC
+  [Jitsi (self-hosted)]         as EXT_JITSI
+  [Sentry / Grafana / Loki /\nOpenTelemetry] as EXT_OBS
+}
+
+' --- user → frontend ---
+US --> FE_WEB
+US --> FE_MOB
+UC --> FE_WEB
+UA --> FE_ADM
+
+' --- frontend → edge → API ---
+FE_WEB --> CDN
+FE_MOB --> CDN
+FE_ADM --> CDN
+CDN --> WAF
+WAF --> NGX
+NGX --> API_REST
+NGX --> API_WS
+API_REST -[hidden]- API_WS
+API_REST --> API_AUTH
+API_REST --> API_IDEMP
+
+' --- API → services ---
+API_REST --> SVC_ACC
+API_REST --> SVC_KYC
+API_REST --> SVC_JOBS
+API_REST --> SVC_BID
+API_REST --> SVC_WD
+API_REST --> SVC_WAL
+API_REST --> SVC_LED
+API_REST --> SVC_ESC
+API_REST --> SVC_PG
+API_REST --> SVC_POUT
+API_REST --> SVC_DIS
+API_REST --> SVC_REP
+API_REST --> SVC_OPS
+API_REST --> SVC_NOTIF
+API_REST --> SVC_SEARCH
+API_WS   --> SVC_MSG
+API_WS   --> SVC_NOTIF
+
+' --- services → data ---
+SVC_ACC  --> DB_PG
+SVC_KYC  --> DB_PG
+SVC_KYC  --> DB_KYC
+SVC_DEV  --> DB_PG
+SVC_JOBS --> DB_PG
+SVC_BID  --> DB_PG
+SVC_WD   --> DB_PG
+SVC_WAL  --> DB_PG
+SVC_LED  --> DB_PG
+SVC_ESC  --> DB_PG
+SVC_DIS  --> DB_PG
+SVC_REP  --> DB_PG
+SVC_RISK --> DB_PG
+SVC_AN   --> DB_DW
+SVC_SEARCH --> DB_SR
+
+SVC_MSG   --> DB_RD
+SVC_NOTIF --> DB_RD
+API_AUTH  --> DB_RD
+API_IDEMP --> DB_RD
+
+SVC_JOBS --> DB_S3
+SVC_WD   --> DB_S3
+SVC_MSG  --> DB_S3
+
+' --- async plane ---
+Q_WORK   --> DB_RD
+Q_BEAT   --> Q_WORK
+Q_OUTBOX --> DB_PG
+Q_OUTBOX --> Q_WORK
+Q_WORK   --> Q_DLQ
+
+SVC_LED  --> Q_OUTBOX
+SVC_ESC  --> Q_OUTBOX
+SVC_PG   --> Q_WORK
+SVC_POUT --> Q_WORK
+SVC_NOTIF --> Q_WORK
+SVC_RISK  --> Q_WORK
+
+' --- services → external ---
+SVC_PG   --> EXT_MFS
+SVC_PG   --> EXT_AGG
+SVC_POUT --> EXT_MFS
+SVC_POUT --> EXT_BANK
+SVC_NOTIF --> EXT_SMS
+SVC_NOTIF --> EXT_EMAIL
+SVC_NOTIF --> EXT_PUSH
+SVC_KYC   --> EXT_KYC
+SVC_MEET  --> EXT_JITSI
+API_REST  --> EXT_OBS
+@enduml
+
+
+'==============================================================
+' 3) ESCROW LIFECYCLE — STATE DIAGRAM  (maps to §3.4)
+'==============================================================
+@startuml UniMarketplace_EscrowState
+title Escrow Lifecycle (per milestone)
+
+skinparam shadowing false
+hide empty description
+
+[*] --> DRAFT : contract created
+
+DRAFT --> FUNDED            : client deposits +\nledger posts escrow_fund
+FUNDED --> IN_REVIEW        : student submits deliverable
+FUNDED --> REFUNDED         : cancel before work\n(both consent / admin)
+
+IN_REVIEW --> RELEASED      : client approves\n/ auto-release timer
+IN_REVIEW --> DISPUTED      : either party opens dispute
+
+DISPUTED --> RELEASED       : admin: full release
+DISPUTED --> REFUNDED       : admin: full refund
+DISPUTED --> DECIDED_SPLIT  : admin: partial split\n(template journal)
+
+RELEASED      --> [*]
+REFUNDED      --> [*]
+DECIDED_SPLIT --> [*]
+
+' Cross-cutting freeze (risk / admin)
+state FROZEN
+FUNDED     --> FROZEN : risk / admin freeze
+IN_REVIEW  --> FROZEN : risk / admin freeze
+DISPUTED   --> FROZEN : risk / admin freeze
+FROZEN     --> FUNDED    : unfreeze
+FROZEN     --> IN_REVIEW : unfreeze
+FROZEN     --> DISPUTED  : unfreeze
+
+note right of FUNDED
+  Money sits in
+  user.escrow_hold[contract_id]
+  Client cannot withdraw it.
+end note
+
+note right of RELEASED
+  Journal:
+  DR escrow_hold
+    CR student.available  (80%)
+    CR platform.revenue   (20%)
+end note
+
+note right of DECIDED_SPLIT
+  Journal example (60/40):
+  DR escrow_hold
+    CR student.available  (48%)
+    CR platform.revenue   (12%)
+    CR client.available   (40%)
+end note
+@enduml
+
+
+'==============================================================
+' 4) SEQUENCE: DEPOSIT → FUND ESCROW → DELIVERY → RELEASE → PAYOUT
+'    (maps to Appendix B of the design doc)
+'==============================================================
+@startuml UniMarketplace_Sequence_MoneyFlow
+title End-to-end money flow: deposit → escrow → release → payout
+
+skinparam shadowing false
+autonumber
+
+actor Client    as Cl
+actor Student   as St
+participant "API\n(Django ASGI)" as API
+participant "Ledger\n(double-entry)" as L
+participant "Escrow\nstate machine" as E
+participant "Risk\nengine"          as R
+participant "Outbox /\nNotifications" as O
+participant "bKash / SSLCommerz\n(Gateway)"   as G
+
+== Deposit (client tops up wallet) ==
+Cl  -> API : POST /payments/init\n[Idempotency-Key]
+API -> R   : score(deposit, client)
+R   --> API: allow
+API -> G   : create payment intent
+G   --> API: redirect / token
+API --> Cl : redirect URL
+Cl  -> G   : authenticates + pays
+G   -> API : signed callback
+API -> G   : verify (server-to-server)
+G   --> API: ok
+API -> L   : post deposit journal\n(DR gw_settlement, CR client.available)
+API -> O   : emit "wallet.credited"
+O   --> Cl : in-app + email
+
+== Fund escrow ==
+Cl  -> API : POST /contracts/{id}/fund_escrow\n[Idempotency-Key]
+API -> L   : check client.available >= amount
+L  --> API : ok
+API -> L   : post escrow_fund journal\n(DR client.available, CR escrow_hold[contract])
+API -> E   : transition contract → FUNDED
+API -> O   : emit "contract.funded"
+O   --> St : notify
+
+== Delivery ==
+St  -> API : POST /milestones/{id}/submit
+API -> E   : transition → IN_REVIEW
+API -> O   : emit "milestone.submitted"
+O   --> Cl : notify (auto-release timer started)
+
+== Release ==
+alt client approves
+    Cl -> API : POST /milestones/{id}/approve
+else auto-release timer fires (T+7d)
+    API -> API : scheduled job triggers
+end
+API -> L   : post escrow_release journal\n(DR escrow_hold,\n  CR student.available 80%,\n  CR platform.revenue 20%)
+API -> E   : transition → RELEASED
+API -> O   : emit "milestone.released"
+O   --> St : notify
+
+== Payout ==
+St  -> API : POST /payouts/request\n[Idempotency-Key]
+API -> R   : score(payout, student)
+R   --> API: allow / hold
+API -> L   : post payout_pending journal\n(DR student.available, CR payout_in_flight)
+API -> G   : submit B2C payout
+G   -> API : callback success
+API -> L   : post payout_settled journal\n(DR payout_in_flight, CR gw_settlement)
+API -> O   : emit "payout.settled"
+O   --> St : notify
+
+== Reconciliation (nightly) ==
+API -> G   : pull statement
+G   --> API: txns + fees
+API -> L   : match journal entries\nflag exceptions
+@enduml
+
+
+'==============================================================
+' 5) LEDGER / ESCROW DATA MODEL — CLASS DIAGRAM  (maps to §3.2)
+'==============================================================
+@startuml UniMarketplace_LedgerModel
+title Ledger & Escrow data model (double-entry)
+
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class Account {
+  + id : BIGSERIAL
+  --
+  owner_type : ENUM
+  owner_id : BIGINT
+  account_type : ENUM
+  currency : CHAR(3)
+  status : ENUM
+  created_at, updated_at
+  __ enum owner_type __
+  user / platform / gateway /
+  escrow / fees / suspense
+  __ enum account_type __
+  available / pending /
+  escrow_hold / revenue /
+  fees / tax_withheld /
+  gateway_settlement /
+  suspense / rounding
+}
+
+class JournalEntry {
+  + id : BIGSERIAL
+  --
+  external_ref : VARCHAR(64) UNIQUE
+  type : ENUM
+  status : ENUM (pending|posted|reversed)
+  metadata : JSONB
+  created_by : ENUM
+  created_at
+  __ enum type __
+  deposit / escrow_fund /
+  escrow_release / escrow_refund /
+  fee_charge / tax_withhold /
+  payout / reversal /
+  adjustment / chargeback /
+  correction
+}
+
+class Posting {
+  + id : BIGSERIAL
+  --
+  journal_entry_id : FK
+  account_id : FK
+  direction : ENUM (debit|credit)
+  amount : NUMERIC(18,2)
+  currency : CHAR(3)
+  created_at
+  __ invariant __
+  per JournalEntry, per currency:
+  sum(debits) == sum(credits)
+}
+
+class BalancesCache {
+  + account_id : PK
+  --
+  balance : NUMERIC(18,2)
+  as_of : TIMESTAMPTZ
+}
+
+class EscrowHold {
+  + id : BIGSERIAL
+  --
+  contract_id : BIGINT
+  milestone_id : BIGINT?
+  account_id : FK Account
+  state : ENUM
+  funded_at, released_at, refunded_at
+  __ enum state __
+  DRAFT / FUNDED / IN_REVIEW /
+  DISPUTED / DECIDED_SPLIT /
+  RELEASED / REFUNDED / FROZEN
+}
+
+class IdempotencyKey {
+  + key : PK
+  --
+  user_id : BIGINT
+  request_hash : TEXT
+  response_status : INT
+  response_body : JSONB
+  expires_at : TIMESTAMPTZ
+}
+
+class OutboxEvent {
+  + id : BIGSERIAL
+  --
+  aggregate, aggregate_id
+  type
+  payload : JSONB
+  status : ENUM
+  attempts : INT
+  next_attempt_at, dispatched_at
+}
+
+class AuditLog {
+  + id : BIGSERIAL
+  --
+  prev_hash : TEXT
+  hash : TEXT (= sha256(prev_hash + payload))
+  actor_type, actor_id
+  action, resource, resource_id
+  diff : JSONB
+  ip, device_id, request_id
+  created_at
+}
+
+class ReconException {
+  + id : BIGSERIAL
+  --
+  gateway_txn_id : FK?
+  journal_entry_id : FK?
+  reason : TEXT
+  status : ENUM
+  resolved_by, resolved_at
+}
+
+class GatewayTxn {
+  + id : BIGSERIAL
+  --
+  gateway : TEXT
+  gateway_txn_id : UNIQUE
+  type, amount, fee, when
+  raw : JSONB
+}
+
+JournalEntry "1" *-- "many" Posting : balances\n(debits = credits)
+Account "1" o-- "many" Posting : referenced by
+Account "1" -- "0..1" BalancesCache
+EscrowHold "1" --> "1" Account : escrow_hold account
+ReconException "1" --> "0..1" GatewayTxn
+ReconException "1" --> "0..1" JournalEntry
+GatewayTxn "1" ..> "0..1" JournalEntry : matched via external_ref
+@enduml
+
+
+'==============================================================
+' 6) KYC / VERIFICATION TIER LADDER — STATE DIAGRAM  (maps to §B.1)
+'==============================================================
+@startuml UniMarketplace_KYCLadder
+title Verification tier ladder (capabilities unlock per tier)
+
+skinparam shadowing false
+hide empty description
+
+[*] --> L0_Anon
+
+state L0_Anon       : Browse only
+state L1_Email      : Email + password / Google\nProfile draft\nNo bidding / no posting
+state L2_StudentEmail: University email OTP\n+ whitelist match\nUp to 5 active proposals\nWallet cap: BDT 5,000
+state L3_StudentID  : Student ID + selfie liveness\n+ cohort cross-check\nUnlimited bids, take contracts\nWallet cap: BDT 50,000
+state L4_KYC        : NID + phone + bKash/bank match\nWithdraw enabled (subject to AML)\nWallet uncapped
+state L5_Trusted    : Tenure + clean record\nLower fees, priority support,\nearly-access features
+
+L0_Anon --> L1_Email          : sign up
+L1_Email --> L2_StudentEmail  : verify university email\n(university_registry match)
+L2_StudentEmail --> L3_StudentID : student-ID OCR + liveness pass
+L3_StudentID  --> L4_KYC      : NID + name match passes
+L4_KYC        --> L5_Trusted  : tenure + reputation thresholds
+
+' Auto-downgrade after grad+24mo
+L4_KYC        --> L2_StudentEmail : grad + 24mo (auto)\nuntil re-verify
+L3_StudentID  --> L2_StudentEmail : grad + 24mo (auto)
+L5_Trusted    --> L4_KYC          : violation / inactivity decay
+
+' Forced freeze (risk)
+state Frozen
+L2_StudentEmail --> Frozen : risk / admin freeze
+L3_StudentID    --> Frozen : risk / admin freeze
+L4_KYC          --> Frozen : risk / admin freeze
+L5_Trusted      --> Frozen : risk / admin freeze
+Frozen --> L4_KYC          : unfreeze (most common)
+@enduml
