@@ -12,12 +12,20 @@ services:
       SERVER_TYPE: local
     volumes:
       - ./src:/app
-    ports:
-      - 8000:8000
+    # The server is reached on the host via nginx (which already binds
+    # 0.0.0.0:8000 and proxies to local-marketplace-server:8000 over the
+    # local-marketplace-backend network). Exposing 8000 again here would
+    # collide with nginx, so we publish nothing and rely on the proxy.
+    expose:
+      - "8000"
     networks:
       - local-marketplace-database
       - local-marketplace-backend
       - local-marketplace
+      # Required for outbound calls (e.g. Paystation payment gateway).
+      # The other three networks are `internal: true`, which blocks DNS
+      # and routing for any host outside the docker bridge.
+      - local-public
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
       interval: 10s
@@ -37,4 +45,6 @@ networks:
   local-marketplace-backend:
     external: true
   local-marketplace:
+    external: true
+  local-public:
     external: true
