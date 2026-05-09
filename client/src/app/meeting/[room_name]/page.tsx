@@ -62,7 +62,7 @@ export default function MeetingPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-[800px] max-h-[500px] aspect-video">
+      <div className="w-full max-w-[1200px] max-h-[1000px] aspect-video">
         <Meeting
           room={joinData.room_name}
           jwt={joinData.token}

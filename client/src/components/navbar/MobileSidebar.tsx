@@ -39,7 +39,7 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
               className="text-xl font-bold text-primary"
               onClick={() => setOpen(false)}
             >
-              CPCHUB
+              UniMarketplace
             </Link>
           </div>
 

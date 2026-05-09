@@ -23,7 +23,6 @@ import {
 import DashboardPagination from "../../dashboard/_views/DashboardPagination";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Image from "next/image";
 import UnauthorizedPage from "@/app/unauthorized/page";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetContractByIdQuery, useGetMilestonesQuery, useCreateMilestoneMutation, CreateMilestonePayload, useGetFreelancerContractByIdQuery, useGetFreelancerMilestonesQuery, useSubmitMilestoneWorkMutation, FreelancerMilestone, Milestone, ContractDetail, FreelancerContractDetail, FreelancerMilestoneSubmissionItem, useUpdateClientMilestoneMutation } from "@/features/api/apiSlice";
@@ -804,12 +803,14 @@ export default function ContractDetailPage() {
                 <h3 className="text-lg font-semibold mb-6">Freelancer Profile</h3>
                 <div className="flex items-center gap-4">
                   {(contract as ContractDetail).freelancer_profile?.avatar ? (
-                    <Image 
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
                       src={(contract as ContractDetail).freelancer_profile.avatar} 
                       alt={(contract as ContractDetail).freelancer_profile.full_name}
                       width={64}
                       height={64}
                       className="w-16 h-16 rounded-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
@@ -831,12 +832,14 @@ export default function ContractDetailPage() {
                 <h3 className="text-lg font-semibold mb-6">Client</h3>
                 <div className="flex items-center gap-4">
                   {(contract as FreelancerContractDetail).client_profile?.avatar ? (
-                    <Image 
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
                       src={(contract as FreelancerContractDetail).client_profile.avatar} 
                       alt={(contract as FreelancerContractDetail).client_profile.username}
                       width={64}
                       height={64}
                       className="w-16 h-16 rounded-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">

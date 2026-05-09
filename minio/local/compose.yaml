@@ -10,9 +10,9 @@ services:
       - .env
     environment:
       MINIO_VOLUMES: /data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    expose:
+      - "9000"
+      - "9001"
     volumes:
       - ${MINIO_PATH}:/data
       - ${MINIO_LICENSE_PATH}:/minio.license
