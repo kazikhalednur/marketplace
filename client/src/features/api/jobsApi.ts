@@ -220,7 +220,7 @@ export interface PaginatedFreelancerBidsResponse {
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://unimarket.kazikhalednur.com:8443',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
       if (token) {
