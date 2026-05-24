@@ -26,12 +26,12 @@ def call() {
 
     stage('Health Check') {
         sh '''
-            timeout=90
-            sleep_time=2
+            timeout=60
+            sleep_time=5
             counter=0
             max_attempts=$((timeout/sleep_time))
 
-            echo "Waiting for staging-marketplace-server to be healthy (max 1.5 minutes)..."
+            echo "Waiting for staging-marketplace-server to be healthy (max 60 seconds)..."
 
             while [ $counter -lt $max_attempts ]; do
                 status=$(docker inspect --format '{{.State.Health.Status}}' staging-marketplace-server 2>/dev/null || echo "not-found")
@@ -46,7 +46,7 @@ def call() {
                 counter=$((counter+1))
             done
 
-            echo "Timeout: staging-marketplace-server did not become healthy within 1.5 minutes."
+            echo "Timeout: staging-marketplace-server did not become healthy within 60 seconds."
             exit 1
         '''
     }
