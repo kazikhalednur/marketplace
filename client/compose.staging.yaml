@@ -3,6 +3,13 @@ services:
     build:
       context: .
       dockerfile: compose/staging/Dockerfile
+            args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_WEBSOCKET_URL: ${NEXT_PUBLIC_WEBSOCKET_URL}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
+        NEXT_PUBLIC_CLIENT_ID: ${NEXT_PUBLIC_CLIENT_ID}
+        NEXT_PUBLIC_CLIENT_SECRET: ${NEXT_PUBLIC_CLIENT_SECRET}
+        NEXT_PUBLIC_JWT_SECRET: ${NEXT_PUBLIC_JWT_SECRET}
     image: staging-marketplace-client
     container_name: staging-marketplace-client
     restart: unless-stopped

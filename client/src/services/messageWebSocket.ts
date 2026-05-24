@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { buildChatWebSocketUrl } from '@/lib/websocketUrl';
 import { logError, logWebSocket } from '@/utils/logger';
 import WebSocketManager from './webSocketManager';
 
@@ -54,11 +55,7 @@ class MessageWebSocketService {
         this.webSocketManager = null;
       }
 
-      // Get WebSocket URL based on environment
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      const protocol = isDevelopment ? 'ws' : 'wss';
-      const host = isDevelopment ? 'localhost:8000' : window.location.host;
-      const url = `${protocol}://${host}/ws/chat/${roomName}/`;
+      const url = buildChatWebSocketUrl(roomName, token);
 
       // Create WebSocket manager
       this.webSocketManager = new WebSocketManager({

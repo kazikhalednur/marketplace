@@ -17,6 +17,7 @@ import { useApplyToJobMutation } from '@/features/api/jobsApi';
 import { usePayForJobMutation } from '@/features/api/paymentsApi';
 import BidsList from './BidsList';
 import { useRouter } from 'next/navigation';
+import { buildJobShareUrl } from '@/lib/appUrl';
 
 
 // Utility for file validation
@@ -330,9 +331,11 @@ interface JobDetailModalProps {
   onClose: () => void;
   job: JobDetail | null;
   onJobApplied?: () => void;
+  /** Show Pay Now for unverified jobs (my-jobs page only) */
+  showPayNow?: boolean;
 }
 
-export default function JobDetailModal({ open, onClose, job, onJobApplied }: JobDetailModalProps) {
+export default function JobDetailModal({ open, onClose, job, onJobApplied, showPayNow = false }: JobDetailModalProps) {
   const router = useRouter();
   const modalRef = React.useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
@@ -342,7 +345,10 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
   const [showBids, setShowBids] = React.useState(false);
   const [payForJob, { isLoading: isPaying }] = usePayForJobMutation();
 
-  // Remove local applied state, use job.is_applied
+  const jobShareUrl = React.useMemo(
+    () => (job ? buildJobShareUrl(job.id) : ""),
+    [job]
+  );
 
   // Reset copied state when modal opens/closes
   React.useEffect(() => {
@@ -538,6 +544,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                       <XCircle className="w-4 h-4" />
                       Payment method not verified
                     </div>
+                    {showPayNow && isAuthenticated && user.role === 'client' && (
                     <Button
                       className="w-fit mt-1"
                       size="sm"
@@ -569,6 +576,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                     >
                       {isPaying ? "Processing..." : "Pay Now"}
                     </Button>
+                    )}
                   </div>
                 )}
               </div>
@@ -577,7 +585,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : ''}
+                    value={jobShareUrl}
                     readOnly
                     className="bg-muted text-muted-foreground rounded px-3 py-2 text-xs w-full font-mono border border-border/20 focus:ring-2 focus:ring-primary/30 transition-all overflow-x-auto whitespace-nowrap"
                     style={{ cursor: 'text' }}
@@ -590,8 +598,7 @@ export default function JobDetailModal({ open, onClose, job, onJobApplied }: Job
                     }`}
                     onClick={() => {
                       if (!copied) {
-                        const jobLink = typeof window !== 'undefined' ? `${window.location.origin}/dashboard?jobId=${job.id}` : '';
-                        navigator.clipboard.writeText(jobLink);
+                        navigator.clipboard.writeText(jobShareUrl);
                         setCopied(true);
                       }
                     }}

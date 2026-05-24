@@ -33,7 +33,15 @@ function JobCard({ job, onClick, showEditButton, onEditJob, onDeleteJob }: {
         <div className="flex-1 p-6 flex flex-col gap-2">
           <div className="flex items-center gap-2 mb-1">
             <Briefcase className="w-5 h-5 text-primary" />
-            <a href="#" className="text-xl font-bold text-primary group-hover:underline" onClick={e => { e.preventDefault(); onClick(job); }}>
+            <a
+              href="#"
+              className="text-xl font-bold text-primary group-hover:underline"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClick(job);
+              }}
+            >
               {job.title}
             </a>
             {getStatusBadge(job.status)}

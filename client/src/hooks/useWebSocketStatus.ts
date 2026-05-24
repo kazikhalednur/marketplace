@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAppSelector } from '@/hooks/useTypedSelector';
+import { getWebSocketBaseUrl } from '@/lib/websocketUrl';
 import WebSocketManager from '@/services/webSocketManager';
 import { logError, logWebSocket } from '@/utils/logger';
 
@@ -21,13 +22,8 @@ interface UseWebSocketStatusReturn {
 // Singleton WebSocket manager instance
 let webSocketManager: WebSocketManager | null = null;
 
-// Get WebSocket URL based on environment
 const getWebSocketUrl = (notificationId: string): string => {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const protocol = isDevelopment ? 'ws' : 'wss';
-  const host = isDevelopment ? 'localhost:8000' : window.location.host;
-  
-  return `${protocol}://${host}/ws/notification/${notificationId}/`;
+  return `${getWebSocketBaseUrl()}/ws/notification/${notificationId}/`;
 };
 
 export const useWebSocketStatus = (notificationId?: string): UseWebSocketStatusReturn => {

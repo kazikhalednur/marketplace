@@ -1,5 +1,13 @@
 from .base import *
 
+PAYSTATION_ENV = config("PAYSTATION_ENV", default="live").strip().lower()
+
+from config.paystation import paystation_urls
+
+PAYSTATION_INITIATE_URL, PAYSTATION_TRANSACTION_STATUS_URL = paystation_urls(
+    PAYSTATION_ENV
+)
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = True

@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { buildChatWebSocketUrl } from '@/lib/websocketUrl';
 import { logWebSocket, logChat, logError } from '@/utils/logger';
 
 export interface ChatMessage {
@@ -101,8 +102,7 @@ export class ChatWebSocket {
     this.isConnecting = true;
     this.connectionAttempts++;
     
-    // Connect to chat WebSocket
-    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chat/${this.roomName}/?token=${token}`;
+    const url = buildChatWebSocketUrl(this.roomName, token);
     
     logWebSocket('Attempting chat WebSocket connection...', {
       attempt: this.connectionAttempts,
