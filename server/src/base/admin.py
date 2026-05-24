@@ -12,6 +12,6 @@ class SettingsAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.site_header = "Unimarketplace Admin"
-admin.site.site_title = "Unimarketplace Admin"
-admin.site.index_title = "Unimarketplace Admin Dashboard"
+admin.site.site_header = "CPCHUB Admin"
+admin.site.site_title = "CPCHUB Admin"
+admin.site.index_title = "CPCHUB Admin Dashboard"
