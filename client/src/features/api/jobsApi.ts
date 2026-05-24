@@ -40,6 +40,7 @@ interface JobApi {
   status: string;
   created_by: JobApiCreator;
   created_at: string;
+  is_payment_verified?: boolean;
 }
 
 interface PaginatedJobsApiResponse {
@@ -51,6 +52,37 @@ interface PaginatedJobsApiResponse {
     next: string | null;
     previous: string | null;
     results: JobApi[];
+  };
+}
+
+interface SingleJobApiResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: JobApi;
+}
+
+function mapJobApiToDetail(job: JobApi): JobDetail {
+  return {
+    id: job.id,
+    title: job.title,
+    description: job.description,
+    tags: job.tags,
+    category: job.category,
+    skills: job.skills,
+    currency: undefined,
+    is_fixed: job.is_fixed,
+    min_budget: job.min_budget,
+    max_budget: job.max_budget,
+    duration: job.duration,
+    experience_level: job.experience_level,
+    min_proposal_count: job.min_proposal_count,
+    max_proposal_count: job.max_proposal_count,
+    status: job.status,
+    created_by: job.created_by,
+    created_at: job.created_at,
+    is_applied: job.is_applied ?? false,
+    is_payment_verified: job.is_payment_verified,
   };
 }
 
@@ -162,10 +194,33 @@ export interface PaginatedBidsResponse {
   };
 }
 
+export interface FreelancerBid {
+  id: string;
+  job: string;
+  job_link: string;
+  cover_letter: string;
+  bid_amount: string;
+  status: string;
+  submitted_at: string;
+  uploaded_attachments: BidAttachment[];
+}
+
+export interface PaginatedFreelancerBidsResponse {
+  success: boolean;
+  status_code: number;
+  message: string;
+  data: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: FreelancerBid[];
+  };
+}
+
 export const jobsApi = createApi({
   reducerPath: 'jobsApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://unimarket.kazikhalednur.com:8443',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');
       if (token) {
@@ -220,28 +275,7 @@ export const jobsApi = createApi({
       },
       transformResponse: (response: PaginatedJobsApiResponse) => {
         if (response?.data && Array.isArray(response.data.results)) {
-          const jobs = response.data.results.map((job: JobApi) => ({
-            id: job.id,
-            title: job.title,
-            description: job.description,
-            tags: job.tags,
-            category: job.category,
-            skills: job.skills,
-            currency: undefined, // Not provided in API response
-            is_fixed: job.is_fixed,
-            min_budget: job.min_budget,
-            max_budget: job.max_budget,
-            min_hourly_rate: job.min_hourly_rate,
-            max_hourly_rate: job.max_hourly_rate,
-            duration: job.duration,
-            experience_level: job.experience_level,
-            min_proposal_count: job.min_proposal_count,
-            max_proposal_count: job.max_proposal_count,
-            status: job.status,
-            created_by: job.created_by,
-            created_at: job.created_at,
-            is_applied: job.is_applied ?? false,
-          }));
+          const jobs = response.data.results.map(mapJobApiToDetail);
           return {
             jobs,
             count: response.data.count,
@@ -257,6 +291,11 @@ export const jobsApi = createApi({
         };
       },
       providesTags: ['Jobs']
+    }),
+    getJobById: builder.query<JobDetail, string>({
+      query: (id) => `/jobs/${id}/`,
+      transformResponse: (response: SingleJobApiResponse) => mapJobApiToDetail(response.data),
+      providesTags: (_result, _error, id) => [{ type: 'JobDetail', id }],
     }),
     getDropdowns: builder.query<JobsDropdownsResponse['data'], void>({
       query: () => '/jobs/dropdown/',
@@ -333,28 +372,7 @@ export const jobsApi = createApi({
       },
       transformResponse: (response: PaginatedJobsApiResponse) => {
         if (response?.data && Array.isArray(response.data.results)) {
-          const jobs = response.data.results.map((job: JobApi) => ({
-            id: job.id,
-            title: job.title,
-            description: job.description,
-            tags: job.tags,
-            category: job.category,
-            skills: job.skills,
-            currency: undefined, // Not provided in API response
-            is_fixed: job.is_fixed,
-            min_budget: job.min_budget,
-            max_budget: job.max_budget,
-            min_hourly_rate: job.min_hourly_rate,
-            max_hourly_rate: job.max_hourly_rate,
-            duration: job.duration,
-            experience_level: job.experience_level,
-            min_proposal_count: job.min_proposal_count,
-            max_proposal_count: job.max_proposal_count,
-            status: job.status,
-            created_by: job.created_by,
-            created_at: job.created_at,
-            is_applied: job.is_applied ?? false,
-          }));
+          const jobs = response.data.results.map(mapJobApiToDetail);
           return {
             jobs,
             count: response.data.count,
@@ -418,21 +436,36 @@ export const jobsApi = createApi({
       invalidatesTags: ['Bids']
     }),
 
-    getMyBids: builder.query<PaginatedBidsResponse['data'], { page?: number; pageSize?: number }>({
+    getMyBids: builder.query<
+      PaginatedFreelancerBidsResponse['data'],
+      { page?: number; pageSize?: number }
+    >({
       query: ({ page = 1, pageSize = 10 }) => {
         const params = new URLSearchParams();
         params.append('page', page.toString());
         params.append('page_size', pageSize.toString());
         return `/biding/proposals/?${params.toString()}`;
       },
-      transformResponse: (response: PaginatedBidsResponse) => response.data,
-      providesTags: ['Bids']
+      transformResponse: (response: PaginatedFreelancerBidsResponse) => response.data,
+      providesTags: ['Bids'],
+    }),
+
+    deleteMyBid: builder.mutation<
+      { success: boolean; status_code: number; message: string },
+      string
+    >({
+      query: (id) => ({
+        url: `/biding/proposals/${id}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Bids'],
     }),
   }),
 });
 
 export const { 
-  useGetJobsQuery, 
+  useGetJobsQuery,
+  useGetJobByIdQuery,
   useCreateJobMutation, 
   useUpdateJobMutation, 
   useDeleteJobMutation, 
@@ -442,5 +475,6 @@ export const {
   useApplyToJobMutation,
   useGetBidsForJobQuery,
   useUpdateProposalStatusMutation,
-  useGetMyBidsQuery
+  useGetMyBidsQuery,
+  useDeleteMyBidMutation,
 } = jobsApi; 
