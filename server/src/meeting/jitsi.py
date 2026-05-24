@@ -8,7 +8,7 @@ def generate_jitsi_token(user, room, is_creator=False):
     payload = {
         "iss": settings.JITSI_ISSUER,
         "aud": settings.JITSI_AUDIENCE,
-        "sub": settings.JITSI_DOMAIN,
+        "sub": settings.JITSI_XMPP_DOMAIN,
         "room": room,
         "exp": int(time.time()) + 3600,
         "context": {
