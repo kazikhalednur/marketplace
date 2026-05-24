@@ -14,13 +14,15 @@ class LastMessageSerializer(serializers.Serializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    contract_title = serializers.CharField(source="contract.job.title", read_only=True)
+    # `contract` was removed from the Conversation model (see migration
+    # chat/0004_remove_conversation_contract_and_more.py), so resolve the
+    # display fields from the profile relations that still exist.
+    contract_title = serializers.SerializerMethodField()
     freelancer_name = serializers.CharField(
-        source="contract.freelancer_sub_profile.freelancer_profile.freelancer.username",
-        read_only=True,
+        source="freelancer_profile.freelancer.username", read_only=True
     )
     client_name = serializers.CharField(
-        source="contract.proposal.job.created_by.username", read_only=True
+        source="client_profile.client.username", read_only=True
     )
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
@@ -38,6 +40,28 @@ class ConversationSerializer(serializers.ModelSerializer):
             "last_message",
             "unread_count",
         ]
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_contract_title(self, obj):
+        # Best-effort: surface the most recent contract title between this
+        # client/freelancer pair if one exists, otherwise return None.
+        try:
+            from biding.models import Contract
+        except Exception:
+            return None
+
+        contract = (
+            Contract.objects.filter(
+                freelancer_profile=obj.freelancer_profile,
+                client_profile=obj.client_profile,
+            )
+            .select_related("job")
+            .order_by("-id")
+            .first()
+        )
+        if contract and getattr(contract, "job", None):
+            return getattr(contract.job, "title", None)
+        return None
 
     @extend_schema_field(LastMessageSerializer)
     def get_last_message(self, obj):
@@ -61,11 +85,13 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_unread_count(self, obj):
         user = self.context["request"].user
         try:
-            if hasattr(user, "freelancerprofile"):
+            # `related_name` on the profile FKs is `freelancer_profile` /
+            # `client_profile` (with underscore), so use those.
+            if hasattr(user, "freelancer_profile"):
                 return obj.messages.filter(
                     is_read=False, client_profile__isnull=False
                 ).count()
-            elif hasattr(user, "clientprofile"):
+            elif hasattr(user, "client_profile"):
                 return obj.messages.filter(
                     is_read=False, freelancer_profile__isnull=False
                 ).count()

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useState } from "react";
 
 interface AvatarProps {
@@ -23,7 +22,10 @@ export default function Avatar({ src, name, size = 120, className = "" }: Avatar
       style={{ width: size, height: size, fontSize: size / 2.5 }}
     >
       {src && !showInitials ? (
-        <Image
+        // Using native img instead of next/image to avoid SSRF protection
+        // that blocks private IPs (e.g. 127.0.0.1:9000 for MinIO)
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={src}
           alt={name || ""}
           width={size}
@@ -31,6 +33,7 @@ export default function Avatar({ src, name, size = 120, className = "" }: Avatar
           className="rounded-full object-cover w-full h-full"
           onError={() => setShowInitials(true)}
           onLoad={() => setShowInitials(false)}
+          loading="lazy"
         />
       ) : initials ? (
         initials

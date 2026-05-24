@@ -161,14 +161,26 @@ class ChatConsumer(BaseAuthConsumer):
     def setup_conversation(self) -> bool:
         """Setup and validate conversation access"""
         try:
-            self.conversation = Conversation.objects.get(
-                conversation_id=self.conversation_id, status=Conversation.Status.ACTIVE
+            self.conversation = Conversation.objects.select_related(
+                "freelancer_profile", "client_profile"
+            ).get(
+                conversation_id=self.conversation_id,
+                status=Conversation.Status.ACTIVE,
             )
 
-            if self.conversation.contract.freelancer_profile.id == self.user_profile.id:
+            # `contract` was removed from Conversation (see migration
+            # chat/0004_remove_conversation_contract_and_more.py); authorize
+            # off the profile fields that still live on the model.
+            if (
+                self.profile_type == "freelancer"
+                and self.conversation.freelancer_profile_id == self.user_profile.id
+            ):
                 return True
 
-            if self.conversation.contract.client_profile.id == self.user_profile.id:
+            if (
+                self.profile_type == "client"
+                and self.conversation.client_profile_id == self.user_profile.id
+            ):
                 return True
 
             return False

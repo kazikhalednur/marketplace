@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface MessageAvatarProps {
@@ -70,7 +69,8 @@ export default function MessageAvatar({
 
   if (hasRealAvatar() && profilePicture) {
     return (
-      <Image
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
         src={profilePicture}
         alt={`${username}'s avatar`}
         width={size === 'sm' ? 24 : size === 'lg' ? 40 : 32}
@@ -80,6 +80,7 @@ export default function MessageAvatar({
           getSizeClasses(),
           className
         )}
+        loading="lazy"
       />
     );
   }
