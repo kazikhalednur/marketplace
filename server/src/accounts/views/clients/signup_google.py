@@ -1,5 +1,8 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import AllowAny
+
+from utils.helpers import Response
 
 from ...serializers.clients import ClientSignupGoogleSerializer
 
@@ -11,5 +14,11 @@ class SignupGoogleView(CreateAPIView):
     """
 
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     serializer_class = ClientSignupGoogleSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(message="User Created Successfully")
