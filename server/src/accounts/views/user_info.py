@@ -1,4 +1,9 @@
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    PolymorphicProxySerializer,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import serializers
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -13,8 +18,27 @@ from ..serializers.freelancers import UserInfoSerializer
 @extend_schema_view(
     get=extend_schema(
         tags=["accounts"],
+        operation_id="accounts_username_info_retrieve",
         summary="Get user info by username",
         description="Returns user information based on username. If the user is a client, returns client-specific info. If freelancer, returns freelancer-specific info.",  # noqa: E501
+        parameters=[
+            OpenApiParameter(
+                name="username",
+                type=str,
+                location=OpenApiParameter.PATH,
+                required=True,
+            ),
+        ],
+        responses={
+            200: PolymorphicProxySerializer(
+                component_name="UsernameInfoResponse",
+                serializers=[
+                    ClientUserInfoSerializer,
+                    UserInfoSerializer,
+                ],
+                resource_type_field_name=None,
+            ),
+        },
     ),
 )
 class UsernameInfoView(RetrieveAPIView):
@@ -25,6 +49,7 @@ class UsernameInfoView(RetrieveAPIView):
 
     http_method_names = ["get"]
     permission_classes = [IsAuthenticated]
+    serializer_class = UserInfoSerializer
     lookup_field = "username"
     lookup_url_kwarg = "username"
 

@@ -1,3 +1,5 @@
+from drf_spectacular.utils import extend_schema_serializer
+
 from custom_admin.serializers.base import AdminModelSerializer
 from jobs.models import Attachment, Category, Job, Skill
 
@@ -23,6 +25,7 @@ class SkillAdminSerializer(AdminModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at")
 
 
+@extend_schema_serializer(component_name="JobsAttachmentAdmin")
 class AttachmentAdminSerializer(AdminModelSerializer):
     class Meta:
         model = Attachment

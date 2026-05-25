@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from accounts.models import (
@@ -47,6 +48,48 @@ class UserAdminListSerializer(AdminModelSerializer):
         return instance
 
 
+class ClientProfileAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = ClientProfile
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class FreelancerProfileAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = FreelancerProfile
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class FreelancerSubProfileAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = FreelancerSubProfile
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class ProjectAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = Project
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class EducationAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = Education
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class ExperienceAdminSerializer(AdminModelSerializer):
+    class Meta:
+        model = Experience
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
 class UserAdminDetailSerializer(AdminModelSerializer):
     """Serializer for User detail view - includes all nested related data."""
 
@@ -67,12 +110,14 @@ class UserAdminDetailSerializer(AdminModelSerializer):
             "password": {"write_only": True},
         }
 
+    @extend_schema_field(ClientProfileAdminSerializer(allow_null=True))
     def get_client_profile(self, obj):
         """Get client profile if user is a client."""
         if obj.role == "client" and hasattr(obj, "client_profile"):
             return ClientProfileAdminSerializer(obj.client_profile).data
         return None
 
+    @extend_schema_field(FreelancerProfileAdminSerializer(allow_null=True))
     def get_freelancer_profile(self, obj):
         """Get freelancer profile if user is a freelancer."""
         if obj.role == "freelancer" and hasattr(obj, "freelancer_profile"):
@@ -86,6 +131,7 @@ class UserAdminDetailSerializer(AdminModelSerializer):
             return profile_data
         return None
 
+    @extend_schema_field(ProjectAdminSerializer(many=True))
     def get_projects(self, obj):
         """Get all projects for freelancers."""
         if obj.role == "freelancer" and hasattr(obj, "freelancer_profile"):
@@ -98,6 +144,7 @@ class UserAdminDetailSerializer(AdminModelSerializer):
             return ProjectAdminSerializer(projects, many=True).data
         return []
 
+    @extend_schema_field(EducationAdminSerializer(many=True))
     def get_education(self, obj):
         """Get all education records for freelancers."""
         if obj.role == "freelancer" and hasattr(obj, "freelancer_profile"):
@@ -109,6 +156,7 @@ class UserAdminDetailSerializer(AdminModelSerializer):
             return EducationAdminSerializer(education_records, many=True).data
         return []
 
+    @extend_schema_field(ExperienceAdminSerializer(many=True))
     def get_experience(self, obj):
         """Get all experience records for freelancers."""
         if obj.role == "freelancer" and hasattr(obj, "freelancer_profile"):
@@ -154,48 +202,6 @@ class FreelancerAdminSerializer(AdminModelSerializer):
         model = Freelancer
         fields = "__all__"
         read_only_fields = ("id", "date_joined", "last_login")
-
-
-class ClientProfileAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = ClientProfile
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
-class FreelancerProfileAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = FreelancerProfile
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
-class FreelancerSubProfileAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = FreelancerSubProfile
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
-class ProjectAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = Project
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
-class EducationAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = Education
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
-class ExperienceAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = Experience
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
 
 
 class ArbitratorAdminSerializer(AdminModelSerializer):

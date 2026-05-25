@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.response import Response
@@ -9,6 +9,14 @@ from ..models import PaymentRequest
 
 @extend_schema(
     tags=["payments"],
+    parameters=[
+        OpenApiParameter(
+            name="invoice_number",
+            type=str,
+            location=OpenApiParameter.PATH,
+            required=True,
+        ),
+    ],
     responses={
         200: inline_serializer(
             name="StatusByInvoiceNumberViewResponse",

@@ -1,5 +1,6 @@
 from biding.models import Attachment, Contract, Proposal
 from custom_admin.serializers.base import AdminModelSerializer
+from drf_spectacular.utils import extend_schema_serializer
 
 
 class ProposalAdminSerializer(AdminModelSerializer):
@@ -16,6 +17,7 @@ class ContractAdminSerializer(AdminModelSerializer):
         read_only_fields = ("id", "start_date")
 
 
+@extend_schema_serializer(component_name="BidingAttachmentAdmin")
 class AttachmentAdminSerializer(AdminModelSerializer):
     class Meta:
         model = Attachment

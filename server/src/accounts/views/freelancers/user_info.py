@@ -20,7 +20,10 @@ from ...serializers.freelancers import UserInfoSerializer
             ),
         },
     ),
-    get=extend_schema(tags=["freelancer"]),
+    get=extend_schema(
+        tags=["freelancer"],
+        operation_id="accounts_freelancer_info_retrieve",
+    ),
 )
 class UserInfoView(RetrieveUpdateAPIView):
     """User detail Read and Update API"""

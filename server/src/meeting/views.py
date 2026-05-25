@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -46,6 +47,18 @@ class CreateMeetingView(CreateAPIView):
         return context
 
 
+@extend_schema(
+    tags=["meetings"],
+    parameters=[
+        OpenApiParameter(
+            name="room_name",
+            type=str,
+            location=OpenApiParameter.PATH,
+            required=True,
+        ),
+    ],
+    responses={200: MeetingJoinSerializer},
+)
 class JoinMeetingView(APIView):
     """
     Join an existing meeting by room name.
@@ -127,6 +140,10 @@ class MyMeetingsView(ListAPIView):
             return Meeting.objects.none()
 
 
+@extend_schema(
+    tags=["meetings"],
+    responses={200: ContractFreelancerSerializer(many=True)},
+)
 class FreelancerListView(APIView):
     """
     List all freelancers with active contracts for the authenticated client.

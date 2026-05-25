@@ -6,3 +6,5 @@ log-analyser/grafana
 **/.DS_Store
 **/.idea
 !.env.gpg
+cert.key
+cert.crt
