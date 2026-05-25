@@ -47,7 +47,6 @@ pyproject.toml
 
 
 # Credentials (extra safety)
-google_credentials.json
 *.pem
 *.key
 *.crt
