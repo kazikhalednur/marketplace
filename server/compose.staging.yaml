@@ -17,6 +17,10 @@ services:
       - staging-marketplace-database
       - staging-marketplace-backend
       - staging-marketplace
+      # Required for outbound calls (e.g. Google OAuth, Paystation).
+      # The other three networks are `internal: true`, which blocks DNS
+      # and routing for any host outside the docker bridge.
+      - staging-public
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
       interval: 10s
@@ -53,4 +57,6 @@ networks:
   staging-marketplace-backend:
     external: true
   staging-marketplace:
+    external: true
+  staging-public:
     external: true
