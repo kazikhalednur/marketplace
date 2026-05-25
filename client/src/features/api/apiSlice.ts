@@ -445,14 +445,14 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    googleFreelancerSignup: builder.mutation<SignupResponse, GoogleAuthCodePayload>({
+    googleFreelancerSignup: builder.mutation<LoginResponse, GoogleAuthCodePayload>({
       query: (body) => ({
         url: 'accounts/signup-google/',
         method: 'POST',
         body,
       }),
     }),
-    googleClientSignup: builder.mutation<SignupResponse, GoogleClientSignupPayload>({
+    googleClientSignup: builder.mutation<LoginResponse, GoogleClientSignupPayload>({
       query: (body) => ({
         url: 'accounts/clients/signup-google/',
         method: 'POST',

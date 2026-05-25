@@ -18,17 +18,30 @@ import {
 } from "@/components/ui/form";
 import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
-import { StudentSignupPayload, useStudentSignupMutation } from '@/features/api/apiSlice';
-import { useGetAcceptedDomainsQuery } from '@/features/api/jobsApi';
-import { getErrorMessage } from '@/utils/error';
-import { checkStrength, generatePassword } from '@/utils/password';
-import { validateEmail } from '@/utils/emailValidation';
-import { ArrowLeft, Eye, EyeOff, IdCard, Lock, Mail, Phone, RefreshCw, User } from "lucide-react";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import {
+  StudentSignupPayload,
+  useStudentSignupMutation,
+} from "@/features/api/apiSlice";
+import { useGetAcceptedDomainsQuery } from "@/features/api/jobsApi";
+import { getErrorMessage } from "@/utils/error";
+import { checkStrength, generatePassword } from "@/utils/password";
+import { validateEmail } from "@/utils/emailValidation";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  IdCard,
+  Lock,
+  Mail,
+  Phone,
+  RefreshCw,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useToast } from '@/components/ui/toast-provider';
+import { useToast } from "@/components/ui/toast-provider";
 
 export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const form = useForm<StudentSignupPayload>({
@@ -51,7 +64,7 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
   const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [remember, setRemember] = useState(false);
   const [studentSignup, { isLoading }] = useStudentSignupMutation();
-  
+
   // Fetch accepted domains for email validation
   const { data: domainsData } = useGetAcceptedDomainsQuery();
   const acceptedDomains = domainsData?.data?.domains || [];
@@ -60,19 +73,28 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
 
   const onSubmit = async (data: StudentSignupPayload) => {
     if (data.password !== data.confirm_password) {
-      showToast({ type: 'error', message: 'Passwords do not match' });
+      showToast({ type: "error", message: "Passwords do not match" });
       return;
     }
     try {
       const res = await studentSignup(data).unwrap();
       if (res?.success) {
-        showToast({ type: 'success', message: 'Registration successful! Please login.' });
-        router.push('/login');
+        showToast({
+          type: "success",
+          message: "Registration successful! Please login.",
+        });
+        router.push("/login");
       } else {
-        showToast({ type: 'error', message: res?.message || 'Registration failed.' });
+        showToast({
+          type: "error",
+          message: res?.message || "Registration failed.",
+        });
       }
     } catch (err) {
-      showToast({ type: 'error', message: getErrorMessage(err, 'Registration failed.') });
+      showToast({
+        type: "error",
+        message: getErrorMessage(err, "Registration failed."),
+      });
     }
   };
 
@@ -90,7 +112,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
           )}
-          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">Create your account</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">
+            Create your account
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-2 sm:px-8 px-4">
           <Form {...form}>
@@ -102,7 +126,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   rules={{ required: "First name is required" }}
                   render={({ field, fieldState }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>First Name <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        First Name <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -112,7 +138,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                             className="pl-10"
                           />
                           <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                            <Icon icon={User} size={20} className="text-muted-foreground" />
+                            <Icon
+                              icon={User}
+                              size={20}
+                              className="text-muted-foreground"
+                            />
                           </span>
                         </div>
                       </FormControl>
@@ -128,7 +158,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   rules={{ required: "Last name is required" }}
                   render={({ field, fieldState }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Last Name <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        Last Name <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -138,7 +170,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                             className="pl-10"
                           />
                           <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                            <Icon icon={User} size={20} className="text-muted-foreground" />
+                            <Icon
+                              icon={User}
+                              size={20}
+                              className="text-muted-foreground"
+                            />
                           </span>
                         </div>
                       </FormControl>
@@ -155,7 +191,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Username is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Username <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Username <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -165,7 +203,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={User} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={User}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -181,7 +223,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Student ID is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Student ID <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Student ID <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -191,7 +235,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={IdCard} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={IdCard}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -207,7 +255,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Phone number is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Phone Number <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -217,7 +267,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Phone} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Phone}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -235,11 +289,13 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   validate: (value) => {
                     const validation = validateEmail(value, acceptedDomains);
                     return validation.isValid || validation.error;
-                  }
+                  },
                 }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Email <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Email <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -250,7 +306,11 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Mail} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Mail}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -266,7 +326,9 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Password is required" }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Password <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative flex items-center">
                         <Input
@@ -275,20 +337,26 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           autoComplete="new-password"
                           {...field}
                           className="pl-10 pr-20"
-                          onChange={e => {
+                          onChange={(e) => {
                             field.onChange(e);
                             setPasswordStrength(checkStrength(e.target.value));
                           }}
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Lock}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                         <button
                           type="button"
                           tabIndex={-1}
                           className="absolute right-12 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                           onClick={() => setShowPassword((v) => !v)}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
                         >
                           {showPassword ? (
                             <Icon icon={EyeOff} size={20} className="w-5 h-5" />
@@ -307,19 +375,25 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           }}
                           aria-label="Generate strong password"
                         >
-                          <Icon icon={RefreshCw} size={20} className="w-5 h-5" />
+                          <Icon
+                            icon={RefreshCw}
+                            size={20}
+                            className="w-5 h-5"
+                          />
                         </button>
                       </div>
                     </FormControl>
                     {/* Password strength checker */}
                     {passwordStrength && (
-                      <div className={`mt-2 text-xs font-medium ${
-                        passwordStrength === "Strong"
-                          ? "text-green-600"
-                          : passwordStrength === "Medium"
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                      }`}>
+                      <div
+                        className={`mt-2 text-xs font-medium ${
+                          passwordStrength === "Strong"
+                            ? "text-green-600"
+                            : passwordStrength === "Medium"
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }`}
+                      >
                         Password strength: {passwordStrength}
                       </div>
                     )}
@@ -333,7 +407,10 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Please confirm your password" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Confirm Password{" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -344,14 +421,22 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10 pr-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Lock}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                         <button
                           type="button"
                           tabIndex={-1}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                           onClick={() => setShowConfirmPassword((v) => !v)}
-                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }
                         >
                           {showConfirmPassword ? (
                             <Icon icon={EyeOff} size={20} className="w-5 h-5" />
@@ -373,29 +458,34 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
                   id="remember"
                   type="checkbox"
                   checked={remember}
-                  onChange={e => setRemember(e.target.checked)}
+                  onChange={(e) => setRemember(e.target.checked)}
                   className="accent-primary w-4 h-4 rounded border border-border focus:ring-2 focus:ring-primary"
                 />
-                <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
+                <label
+                  htmlFor="remember"
+                  className="text-sm text-muted-foreground cursor-pointer select-none"
+                >
                   Remember me
                 </label>
               </FormItem>
-              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                {isLoading ? 'Registering...' : 'Create Account'}
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Registering..." : "Create Account"}
               </Button>
-              <div className="flex items-center mb-2 mt-4">
-                <div className="flex-1 h-px bg-border" />
-                <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
-                <div className="flex-1 h-px bg-border" />
-              </div>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
-          <GoogleSignInButton flow="signup-freelancer" label="Sign up with Google" />
           <div className="w-full text-center text-muted-foreground text-sm">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline font-medium">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-primary hover:underline font-medium"
+            >
               Login here
             </a>
           </div>

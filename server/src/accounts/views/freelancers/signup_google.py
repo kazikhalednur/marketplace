@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from utils.helpers import Response
 
@@ -20,5 +21,13 @@ class SignupGoogleView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(message="User Created Successfully")
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            message="Registration successful",
+            data={
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "role": user.role,
+            },
+        )
