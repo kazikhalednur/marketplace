@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-start md:justify-between gap-10">
         {/* Branding & Social */}
         <div className="flex-1 flex flex-col gap-4">
-          <Link href="/" className="text-2xl font-extrabold text-primary tracking-tight">CPCHUB</Link>
+          <Link href="/" className="text-2xl font-extrabold text-primary tracking-tight">UniMarketplace</Link>
           <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
             The modern marketplace for students, employers, and professionals. Discover, connect, and grow with the best projects in the industry.
           </p>
@@ -56,7 +56,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground bg-muted/60 mt-10">
-        © {new Date().getFullYear()} CPCHUB. All rights reserved. &nbsp;|&nbsp;
+        © {new Date().getFullYear()} UniMarketplace. All rights reserved. &nbsp;|&nbsp;
         <Link href="#" className="hover:text-primary">Privacy Policy</Link> &nbsp;|&nbsp;
         <Link href="#" className="hover:text-primary">Terms of Service</Link>
       </div>

@@ -19,8 +19,10 @@ import {
 import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
 import { useToast } from '@/components/ui/toast-provider';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { LoginPayload, useLoginMutation } from '@/features/api/apiSlice';
 import { Loader, useAuth } from '@/hooks/useAuth';
+import { setAuthTokens } from '@/utils/authTokens';
 import { getErrorMessage } from '@/utils/error';
 import Cookies from 'js-cookie';
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -79,9 +81,7 @@ export default function LoginPage() {
         // Set cookie expiration based on remember me
         const expires = data.remember ? 30 : 7; // 30 days if remember me, 7 days otherwise
         
-        // Save tokens as cookies (not HttpOnly, accessible to JS)
-        Cookies.set('accessToken', res.data.access, { path: '/', expires });
-        Cookies.set('refreshToken', res.data.refresh, { path: '/', expires });
+        setAuthTokens(res.data.access, res.data.refresh, data.remember);
         
         // Save remember me preference and credentials if remember me is checked
         Cookies.set('rememberMe', data.remember ? 'true' : 'false', { path: '/', expires });
@@ -237,33 +237,7 @@ export default function LoginPage() {
             <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
             <hr className="flex-1 border-t border-border" />
           </div>
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 mt-2"
-            type="button"
-            aria-label="Sign in with Google"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 48 48"
-            >
-              <path
-                fill="#FFC107"
-                d="M43.611 20.083h-19.5v7.833h11.237c-1.212 6.722-7.151 11.25-14.494 11.25-8.327 0-15.1-6.773-15.1-15.1s6.773-15.1 15.1-15.1c4.073 0 7.78 1.564 10.575 4.117l5.58-5.58C34.35 6.4 29.412 4 24.11 4 12.648 4 3.11 13.537 3.11 25s9.538 21 21 21c12.18 0 20.88-8.543 20.88-20.48 0-1.38-.14-2.72-.38-4.437z"
-              />
-              <path
-                fill="#FF3D00"
-                d="M6.306 14.691l6.546 4.81c1.94-4.44 6.646-7.544 11.85-7.544 4.073 0 7.78 1.564 10.575 4.117l5.58-5.58C34.35 6.4 29.412 4 24.11 4c-7.983 0-15.025 5.058-17.804 12.691z"
-              />
-              <path
-                fill="#4CAF50"
-                d="M24.11 44c5.627 0 10.518-2.216 14.198-5.83l-6.58-5.44c-2.46 1.66-5.71 2.642-9.617 2.642-4.254 0-7.92-2.727-9.247-6.53l-6.65 5.17C8.644 39.45 15.856 44 24.11 44z"
-              />
-              <path fill="#1976D2" d="M43.611 20.083h-19.5v7.833h11.237c-1.212 6.722-7.151 11.25-14.494 11.25-1.653 0-3.262-.324-4.712-.918v6.004c1.43.493 2.952.75 4.712.75 12.18 0 20.88-8.543 20.88-20.48 0-1.38-.14-2.72-.38-4.437z" />
-            </svg>
-            Sign in with Google
-          </Button>
+          <GoogleSignInButton flow="login" label="Sign in with Google" />
           <div className="w-full text-center text-muted-foreground text-sm">
             Don&apos;t have an account?{' '}
             <a href="/register" className="text-primary hover:underline font-medium">

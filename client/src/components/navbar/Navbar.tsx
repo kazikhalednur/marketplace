@@ -93,7 +93,7 @@ export default function Navbar() {
     )}>
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-primary">CPCHUB</Link>
+        <Link href="/" className="text-xl font-bold text-primary">UniMarketplace</Link>
 
         {/* Desktop Nav - Aligned to the right */}
         <div className="hidden md:flex items-center gap-6">

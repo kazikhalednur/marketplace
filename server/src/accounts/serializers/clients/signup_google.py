@@ -5,7 +5,7 @@ from ...helpers import (
     google_user_details,
     match_email_domain,
 )
-from ...models import Client, User
+from ...models import Client
 
 
 class ClientSignupGoogleSerializer(serializers.Serializer):
@@ -31,7 +31,6 @@ class ClientSignupGoogleSerializer(serializers.Serializer):
             username=username,
             email_verified=google_data["email_verified"],
             password=get_random_string(32),
-            role=User.UserRole.FREELANCER,
         )
 
         return user
