@@ -5,7 +5,15 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import { Briefcase, Home, LogOut, MessageSquare, UserCircle2, FileText, Video } from "lucide-react";
+import {
+  Briefcase,
+  Home,
+  LogOut,
+  MessageSquare,
+  UserCircle2,
+  FileText,
+  Video,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 
@@ -24,8 +32,8 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
     user?.role === "employer"
       ? "/dashboard/employer"
       : user?.role === "admin"
-      ? "/admin"
-      : "/dashboard";
+        ? "/admin"
+        : "/dashboard";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -180,7 +188,7 @@ export default function MobileSidebar({ open, setOpen }: MobileSidebarProps) {
         <div className="absolute bottom-0 left-0 w-full px-6 pb-6">
           <div className="flex items-center justify-center gap-3 bg-muted/60 rounded-lg py-3 shadow-sm">
             <span
-              className={`text-sm font-medium ${isDark ? 'text-white' : 'text-muted-foreground'}`}
+              className={`text-sm font-medium ${isDark ? "text-white" : "text-muted-foreground"}`}
             >
               Theme
             </span>

@@ -3,10 +3,11 @@ import React, { useState } from "react";
 interface TagsInputProps {
   value?: string[];
   onChange: (tags: string[]) => void;
+  onBlur?: () => void;
   placeholder?: string;
 }
 
-export function TagsInput({ value = [], onChange, placeholder = "" }: TagsInputProps) {
+export function TagsInput({ value = [], onChange, onBlur, placeholder = "" }: TagsInputProps) {
   const [input, setInput] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +57,7 @@ export function TagsInput({ value = [], onChange, placeholder = "" }: TagsInputP
         value={input}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        onBlur={onBlur}
         placeholder={placeholder}
         className="flex-1 min-w-[120px] bg-transparent outline-none border-none shadow-none px-0 py-1 text-sm"
       />
