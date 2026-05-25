@@ -8,13 +8,23 @@ import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/hooks/useAuth";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { cn } from "@/lib/utils";
-import { HelpCircle, LogOut, Menu, Settings, User as UserIcon, Wifi, ChevronDown, FileText, Briefcase, Video } from "lucide-react";
+import {
+  HelpCircle,
+  LogOut,
+  Menu,
+  Settings,
+  User as UserIcon,
+  Wifi,
+  ChevronDown,
+  FileText,
+  Briefcase,
+  Video,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "./NotificationDropdown";
 import MessagesDropdown from "./MessagesDropdown";
-
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -44,7 +54,7 @@ export default function Navbar() {
       ) {
         setProfileDropdownOpen(false);
       }
-      
+
       // Close manage work dropdown
       if (
         manageWorkDropdownOpen &&
@@ -74,46 +84,90 @@ export default function Navbar() {
       return user.name;
     }
     if (user?.first_name || user?.last_name) {
-      return `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
+      return `${user?.first_name || ""} ${user?.last_name || ""}`.trim();
     }
-    return 'User';
+    return "User";
   }
 
   // Helper to determine if avatar is real
   function hasRealAvatar() {
     if (!user?.avatar) return false;
-    const placeholderList = ["/avatar-placeholder.png", "/placeholder.png", "placeholder", "avatar-placeholder"];
+    const placeholderList = [
+      "/avatar-placeholder.png",
+      "/placeholder.png",
+      "placeholder",
+      "avatar-placeholder",
+    ];
     return !placeholderList.includes(user.avatar.trim());
   }
 
   return (
-    <header className={cn(
-      "sticky top-0 z-50 w-full transition-all",
-      scrolled ? "shadow-sm border-b bg-background/90 backdrop-blur" : "bg-background/70"
-    )}>
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all",
+        scrolled
+          ? "shadow-sm border-b bg-background/90 backdrop-blur"
+          : "bg-background/70",
+      )}
+    >
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-primary">UniMarketplace</Link>
+        <Link href="/" className="text-xl font-bold text-primary">
+          CPCHUB
+        </Link>
 
         {/* Desktop Nav - Aligned to the right */}
         <div className="hidden md:flex items-center gap-6">
           <nav className="flex items-center gap-6">
-            <Link href="/dashboard" className={cn("hover:text-primary", isActive("/dashboard") && "text-primary font-medium")}>Dashboard</Link>
+            <Link
+              href="/dashboard"
+              className={cn(
+                "hover:text-primary",
+                isActive("/dashboard") && "text-primary font-medium",
+              )}
+            >
+              Dashboard
+            </Link>
             {isAuthenticated && (
-              <Link href="/meetings" className={cn("hover:text-primary", isActive("/meetings") && "text-primary font-medium")}>Meetings</Link>
+              <Link
+                href="/meetings"
+                className={cn(
+                  "hover:text-primary",
+                  isActive("/meetings") && "text-primary font-medium",
+                )}
+              >
+                Meetings
+              </Link>
             )}
             {isDev && (
-              <Link href="/admin" className={cn("hover:text-primary", isActive("/admin") && "text-primary font-medium")}>Admin Panel (Temp)</Link>
+              <Link
+                href="/admin"
+                className={cn(
+                  "hover:text-primary",
+                  isActive("/admin") && "text-primary font-medium",
+                )}
+              >
+                Admin Panel (Temp)
+              </Link>
             )}
             {user?.role === "client" && (
               <>
-                <Link href="/my-jobs" className={cn("hover:text-primary", isActive("/my-jobs") && "text-primary font-medium")}>My Jobs</Link>
+                <Link
+                  href="/my-jobs"
+                  className={cn(
+                    "hover:text-primary",
+                    isActive("/my-jobs") && "text-primary font-medium",
+                  )}
+                >
+                  My Jobs
+                </Link>
                 <div className="relative">
                   <button
                     ref={manageWorkButtonRef}
                     className={cn(
                       "flex items-center gap-1 hover:text-primary transition-colors",
-                      (isActive("/manage-work") || isActive("/contract")) && "text-primary font-medium"
+                      (isActive("/manage-work") || isActive("/contract")) &&
+                        "text-primary font-medium",
                     )}
                     onClick={() => setManageWorkDropdownOpen((v) => !v)}
                     aria-haspopup="true"
@@ -122,7 +176,12 @@ export default function Navbar() {
                     type="button"
                   >
                     Manage Work
-                    <ChevronDown className={cn("w-4 h-4 transition-transform", manageWorkDropdownOpen && "rotate-180")} />
+                    <ChevronDown
+                      className={cn(
+                        "w-4 h-4 transition-transform",
+                        manageWorkDropdownOpen && "rotate-180",
+                      )}
+                    />
                   </button>
                   {manageWorkDropdownOpen && (
                     <div
@@ -152,13 +211,22 @@ export default function Navbar() {
             )}
             {user?.role === "freelancer" && (
               <>
-                <Link href="/my-bids" className={cn("hover:text-primary", isActive("/my-bids") && "text-primary font-medium")}>My Bids</Link>
+                <Link
+                  href="/my-bids"
+                  className={cn(
+                    "hover:text-primary",
+                    isActive("/my-bids") && "text-primary font-medium",
+                  )}
+                >
+                  My Bids
+                </Link>
                 <div className="relative">
                   <button
                     ref={manageWorkButtonRef}
                     className={cn(
                       "flex items-center gap-1 hover:text-primary transition-colors",
-                      (isActive("/manage-work") || isActive("/contract")) && "text-primary font-medium"
+                      (isActive("/manage-work") || isActive("/contract")) &&
+                        "text-primary font-medium",
                     )}
                     onClick={() => setManageWorkDropdownOpen((v) => !v)}
                     aria-haspopup="true"
@@ -167,7 +235,12 @@ export default function Navbar() {
                     type="button"
                   >
                     Manage Work
-                    <ChevronDown className={cn("w-4 h-4 transition-transform", manageWorkDropdownOpen && "rotate-180")} />
+                    <ChevronDown
+                      className={cn(
+                        "w-4 h-4 transition-transform",
+                        manageWorkDropdownOpen && "rotate-180",
+                      )}
+                    />
                   </button>
                   {manageWorkDropdownOpen && (
                     <div
@@ -203,7 +276,7 @@ export default function Navbar() {
               </>
             )} */}
           </nav>
-          
+
           {/* Actions - Theme toggle at the end */}
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
@@ -214,10 +287,10 @@ export default function Navbar() {
                     <Wifi className="w-4 h-4 text-green-500" />
                   </div>
                 )}
-                
+
                 <NotificationDropdown />
                 <MessagesDropdown />
-                
+
                 <div className="relative">
                   <button
                     ref={profileButtonRef}
@@ -228,7 +301,11 @@ export default function Navbar() {
                     aria-label="Open profile menu"
                     type="button"
                   >
-                    <Avatar src={user?.avatar ?? undefined} name={getDisplayName() ?? undefined} size={40} />
+                    <Avatar
+                      src={user?.avatar ?? undefined}
+                      name={getDisplayName() ?? undefined}
+                      size={40}
+                    />
                   </button>
                   {/* Improved Dropdown */}
                   {profileDropdownOpen && (
@@ -238,25 +315,33 @@ export default function Navbar() {
                     >
                       <div className="flex flex-col items-center gap-2 py-5 border-b border-border">
                         {hasRealAvatar() ? (
-                          <Avatar src={user?.avatar ?? undefined} name={getDisplayName() ?? undefined} size={80} />
-                        ) : null }
-                        <span className="font-bold text-lg">{getDisplayName()}</span>
-                        <span className="text-base font-medium text-muted-foreground">{user?.email}</span>
+                          <Avatar
+                            src={user?.avatar ?? undefined}
+                            name={getDisplayName() ?? undefined}
+                            size={80}
+                          />
+                        ) : null}
+                        <span className="font-bold text-lg">
+                          {getDisplayName()}
+                        </span>
+                        <span className="text-base font-medium text-muted-foreground">
+                          {user?.email}
+                        </span>
                       </div>
-                      <Link 
-                        href={`/profile/${user?.username || 'profile'}`}
+                      <Link
+                        href={`/profile/${user?.username || "profile"}`}
                         className="flex items-center gap-3 w-full px-4 py-2 mt-1 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold"
                         onClick={() => setProfileDropdownOpen(false)}
                       >
                         <Icon icon={UserIcon} size={18} /> Profile
                       </Link>
-                      <button 
+                      <button
                         className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold cursor-pointer"
                         onClick={() => setProfileDropdownOpen(false)}
                       >
                         <Icon icon={Settings} size={18} /> Settings
                       </button>
-                      <button 
+                      <button
                         className="flex items-center gap-3 w-full px-4 py-2 hover:bg-primary/10 hover:border-l-4 hover:border-primary rounded-lg transition text-base font-semibold cursor-pointer"
                         onClick={() => setProfileDropdownOpen(false)}
                       >
@@ -269,7 +354,12 @@ export default function Navbar() {
                           setProfileDropdownOpen(false);
                         }}
                       >
-                        <Icon icon={LogOut} size={18} className="-scale-x-100" /> Logout
+                        <Icon
+                          icon={LogOut}
+                          size={18}
+                          className="-scale-x-100"
+                        />{" "}
+                        Logout
                       </button>
                     </div>
                   )}
@@ -285,7 +375,7 @@ export default function Navbar() {
                 </Button>
               </div>
             )}
-            
+
             {/* Theme Toggle - Always at the end */}
             <span className="scale-125">
               <ThemeToggle />
@@ -306,4 +396,3 @@ export default function Navbar() {
     </header>
   );
 }
- 
