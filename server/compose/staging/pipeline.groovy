@@ -20,6 +20,26 @@ def call() {
         }
     }
 
+        stage('Create google credentials file') {
+        withCredentials([
+            file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
+            string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
+        ]) {
+            sh '''
+                cd server
+
+                export GNUPGHOME=$(mktemp -d)
+
+                gpg --batch --import "$GPG_KEY"
+
+                gpg --batch --yes \
+                    --pinentry-mode loopback \
+                    --passphrase "$GPG_PASSPHRASE" \
+                    --decrypt google_credentials.json.gpg > google_credentials.json
+            '''
+        }
+    }
+
     stage('Build and Deploy') {
         sh 'docker compose -f server/compose.staging.yaml up --build -d'
     }
