@@ -16,18 +16,26 @@ interface SelectFieldProps {
   options: SelectFieldOption[];
   value: string | number;
   onChange: (value: string | number) => void;
+  onBlur?: () => void;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
 }
 
 export const SelectField = React.forwardRef<HTMLButtonElement, SelectFieldProps>(
-  ({ options, value, onChange, placeholder = "Select an option", className, disabled }, ref) => {
+  ({ options, value, onChange, onBlur, placeholder = "Select an option", className, disabled }, ref) => {
     const [open, setOpen] = React.useState(false);
     const selected = options.find((opt) => String(opt.value) === String(value));
 
+    const handleOpenChange = (nextOpen: boolean) => {
+      setOpen(nextOpen);
+      if (!nextOpen) {
+        onBlur?.();
+      }
+    };
+
     return (
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button
             ref={ref}
@@ -65,6 +73,7 @@ export const SelectField = React.forwardRef<HTMLButtonElement, SelectFieldProps>
                 onClick={() => {
                   onChange(opt.value);
                   setOpen(false);
+                  onBlur?.();
                 }}
               >
                 <span className="flex-1">{opt.label}</span>
@@ -88,12 +97,13 @@ interface MultiSelectFieldProps {
   options: SelectFieldOption[];
   value: string[];
   onChange: (value: string[]) => void;
+  onBlur?: () => void;
   placeholder?: string;
   className?: string;
 }
 
 export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFieldProps>(
-  ({ options, value, onChange, placeholder, className = "" }, ref) => {
+  ({ options, value, onChange, onBlur, placeholder, className = "" }, ref) => {
     const [isOpen, setIsOpen] = React.useState(false);
 
     const handleSelect = (optionValue: string) => {
@@ -112,7 +122,17 @@ export const MultiSelectField = React.forwardRef<HTMLDivElement, MultiSelectFiel
     const unselectedOptions = options.filter(opt => !value.includes(String(opt.value)));
 
     return (
-      <div ref={ref} className={`relative ${className}`} tabIndex={0} onBlur={() => setIsOpen(false)}>
+      <div
+        ref={ref}
+        className={`relative ${className}`}
+        tabIndex={0}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setIsOpen(false);
+            onBlur?.();
+          }
+        }}
+      >
         {/* Selected items display */}
         <div 
           className="min-h-[42px] w-full rounded-md border border-input bg-background px-3 pr-10 py-2 text-sm shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary cursor-pointer flex flex-wrap gap-1 items-center transition"
