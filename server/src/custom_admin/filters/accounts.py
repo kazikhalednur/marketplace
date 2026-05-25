@@ -7,7 +7,7 @@ from accounts.models import (
     ClientProfile,
     Freelancer,
     FreelancerProfile,
-    User
+    User,
 )
 
 

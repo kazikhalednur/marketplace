@@ -121,7 +121,10 @@ class PaymentUtility:
                 "payment_url": self.response.get("payment_url"),
             }
 
-        if status_code == PAYSTATION_DUPLICATE_INVOICE and retry_count < MAX_INVOICE_RETRY:
+        if (
+            status_code == PAYSTATION_DUPLICATE_INVOICE
+            and retry_count < MAX_INVOICE_RETRY
+        ):  # noqa: E501
             self.payment_request.update_invoice_number()
             return self.initiate_payment(retry_count=retry_count + 1)
 
@@ -130,7 +133,7 @@ class PaymentUtility:
 
         if status_code == PAYSTATION_INVALID_CREDENTIAL:
             logger.error(
-                "Paystation rejected credentials (status 1001). env=%s url=%s merchant=%s",
+                "Paystation rejected credentials (status 1001). env=%s url=%s merchant=%s",  # noqa: E501
                 settings.PAYSTATION_ENV,
                 self.initiate_payment_url,
                 self.__paystation_marchant_id,
@@ -140,9 +143,7 @@ class PaymentUtility:
                 "status_code": 502,
                 "status": "failed",
                 "message": (
-                    "Payment gateway credentials are invalid for the configured environment. "
-                    f"Use PAYSTATION_ENV=sandbox with sandbox merchant credentials, or "
-                    f"PAYSTATION_ENV=live with your live Paystation merchant ID and password."
+                    "Payment gateway credentials are invalid for the configured environment. Use PAYSTATION_ENV=sandbox with sandbox merchant credentials, or PAYSTATION_ENV=live with your live Paystation merchant ID and password."  # noqa: E501
                 ),
             }
 

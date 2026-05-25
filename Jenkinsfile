@@ -295,6 +295,7 @@ pipeline {
                 script {
                     sh '''
                         docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep staging || true
+                        docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep jitsi || true
                     '''
                 }
             }

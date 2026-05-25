@@ -65,4 +65,3 @@ class UserAdminViewSet(BaseAdminViewSetMixin, viewsets.ModelViewSet):
         if self.action == "retrieve":
             return UserAdminDetailSerializer
         return UserAdminListSerializer
-

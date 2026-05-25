@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
-from django.db import transaction
 
-from biding.models import Contract, Proposal
+from biding.models import Proposal
 from biding.services import process_proposal_acceptance
 
 
@@ -84,9 +83,7 @@ class Command(BaseCommand):
                 )
             else:
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"Proposal {proposal_id} already has a contract"
-                    )
+                    self.style.WARNING(f"Proposal {proposal_id} already has a contract")
                 )
 
         except Proposal.DoesNotExist:

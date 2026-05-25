@@ -29,14 +29,14 @@ class JobFilter(django_filters.FilterSet):
     def filter_search(self, queryset, name, value):
         if not value:
             return queryset
-        
+
         return queryset.filter(
-            Q(title__icontains=value) |
-            Q(description__icontains=value) |
-            Q(tags__icontains=value) |
-            Q(category__name__icontains=value) |
-            Q(skills__name__icontains=value) |
-            Q(experience_level__icontains=value)
+            Q(title__icontains=value)
+            | Q(description__icontains=value)
+            | Q(tags__icontains=value)
+            | Q(category__name__icontains=value)
+            | Q(skills__name__icontains=value)
+            | Q(experience_level__icontains=value)
         ).distinct()
 
     class Meta:

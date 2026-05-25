@@ -59,7 +59,9 @@ urlpatterns = [
         name="accepted_domain",
     ),
     path("info/", freelancers_views.UserInfoView.as_view(), name="info"),
-    path("info/<str:username>/", views.UsernameInfoView.as_view(), name="username_info"),
+    path(
+        "info/<str:username>/", views.UsernameInfoView.as_view(), name="username_info"
+    ),  # noqa: E501
     # Client specific URLs
     path("clients/signup/", clients_views.SignupView.as_view(), name="clients_signup"),
     path(

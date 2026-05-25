@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
 from accounts.models import (
-    OTP,
-    AcceptedDomain,
     Arbitrator,
     Auditor,
     Client,
@@ -14,7 +12,6 @@ from accounts.models import (
     FreelancerSubProfile,
     Project,
     User,
-    WebSocketID,
 )
 from custom_admin.serializers.base import AdminModelSerializer
 
@@ -213,10 +210,3 @@ class AuditorAdminSerializer(AdminModelSerializer):
         model = Auditor
         fields = "__all__"
         read_only_fields = ("id", "date_joined", "last_login")
-
-
-class WebSocketIDAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = WebSocketID
-        fields = "__all__"
-        read_only_fields = ("id",)

@@ -5,9 +5,7 @@ from .accounts import (
     ClientProfileAdminFilter,
     FreelancerAdminFilter,
     FreelancerProfileAdminFilter,
-    OTPAdminFilter,
     UserAdminFilter,
-    WebSocketIDAdminFilter,
 )
 from .biding import (
     BidingAttachmentAdminFilter,
@@ -32,8 +30,6 @@ __all__ = [
     "FreelancerAdminFilter",
     "ClientProfileAdminFilter",
     "FreelancerProfileAdminFilter",
-    "OTPAdminFilter",
-    "WebSocketIDAdminFilter",
     "ArbitratorAdminFilter",
     "AuditorAdminFilter",
     # Jobs

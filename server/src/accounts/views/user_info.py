@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import serializers
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import serializers
 
 from utils.helpers import Response
 
@@ -14,7 +14,7 @@ from ..serializers.freelancers import UserInfoSerializer
     get=extend_schema(
         tags=["accounts"],
         summary="Get user info by username",
-        description="Returns user information based on username. If the user is a client, returns client-specific info. If freelancer, returns freelancer-specific info.",
+        description="Returns user information based on username. If the user is a client, returns client-specific info. If freelancer, returns freelancer-specific info.",  # noqa: E501
     ),
 )
 class UsernameInfoView(RetrieveAPIView):
