@@ -23,15 +23,16 @@ class SigninGoogleSerializer(JWTTokenObtainPairSerializer):
 
         google_data = google_user_details(code)
 
-        user = User.objects.filter(email=google_data["email"], sub=google_data["sub"])
+        users = User.objects.filter(email=google_data["email"], sub=google_data["sub"])
 
-        if not user.exists():
+        if not users.exists():
             raise serializers.ValidationError({"email": "Invalid User"})
 
+        user = users.first()
         refresh = self.get_token(user)
 
         attrs["refresh"] = str(refresh)
         attrs["access"] = str(refresh.access_token)
-        attrs["role"] = user.first().role
+        attrs["role"] = user.role
 
         return attrs

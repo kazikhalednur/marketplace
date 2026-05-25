@@ -40,8 +40,17 @@ export interface LoginResponse {
   };
   error?: {
     detail?: string;
+    email?: string;
     [key: string]: unknown;
   };
+}
+
+export interface GoogleAuthCodePayload {
+  code: string;
+}
+
+export interface GoogleClientSignupPayload extends GoogleAuthCodePayload {
+  student_id: string;
 }
 
 // Conversation Types
@@ -429,6 +438,27 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    googleLogin: builder.mutation<LoginResponse, GoogleAuthCodePayload>({
+      query: (body) => ({
+        url: 'accounts/signin-google/',
+        method: 'POST',
+        body,
+      }),
+    }),
+    googleFreelancerSignup: builder.mutation<SignupResponse, GoogleAuthCodePayload>({
+      query: (body) => ({
+        url: 'accounts/signup-google/',
+        method: 'POST',
+        body,
+      }),
+    }),
+    googleClientSignup: builder.mutation<SignupResponse, GoogleClientSignupPayload>({
+      query: (body) => ({
+        url: 'accounts/clients/signup-google/',
+        method: 'POST',
+        body,
+      }),
+    }),
     getMe: builder.query<UserInfo, void>({
       query: () => 'accounts/info/',
       transformResponse: (response: { data: UserInfo }) => response.data,
@@ -675,7 +705,10 @@ export const apiSlice = createApi({
 export const { 
   useStudentSignupMutation, 
   useEmployerSignupMutation, 
-  useLoginMutation, 
+  useLoginMutation,
+  useGoogleLoginMutation,
+  useGoogleFreelancerSignupMutation,
+  useGoogleClientSignupMutation,
   useGetMeQuery, 
   useGetClientMeQuery, 
   useGetProfileByUsernameQuery,
