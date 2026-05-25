@@ -201,20 +201,6 @@ class ExperienceAdminSerializer(AdminModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at")
 
 
-class OTPAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = OTP
-        fields = "__all__"
-        read_only_fields = ("id", "created_at")
-
-
-class AcceptedDomainAdminSerializer(AdminModelSerializer):
-    class Meta:
-        model = AcceptedDomain
-        fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at")
-
-
 class ArbitratorAdminSerializer(AdminModelSerializer):
     class Meta:
         model = Arbitrator

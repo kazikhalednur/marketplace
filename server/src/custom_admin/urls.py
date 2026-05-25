@@ -1,12 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from custom_admin.views.accounts import (
-    AcceptedDomainAdminViewSet,
-    OTPAdminViewSet,
-    UserAdminViewSet,
-    WebSocketIDAdminViewSet,
-)
+from custom_admin.views.accounts import UserAdminViewSet
 from custom_admin.views.biding import (
     AttachmentAdminViewSet as BidingAttachmentAdminViewSet,
 )
@@ -38,15 +33,6 @@ router = DefaultRouter()
 
 # accounts app ViewSets
 router.register(r"accounts/users", UserAdminViewSet, basename="admin-user")
-router.register(r"accounts/otps", OTPAdminViewSet, basename="admin-otp")
-router.register(
-    r"accounts/accepted-domains",
-    AcceptedDomainAdminViewSet,
-    basename="admin-accepted-domain",
-)
-router.register(
-    r"accounts/websocket-ids", WebSocketIDAdminViewSet, basename="admin-websocket-id"
-)
 
 # jobs app ViewSets
 router.register(r"jobs/jobs", JobAdminViewSet, basename="admin-job")

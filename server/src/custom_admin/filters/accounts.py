@@ -1,15 +1,13 @@
 import django_filters
 
 from accounts.models import (
-    OTP,
     Arbitrator,
     Auditor,
     Client,
     ClientProfile,
     Freelancer,
     FreelancerProfile,
-    User,
-    WebSocketID,
+    User
 )
 
 
@@ -60,22 +58,6 @@ class FreelancerProfileAdminFilter(django_filters.FilterSet):
     class Meta:
         model = FreelancerProfile
         fields = ["freelancer"]
-
-
-class OTPAdminFilter(django_filters.FilterSet):
-    user = django_filters.UUIDFilter(field_name="user", lookup_expr="exact")
-
-    class Meta:
-        model = OTP
-        fields = ["user"]
-
-
-class WebSocketIDAdminFilter(django_filters.FilterSet):
-    user = django_filters.UUIDFilter(field_name="user", lookup_expr="exact")
-
-    class Meta:
-        model = WebSocketID
-        fields = ["user"]
 
 
 class ArbitratorAdminFilter(django_filters.FilterSet):

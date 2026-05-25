@@ -1,25 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 
-from accounts.models import (
-    OTP,
-    AcceptedDomain,
-    User,
-    WebSocketID,
-)
-from custom_admin.filters import (
-    OTPAdminFilter,
-    UserAdminFilter,
-    WebSocketIDAdminFilter,
-)
+from accounts.models import User
+from custom_admin.filters import UserAdminFilter
 from custom_admin.mixins import BaseAdminViewSetMixin
 from custom_admin.pagination import AdminPagination
 from custom_admin.serializers.accounts import (
-    AcceptedDomainAdminSerializer,
-    OTPAdminSerializer,
     UserAdminDetailSerializer,
     UserAdminListSerializer,
-    WebSocketIDAdminSerializer,
 )
 
 
@@ -78,49 +66,3 @@ class UserAdminViewSet(BaseAdminViewSetMixin, viewsets.ModelViewSet):
             return UserAdminDetailSerializer
         return UserAdminListSerializer
 
-
-class OTPAdminViewSet(BaseAdminViewSetMixin, viewsets.ModelViewSet):
-    """Admin ViewSet for OTP model."""
-
-    queryset = OTP.objects.all().select_related("user")
-    serializer_class = OTPAdminSerializer
-    pagination_class = AdminPagination
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-    filterset_class = OTPAdminFilter
-    search_fields = ["user__email", "otp"]
-    ordering_fields = ["created_at", "expires_at"]
-
-
-class AcceptedDomainAdminViewSet(BaseAdminViewSetMixin, viewsets.ModelViewSet):
-    """Admin ViewSet for AcceptedDomain model."""
-
-    queryset = AcceptedDomain.objects.all()
-    serializer_class = AcceptedDomainAdminSerializer
-    pagination_class = AdminPagination
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-    search_fields = ["domain"]
-    ordering_fields = ["created_at", "updated_at", "domain"]
-
-
-class WebSocketIDAdminViewSet(BaseAdminViewSetMixin, viewsets.ModelViewSet):
-    """Admin ViewSet for WebSocketID model."""
-
-    queryset = WebSocketID.objects.all().select_related("user").order_by("-id")
-    serializer_class = WebSocketIDAdminSerializer
-    pagination_class = AdminPagination
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-    filterset_class = WebSocketIDAdminFilter
-    search_fields = ["user__email", "user__username", "websocket_id"]
-    ordering_fields = ["id"]
