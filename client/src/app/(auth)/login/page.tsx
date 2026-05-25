@@ -237,7 +237,7 @@ export default function LoginPage() {
             <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
             <hr className="flex-1 border-t border-border" />
           </div>
-          <GoogleSignInButton flow="login" label="Sign in with Google" />
+          <GoogleSignInButton flow="login" />
           <div className="w-full text-center text-muted-foreground text-sm">
             Don&apos;t have an account?{' '}
             <a href="/register" className="text-primary hover:underline font-medium">

@@ -480,6 +480,12 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
+          <div className="flex items-center w-full mb-1 mt-2">
+            <hr className="flex-1 border-t border-border" />
+            <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
+            <hr className="flex-1 border-t border-border" />
+          </div>
+          <GoogleSignInButton flow="signup-freelancer" />
           <div className="w-full text-center text-muted-foreground text-sm">
             Already have an account?{" "}
             <a

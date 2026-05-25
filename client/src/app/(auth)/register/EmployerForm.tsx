@@ -43,7 +43,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/toast-provider";
 
 export default function EmployerForm({ onBack }: { onBack?: () => void }) {
-  const form = useForm<EmployerSignupPayload & { google_student_id: string }>({
+  const form = useForm<EmployerSignupPayload>({
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -53,26 +53,22 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
       company_name: "",
       password: "",
       confirm_password: "",
-      google_student_id: "",
     },
     mode: "onBlur",
   });
-  const googleStudentId = form.watch("google_student_id");
   const router = useRouter();
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<string>("");
   const [employerSignup, { isLoading }] = useEmployerSignupMutation();
+  const [googleStudentId, setGoogleStudentId] = useState("");
 
   // Password strength checker and generator are now imported
 
-  const onSubmit = async (
-    data: EmployerSignupPayload & { google_student_id: string },
-  ) => {
-    const { google_student_id: _googleStudentId, ...signupData } = data;
+  const onSubmit = async (data: EmployerSignupPayload) => {
     try {
-      const res = await employerSignup(signupData).unwrap();
+      const res = await employerSignup(data).unwrap();
       if (res?.success) {
         showToast({
           type: "success",
@@ -445,7 +441,36 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
+        <CardFooter className="flex flex-col gap-3 pt-0 pb-6 sm:px-8 px-4">
+          <div className="flex items-center w-full mb-1 mt-2">
+            <hr className="flex-1 border-t border-border" />
+            <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
+            <hr className="flex-1 border-t border-border" />
+          </div>
+          <div>
+            <label htmlFor="client-google-student-id" className="text-sm font-medium">
+              Student ID <span className="text-destructive">*</span>
+            </label>
+            <p className="text-xs text-muted-foreground mb-2">Required for Google registration.</p>
+            <div className="relative">
+              <Input
+                id="client-google-student-id"
+                placeholder="222-15-6390"
+                autoComplete="off"
+                value={googleStudentId}
+                onChange={(e) => setGoogleStudentId(e.target.value)}
+                className="pl-10"
+              />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                <Icon icon={IdCard} size={20} className="text-muted-foreground" />
+              </span>
+            </div>
+          </div>
+          <GoogleSignInButton
+            flow="signup-client"
+            studentId={googleStudentId}
+            disabled={!googleStudentId.trim()}
+          />
           <div className="w-full text-center text-muted-foreground text-sm mt-2">
             Already have an account?{" "}
             <a
