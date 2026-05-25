@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
 import {
   GoogleOAuthFlow,
@@ -8,29 +7,29 @@ import {
   startGoogleOAuth,
 } from '@/lib/googleOAuth';
 
-function GoogleIcon() {
+function GoogleLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-5 w-5"
       viewBox="0 0 48 48"
+      className="h-5 w-5 shrink-0"
       aria-hidden
     >
       <path
         fill="#FFC107"
-        d="M43.611 20.083h-19.5v7.833h11.237c-1.212 6.722-7.151 11.25-14.494 11.25-8.327 0-15.1-6.773-15.1-15.1s6.773-15.1 15.1-15.1c4.073 0 7.78 1.564 10.575 4.117l5.58-5.58C34.35 6.4 29.412 4 24.11 4 12.648 4 3.11 13.537 3.11 25s9.538 21 21 21c12.18 0 20.88-8.543 20.88-20.48 0-1.38-.14-2.72-.38-4.437z"
+        d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.939z"
       />
       <path
         fill="#FF3D00"
-        d="M6.306 14.691l6.546 4.81c1.94-4.44 6.646-7.544 11.85-7.544 4.073 0 7.78 1.564 10.575 4.117l5.58-5.58C34.35 6.4 29.412 4 24.11 4c-7.983 0-15.025 5.058-17.804 12.691z"
+        d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"
       />
       <path
         fill="#4CAF50"
-        d="M24.11 44c5.627 0 10.518-2.216 14.198-5.83l-6.58-5.44c-2.46 1.66-5.71 2.642-9.617 2.642-4.254 0-7.92-2.727-9.247-6.53l-6.65 5.17C8.644 39.45 15.856 44 24.11 44z"
+        d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"
       />
       <path
         fill="#1976D2"
-        d="M43.611 20.083h-19.5v7.833h11.237c-1.212 6.722-7.151 11.25-14.494 11.25-1.653 0-3.262-.324-4.712-.918v6.004c1.43.493 2.952.75 4.712.75 12.18 0 20.88-8.543 20.88-20.48 0-1.38-.14-2.72-.38-4.437z"
+        d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.197l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.939z"
       />
     </svg>
   );
@@ -38,11 +37,17 @@ function GoogleIcon() {
 
 interface GoogleSignInButtonProps {
   flow: GoogleOAuthFlow;
-  label: string;
+  label?: string;
   studentId?: string;
   disabled?: boolean;
   className?: string;
 }
+
+const DEFAULT_LABELS: Record<GoogleOAuthFlow, string> = {
+  login: 'Sign in with Google',
+  'signup-freelancer': 'Sign up with Google',
+  'signup-client': 'Sign up with Google',
+};
 
 export default function GoogleSignInButton({
   flow,
@@ -52,6 +57,7 @@ export default function GoogleSignInButton({
   className,
 }: GoogleSignInButtonProps) {
   const { showToast } = useToast();
+  const buttonLabel = label ?? DEFAULT_LABELS[flow];
 
   const handleClick = () => {
     if (!isGoogleOAuthConfigured()) {
@@ -73,16 +79,18 @@ export default function GoogleSignInButton({
   };
 
   return (
-    <Button
-      variant="outline"
-      className={className ?? 'w-full flex items-center justify-center gap-2 mt-2'}
+    <button
       type="button"
-      aria-label={label}
+      aria-label={buttonLabel}
       disabled={disabled}
       onClick={handleClick}
+      className={
+        className ??
+        'w-full h-11 inline-flex items-center justify-center gap-3 rounded-md border border-[#747775] bg-white px-4 text-sm font-medium text-[#1f1f1f] shadow-sm transition-colors hover:bg-[#f8f9fa] active:bg-[#f1f3f4] disabled:pointer-events-none disabled:opacity-50 dark:bg-white dark:hover:bg-[#f8f9fa]'
+      }
     >
-      <GoogleIcon />
-      {label}
-    </Button>
+      <GoogleLogo />
+      <span>{buttonLabel}</span>
+    </button>
   );
 }
