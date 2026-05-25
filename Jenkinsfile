@@ -86,10 +86,7 @@ pipeline {
                         [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
                         [name: 'Mailcatcher', container: 'staging-mailcatcher', folder: 'mailcatcher/'],
                         [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
-                        [name: 'Jitsi-Web', container: 'jitsi-web-1', folder: 'jitsi/'],
-                        [name: 'Jitsi-JVB', container: 'jitsi-jvb-1', folder: 'jitsi/'],
-                        [name: 'Jitsi-Jicofo', container: 'jitsi-jicofo-1', folder: 'jitsi/'],
-                        [name: 'Jitsi-Prosody', container: 'jitsi-prosody-1', folder: 'jitsi/'],
+                        [name: 'Jitsi', container: 'jitsi-web-1', folder: 'jitsi/'],
                         [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
                     ]
                     
@@ -253,11 +250,7 @@ pipeline {
                         env.BUILD_POSTGRES == 'true' ||
                         env.BUILD_REDIS == 'true' ||
                         env.BUILD_MAILCATCHER == 'true' ||
-                        env.BUILD_MINIO == 'true' ||
-                        env.BUILD_JITSI_WEB == 'true' ||
-                        env.BUILD_JITSI_JVB == 'true' ||
-                        env.BUILD_JITSI_JICOFO == 'true' ||
-                        env.BUILD_JITSI_PROSODY == 'true'
+                        env.BUILD_MINIO == 'true'
                     )
                     return anyServiceBuilt
                 }

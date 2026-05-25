@@ -1,13 +1,29 @@
 def call() {
 
+    stage('Create env file') {
+        withCredentials([
+            file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
+            string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
+        ]) {
+            sh '''
+                export GNUPGHOME=$(mktemp -d)
+
+                gpg --batch --import "$GPG_KEY"
+
+                gpg --batch --yes \
+                    --pinentry-mode loopback \
+                    --passphrase "$GPG_PASSPHRASE" \
+                    --decrypt jitsi/compose/staging/.env.gpg > jitsi/.env
+            '''
+        }
+    }
+
     stage('decrypt certificate files') {
         withCredentials([
             file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                mkdir -p jitsi/web/keys
-                
                 export GNUPGHOME=$(mktemp -d)
 
                 gpg --batch --import "$GPG_KEY"
@@ -21,32 +37,16 @@ def call() {
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
                     --decrypt ssl/cpchub_diu_edu_bd.key.gpg > jitsi/web/keys/cert.key
-            '''
-        }
-    }
 
-    stage('Create env file') {
-        withCredentials([
-            file(credentialsId: 'gpg-private-key', variable: 'GPG_KEY'),
-            string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
-        ]) {
-            sh '''
-                cd jitsi/compose/staging
-                
-                export GNUPGHOME=$(mktemp -d)
-
-                gpg --batch --import "$GPG_KEY"
-
-                gpg --batch --yes \
-                    --pinentry-mode loopback \
-                    --passphrase "$GPG_PASSPHRASE" \
-                    --decrypt .env.gpg > .env
+                chmod 600 jitsi/web/keys/cert.key
             '''
         }
     }
 
     stage('Deploy') {
-        sh 'docker compose -f jitsi/docker-compose.yml --env-file jitsi/compose/staging/.env up --build -d'
+        sh '''
+            docker compose -f jitsi/docker-compose.yml --env-file jitsi/.env up --build -d
+        '''
     }
 
     stage('Health Check') {
