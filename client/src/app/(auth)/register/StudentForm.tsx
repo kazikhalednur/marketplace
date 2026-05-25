@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { StudentSignupPayload, useStudentSignupMutation } from '@/features/api/apiSlice';
 import { useGetAcceptedDomainsQuery } from '@/features/api/jobsApi';
 import { getErrorMessage } from '@/utils/error';
@@ -383,16 +382,10 @@ export default function StudentForm({ onBack }: { onBack?: () => void }) {
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? 'Registering...' : 'Create Account'}
               </Button>
-              <div className="flex items-center mb-2 mt-4">
-                <div className="flex-1 h-px bg-border" />
-                <span className="mx-4 text-muted-foreground text-sm font-medium select-none">or</span>
-                <div className="flex-1 h-px bg-border" />
-              </div>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
-          <GoogleSignInButton flow="signup-freelancer" label="Sign up with Google" />
           <div className="w-full text-center text-muted-foreground text-sm">
             Already have an account?{' '}
             <a href="/login" className="text-primary hover:underline font-medium">

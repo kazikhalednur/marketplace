@@ -16,6 +16,17 @@ import { getErrorMessage } from '@/utils/error';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
 
+function handleAuthSuccess(
+  access: string,
+  refresh: string,
+  message: string,
+  showToast: (opts: { type: 'success' | 'error'; message: string }) => void,
+) {
+  setAuthTokens(access, refresh);
+  showToast({ type: 'success', message });
+  window.location.href = '/dashboard';
+}
+
 function GoogleLoginCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -60,18 +71,23 @@ function GoogleLoginCallback() {
         return;
       }
 
+      const signupFailureRedirect = '/register';
+
       try {
         if (flow === 'login') {
           const res = await googleLogin({ code }).unwrap();
           if (res?.success && res?.data?.access && res?.data?.refresh) {
-            setAuthTokens(res.data.access, res.data.refresh);
-            showToast({ type: 'success', message: res.message || 'Login successful!' });
-            window.location.href = '/dashboard';
+            handleAuthSuccess(
+              res.data.access,
+              res.data.refresh,
+              res.message || 'Login successful!',
+              showToast,
+            );
             return;
           }
           showToast({
             type: 'error',
-            message: res?.error?.detail || res?.message || 'Authentication failed.',
+            message: res?.error?.detail || res?.error?.email || res?.message || 'Authentication failed.',
           });
           router.replace('/login');
           return;
@@ -79,43 +95,45 @@ function GoogleLoginCallback() {
 
         if (flow === 'signup-freelancer') {
           const res = await googleFreelancerSignup({ code }).unwrap();
-          if (res?.success) {
-            showToast({
-              type: 'success',
-              message: res.message || 'Registration successful! Please sign in with Google.',
-            });
-            router.replace('/login');
+          if (res?.success && res?.data?.access && res?.data?.refresh) {
+            handleAuthSuccess(
+              res.data.access,
+              res.data.refresh,
+              res.message || 'Registration successful!',
+              showToast,
+            );
             return;
           }
           showToast({ type: 'error', message: res?.message || 'Registration failed.' });
-          router.replace('/register');
+          router.replace(signupFailureRedirect);
           return;
         }
 
         if (flow === 'signup-client') {
           if (!studentId) {
             showToast({ type: 'error', message: 'Student ID is required for client registration.' });
-            router.replace('/register');
+            router.replace(signupFailureRedirect);
             return;
           }
           const res = await googleClientSignup({ code, student_id: studentId }).unwrap();
-          if (res?.success) {
-            showToast({
-              type: 'success',
-              message: res.message || 'Registration successful! Please sign in with Google.',
-            });
-            router.replace('/login');
+          if (res?.success && res?.data?.access && res?.data?.refresh) {
+            handleAuthSuccess(
+              res.data.access,
+              res.data.refresh,
+              res.message || 'Registration successful!',
+              showToast,
+            );
             return;
           }
           showToast({ type: 'error', message: res?.message || 'Registration failed.' });
-          router.replace('/register');
+          router.replace(signupFailureRedirect);
         }
       } catch (err) {
         showToast({
           type: 'error',
           message: getErrorMessage(err, 'Google authentication failed.'),
         });
-        router.replace(flow === 'login' ? '/login' : '/register');
+        router.replace(flow === 'login' ? '/login' : signupFailureRedirect);
       }
     };
 
