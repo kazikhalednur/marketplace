@@ -10,8 +10,7 @@ const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const SCOPES = 'openid email profile';
 
 export function getGoogleClientId(): string | undefined {
-  return process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim()
-    || process.env.NEXT_PUBLIC_CLIENT_ID?.trim();
+  return process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim();
 }
 
 export function getGoogleRedirectUri(): string {
