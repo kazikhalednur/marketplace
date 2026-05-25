@@ -12,6 +12,7 @@ export/
 uploads/
 static/
 google_credentials.json
+!google_credentials.json.gpg
 
 secrets/
 

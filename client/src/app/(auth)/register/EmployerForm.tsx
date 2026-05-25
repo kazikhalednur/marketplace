@@ -18,17 +18,32 @@ import {
 } from "@/components/ui/form";
 import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
-import { EmployerSignupPayload, useEmployerSignupMutation } from '@/features/api/apiSlice';
-import { getErrorMessage } from '@/utils/error';
-import { checkStrength, generatePassword } from '@/utils/password';
-import { ArrowLeft, Building, Eye, EyeOff, Lock, Mail, Phone, RefreshCw, User } from "lucide-react";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import {
+  EmployerSignupPayload,
+  useEmployerSignupMutation,
+} from "@/features/api/apiSlice";
+import { getErrorMessage } from "@/utils/error";
+import { checkStrength, generatePassword } from "@/utils/password";
+import {
+  ArrowLeft,
+  Building,
+  Eye,
+  EyeOff,
+  IdCard,
+  Lock,
+  Mail,
+  Phone,
+  RefreshCw,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useToast } from '@/components/ui/toast-provider';
+import { useToast } from "@/components/ui/toast-provider";
 
 export default function EmployerForm({ onBack }: { onBack?: () => void }) {
-  const form = useForm<EmployerSignupPayload>({
+  const form = useForm<EmployerSignupPayload & { google_student_id: string }>({
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -38,9 +53,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
       company_name: "",
       password: "",
       confirm_password: "",
+      google_student_id: "",
     },
     mode: "onBlur",
   });
+  const googleStudentId = form.watch("google_student_id");
   const router = useRouter();
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
@@ -50,17 +67,29 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
 
   // Password strength checker and generator are now imported
 
-  const onSubmit = async (data: EmployerSignupPayload) => {
+  const onSubmit = async (
+    data: EmployerSignupPayload & { google_student_id: string },
+  ) => {
+    const { google_student_id: _googleStudentId, ...signupData } = data;
     try {
-      const res = await employerSignup(data).unwrap();
+      const res = await employerSignup(signupData).unwrap();
       if (res?.success) {
-        showToast({ type: 'success', message: 'Registration successful! Please login.' });
-        router.push('/login');
+        showToast({
+          type: "success",
+          message: "Registration successful! Please login.",
+        });
+        router.push("/login");
       } else {
-        showToast({ type: 'error', message: res?.message || 'Registration failed.' });
+        showToast({
+          type: "error",
+          message: res?.message || "Registration failed.",
+        });
       }
     } catch (err) {
-      showToast({ type: 'error', message: getErrorMessage(err, 'Registration failed.') });
+      showToast({
+        type: "error",
+        message: getErrorMessage(err, "Registration failed."),
+      });
     }
   };
 
@@ -78,7 +107,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
           )}
-          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">Register as Client</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-center w-full">
+            Register as Client
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-2 sm:px-8 px-4">
           <Form {...form}>
@@ -90,7 +121,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                   rules={{ required: "First name is required" }}
                   render={({ field, fieldState }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>First Name <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        First Name <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -100,7 +133,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                             className="pl-10"
                           />
                           <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                            <Icon icon={User} size={20} className="text-muted-foreground" />
+                            <Icon
+                              icon={User}
+                              size={20}
+                              className="text-muted-foreground"
+                            />
                           </span>
                         </div>
                       </FormControl>
@@ -116,7 +153,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                   rules={{ required: "Last name is required" }}
                   render={({ field, fieldState }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Last Name <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        Last Name <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -126,7 +165,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                             className="pl-10"
                           />
                           <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                            <Icon icon={User} size={20} className="text-muted-foreground" />
+                            <Icon
+                              icon={User}
+                              size={20}
+                              className="text-muted-foreground"
+                            />
                           </span>
                         </div>
                       </FormControl>
@@ -143,7 +186,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Username is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Username <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Username <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -153,7 +198,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={User} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={User}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -169,7 +218,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Email is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Email <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Email <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -180,7 +231,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Mail} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Mail}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -206,7 +261,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Phone} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Phone}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -231,7 +290,11 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Building} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Building}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                       </div>
                     </FormControl>
@@ -244,7 +307,9 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Password is required" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Password <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Password <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative flex items-center">
                         <Input
@@ -253,20 +318,26 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           autoComplete="new-password"
                           {...field}
                           className="pl-10 pr-20"
-                          onChange={e => {
+                          onChange={(e) => {
                             field.onChange(e);
                             setPasswordStrength(checkStrength(e.target.value));
                           }}
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Lock}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                         <button
                           type="button"
                           tabIndex={-1}
                           className="absolute right-12 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                           onClick={() => setShowPassword((v) => !v)}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
                         >
                           {showPassword ? (
                             <Icon icon={EyeOff} size={20} className="w-5 h-5" />
@@ -285,19 +356,25 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           }}
                           aria-label="Generate strong password"
                         >
-                          <Icon icon={RefreshCw} size={20} className="w-5 h-5" />
+                          <Icon
+                            icon={RefreshCw}
+                            size={20}
+                            className="w-5 h-5"
+                          />
                         </button>
                       </div>
                     </FormControl>
                     {/* Password strength checker */}
                     {passwordStrength && (
-                      <div className={`mt-2 text-xs font-medium ${
-                        passwordStrength === "Strong"
-                          ? "text-green-600"
-                          : passwordStrength === "Medium"
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                      }`}>
+                      <div
+                        className={`mt-2 text-xs font-medium ${
+                          passwordStrength === "Strong"
+                            ? "text-green-600"
+                            : passwordStrength === "Medium"
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }`}
+                      >
                         Password strength: {passwordStrength}
                       </div>
                     )}
@@ -313,7 +390,10 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                 rules={{ required: "Please confirm your password" }}
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Confirm Password{" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -324,14 +404,22 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                           className="pl-10 pr-10"
                         />
                         <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                          <Icon icon={Lock} size={20} className="text-muted-foreground" />
+                          <Icon
+                            icon={Lock}
+                            size={20}
+                            className="text-muted-foreground"
+                          />
                         </span>
                         <button
                           type="button"
                           tabIndex={-1}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                           onClick={() => setShowConfirmPassword((v) => !v)}
-                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }
                         >
                           {showConfirmPassword ? (
                             <Icon icon={EyeOff} size={20} className="w-5 h-5" />
@@ -347,19 +435,26 @@ export default function EmployerForm({ onBack }: { onBack?: () => void }) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-                {isLoading ? 'Registering...' : 'Register'}
+              <Button
+                type="submit"
+                className="w-full mt-4"
+                disabled={isLoading}
+              >
+                {isLoading ? "Registering..." : "Register"}
               </Button>
-      </form>
+            </form>
           </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 pt-0 pb-6 sm:px-8 px-4">
           <div className="w-full text-center text-muted-foreground text-sm mt-2">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline font-medium">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-primary hover:underline font-medium"
+            >
               Login here
             </a>
-    </div>
+          </div>
         </CardFooter>
       </Card>
     </main>

@@ -48,6 +48,7 @@ RUN adduser \
     appuser
 
 COPY --from=builder /install /usr/local
+COPY google_credentials.json /app/google_credentials.json
 COPY src/. /app/
 
 RUN chown -R appuser:appuser /app

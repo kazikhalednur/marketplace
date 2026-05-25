@@ -4,8 +4,7 @@ services:
     container_name: local-mailcatcher
     expose:
       - 1025
-    ports:
-      - 1080:1080
+      - 1080
     networks:
       - local-marketplace-backend
       - local-marketplace

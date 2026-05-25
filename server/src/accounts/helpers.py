@@ -1,6 +1,5 @@
 import json
 
-import requests
 from django.conf import settings
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
@@ -12,7 +11,7 @@ from .models import AcceptedDomain
 
 def google_user_details(code: str):
     try:
-        credentials_path = settings.BASE_DIR / "google_credentials.json"
+        credentials_path = settings.GOOGLE_CREDENTIALS_PATH
 
         if not credentials_path.exists():
             raise FileNotFoundError("Google credentials file not found.")
@@ -35,6 +34,7 @@ def google_user_details(code: str):
         idinfo = id_token.verify_oauth2_token(
             id_token_str, google_requests.Request(), credentials["web"]["client_id"]
         )
+        print(idinfo, "idinfo")
 
         return idinfo
 
@@ -77,25 +77,6 @@ def match_email_id_digits_group(student_id, email):
             break
 
     return match_length >= 3
-
-
-def get_student_data(student_id):
-    response = requests.get(
-        f"{settings.STUDENT_DATA_URL}/result/studentInfo?studentId={student_id}"
-    )
-    if response.status_code != 200:
-        raise ValidationError({"error": "Failed to fetch student data"})
-
-    try:
-        student_data = response.json()
-        if not student_data:
-            raise ValidationError({"error": "No data found for the given student ID"})
-        return student_data
-
-    except json.JSONDecodeError:
-        raise ValidationError(
-            {"error": "Invalid response format from student data API"}
-        )
 
 
 def split_name_equal(full_name):
