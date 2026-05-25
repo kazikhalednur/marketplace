@@ -13,7 +13,7 @@ fi
 
 # Required for WebRTC when clients reach the host by public DNS name.
 if ! grep -q '^JVB_ADVERTISE_IPS=' "${ENV_FILE}"; then
-  echo 'JVB_ADVERTISE_IPS=206.189.33.138' >> "${ENV_FILE}"
+  echo 'JVB_ADVERTISE_IPS=165.101.23.47' >> "${ENV_FILE}"
 fi
 sed -i 's|^CONFIG=.*|CONFIG=/var/lib/jenkins/.jitsi-meet-cfg|' "${ENV_FILE}"
 

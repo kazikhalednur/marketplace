@@ -1,6 +1,5 @@
 import json
 
-import requests
 from django.conf import settings
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
@@ -77,25 +76,6 @@ def match_email_id_digits_group(student_id, email):
             break
 
     return match_length >= 3
-
-
-def get_student_data(student_id):
-    response = requests.get(
-        f"{settings.STUDENT_DATA_URL}/result/studentInfo?studentId={student_id}"
-    )
-    if response.status_code != 200:
-        raise ValidationError({"error": "Failed to fetch student data"})
-
-    try:
-        student_data = response.json()
-        if not student_data:
-            raise ValidationError({"error": "No data found for the given student ID"})
-        return student_data
-
-    except json.JSONDecodeError:
-        raise ValidationError(
-            {"error": "Invalid response format from student data API"}
-        )
 
 
 def split_name_equal(full_name):
