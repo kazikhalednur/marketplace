@@ -266,7 +266,7 @@ export default function MyJobsPage() {
             </>
           )}
         </section>
-        <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} />
+        <JobDetailModal open={modalOpen} onClose={handleCloseModal} job={selectedJob} showPayNow />
         <JobCreateModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} onJobPosted={() => { setCreateModalOpen(false); dispatch(clearFilters()); refetch(); }} />
         {jobToEdit && (
           <JobEditModal 

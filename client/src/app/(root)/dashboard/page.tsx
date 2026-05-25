@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetJobsQuery } from '@/features/api/jobsApi';
+import { useGetJobByIdQuery, useGetJobsQuery } from '@/features/api/jobsApi';
 import { useAppSelector } from '@/hooks/useTypedSelector';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -55,6 +55,23 @@ function DashboardContent() {
   }, [status, search, tags, min_budget, max_budget, skills, category]);
 
   const jobs = useMemo(() => jobsData?.jobs || [], [jobsData]);
+
+  const jobIdFromUrl = useMemo(() => {
+    const raw = searchParams.get('jobId');
+    if (!raw) return null;
+    return raw.replace(/\/$/, '');
+  }, [searchParams]);
+
+  const jobFromList = useMemo(() => {
+    if (!jobIdFromUrl) return null;
+    return jobs.find((j) => j.id === jobIdFromUrl) ?? null;
+  }, [jobs, jobIdFromUrl]);
+
+  const { data: jobFromApi } = useGetJobByIdQuery(jobIdFromUrl!, {
+    skip: !jobIdFromUrl || !!jobFromList,
+  });
+
+  const jobFromUrl = jobFromList ?? jobFromApi ?? null;
   
   // Use server-side pagination data directly
   const totalCount = jobsData?.count || 0;
@@ -62,27 +79,21 @@ function DashboardContent() {
   const hasPrevious = jobsData?.previous !== null;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  // Handle URL parameters for job details and update selectedJob when jobs data changes
+  // Sync modal state from URL only (avoids double-open with handleJobClick)
   useEffect(() => {
-    const jobId = searchParams.get('jobId');
-    if (jobId && jobs.length > 0) {
-      const job = jobs.find(j => j.id === jobId);
-      if (job) {
-        setSelectedJob(job);
-        setModalOpen(true);
-      }
-    } else if (!jobId && modalOpen) {
-      // Close modal if jobId is removed from URL
+    if (!jobIdFromUrl) {
       setModalOpen(false);
       setSelectedJob(null);
+      return;
     }
-  }, [searchParams, jobs, modalOpen]);
+
+    if (jobFromUrl) {
+      setSelectedJob(jobFromUrl);
+      setModalOpen(true);
+    }
+  }, [jobIdFromUrl, jobFromUrl]);
 
   const handleJobClick = (job: JobDetail) => {
-    setSelectedJob(job);
-    setModalOpen(true);
-    
-    // Update URL with jobId parameter
     const params = new URLSearchParams(searchParams.toString());
     params.set('jobId', job.id);
     router.push(`/dashboard?${params.toString()}`, { scroll: false });

@@ -33,6 +33,20 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Create a stage for building the application.
 FROM deps as build
 
+# NEXT_PUBLIC_* are inlined at build time; pass them from compose/staging/.env via build args.
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WEBSOCKET_URL
+ARG NEXT_PUBLIC_BASE_URL
+ARG NEXT_PUBLIC_CLIENT_ID
+ARG NEXT_PUBLIC_CLIENT_SECRET
+ARG NEXT_PUBLIC_JWT_SECRET
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WEBSOCKET_URL=$NEXT_PUBLIC_WEBSOCKET_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_CLIENT_ID=$NEXT_PUBLIC_CLIENT_ID
+ENV NEXT_PUBLIC_CLIENT_SECRET=$NEXT_PUBLIC_CLIENT_SECRET
+ENV NEXT_PUBLIC_JWT_SECRET=$NEXT_PUBLIC_JWT_SECRET
+
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
 RUN --mount=type=bind,source=package.json,target=package.json \

@@ -1,14 +1,14 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ToastProvider } from '@/components/ui/toast-provider';
-import ReduxProvider from '@/store/Provider';
+import { ToastProvider } from "@/components/ui/toast-provider";
+import ReduxProvider from "@/store/Provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import React from 'react';
+import React from "react";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import NotificationWebSocketProvider from "@/components/NotificationWebSocketProvider";
-import ChatWebSocketProvider from '@/components/ChatWebSocketProvider';
+import ChatWebSocketProvider from "@/components/ChatWebSocketProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-      title: "UniMarketplace",
+  title: "CPCHUB",
   description: "Online Marketplace",
 };
 

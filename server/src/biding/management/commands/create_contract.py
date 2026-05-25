@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from biding.models import Contract, Proposal
+from biding.services import process_proposal_acceptance
 
 
 class Command(BaseCommand):
@@ -74,18 +75,17 @@ class Command(BaseCommand):
                 )
                 return
 
-            with transaction.atomic():
-                contract = Contract.objects.create(
-                    job=proposal.job,
-                    proposal=proposal,
-                    freelancer_profile=proposal.freelancer_sub_profile.freelancer_profile,  # noqa: E501
-                    freelancer_sub_profile=proposal.freelancer_sub_profile,
-                    client_profile=proposal.job.created_by.client_profile,
-                )
-
+            contract = process_proposal_acceptance(proposal)
+            if contract:
                 self.stdout.write(
                     self.style.SUCCESS(
                         f"Successfully created contract {contract.id} for proposal {proposal_id}"  # noqa: E501
+                    )
+                )
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Proposal {proposal_id} already has a contract"
                     )
                 )
 
@@ -128,28 +128,23 @@ class Command(BaseCommand):
                 return
 
             created_count = 0
-            with transaction.atomic():
-                for proposal in proposals_without_contracts:
-                    try:
-                        contract = Contract.objects.create(
-                            job=proposal.job,
-                            proposal=proposal,
-                            freelancer_profile=proposal.freelancer_sub_profile.freelancer_profile,  # noqa: E501
-                            freelancer_sub_profile=proposal.freelancer_sub_profile,
-                            client_profile=proposal.job.created_by.client_profile,
-                        )
-                        created_count += 1
+            for proposal in proposals_without_contracts:
+                try:
+                    contract = process_proposal_acceptance(proposal)
+                    if not contract:
+                        continue
+                    created_count += 1
 
-                        self.stdout.write(
-                            f"Created contract {contract.id} for proposal {proposal.id} (Job: {proposal.job.title})"  # noqa: E501
-                        )
+                    self.stdout.write(
+                        f"Created contract {contract.id} for proposal {proposal.id} (Job: {proposal.job.title})"  # noqa: E501
+                    )
 
-                    except Exception as e:
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"Error creating contract for proposal {proposal.id}: {str(e)} "  # noqa: E501
-                            )
+                except Exception as e:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"Error creating contract for proposal {proposal.id}: {str(e)} "  # noqa: E501
                         )
+                    )
 
             self.stdout.write(
                 self.style.SUCCESS(f"Successfully created {created_count} contracts")

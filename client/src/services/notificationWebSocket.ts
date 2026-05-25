@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { buildNotificationWebSocketUrl } from '@/lib/websocketUrl';
 import { logWebSocket, logNotification, logError } from '@/utils/logger';
 
 export interface Notification {
@@ -69,8 +70,7 @@ export class NotificationWebSocket {
     
     this.connectionAttempts++;
     
-    // Connect without token in URL - send it as a message after connection
-    const url = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/notification/${this.notificationId}/?token=${token}`;
+    const url = buildNotificationWebSocketUrl(this.notificationId, token);
     
     logWebSocket('Attempting WebSocket connection...');
     logWebSocket('Notification ID:', this.notificationId);
