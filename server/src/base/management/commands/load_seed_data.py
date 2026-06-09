@@ -251,7 +251,7 @@ class Command(BaseCommand):
                         status=job_data.get("status", "draft"),
                         connect=job_data.get("connect", 1),
                         privacy=job_data.get("privacy", "public"),
-                        is_payment_verified=job_data.get("is_payment_verified", False),
+                        # is_payment_verified=job_data.get("is_payment_verified", False),
                     )
 
                     # Add skills

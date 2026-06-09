@@ -34,8 +34,8 @@ def payment_callback_log_post_save(
     instance.payment_request.transaction.trx_status = instance.status
     instance.payment_request.transaction.save(update_fields=["trx_status"])
 
-    if instance.status == "SUCCESSFUL":
-        instance.payment_request.payment_history.job.is_payment_verified = True
-        instance.payment_request.payment_history.job.save(
-            update_fields=["is_payment_verified"]
-        )
+    # if instance.status == "SUCCESSFUL":
+    #     instance.payment_request.payment_history.job.is_payment_verified = True
+    #     instance.payment_request.payment_history.job.save(
+    #         update_fields=["is_payment_verified"]
+    #     )

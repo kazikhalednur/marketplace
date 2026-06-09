@@ -23,8 +23,7 @@
         "created_by": "techcorp",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Mobile App Development with Flutter",
@@ -50,8 +49,7 @@
         "created_by": "food_delivery",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Python Django Backend API Development",
@@ -77,8 +75,7 @@
         "created_by": "healthcare_tech",
         "status": "in_progress",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "UI/UX Design for Mobile App",
@@ -104,8 +101,7 @@
         "created_by": "travel_tech",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "DevOps Engineer for AWS Infrastructure",
@@ -133,8 +129,7 @@
         "created_by": "cloud_services",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Machine Learning Model Development",
@@ -160,8 +155,7 @@
         "created_by": "ai_research",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Content Writer for Tech Blog",
@@ -189,8 +183,7 @@
         "created_by": "media_co",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Video Editing for YouTube Channel",
@@ -216,8 +209,7 @@
         "created_by": "edu_platform",
         "status": "completed",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "SEO Optimization for E-Commerce Site",
@@ -243,8 +235,7 @@
         "created_by": "ecommerce_store",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": false
+        "privacy": "public"
     },
     {
         "title": "iOS App Development",
@@ -269,8 +260,7 @@
         "created_by": "sports_platform",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Data Analysis and Visualization",
@@ -296,8 +286,7 @@
         "created_by": "data_analytics",
         "status": "in_progress",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Logo Design for Startup",
@@ -323,8 +312,7 @@
         "created_by": "startup_inc",
         "status": "completed",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Full Stack Web Application",
@@ -351,8 +339,7 @@
         "created_by": "software_house",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Android App with Kotlin",
@@ -377,8 +364,7 @@
         "created_by": "social_network",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "WordPress Website Development",
@@ -404,8 +390,7 @@
         "created_by": "consulting_firm",
         "status": "closed",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "3D Animation for Product Demo",
@@ -430,8 +415,7 @@
         "created_by": "retail_biz",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Social Media Marketing Campaign",
@@ -459,8 +443,7 @@
         "created_by": "marketing_hub",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Laravel E-Commerce Platform",
@@ -486,8 +469,7 @@
         "created_by": "fashion_brand",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Blockchain Smart Contract Development",
@@ -512,8 +494,7 @@
         "created_by": "crypto_exchange",
         "status": "in_progress",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Copywriting for Marketing Materials",
@@ -538,8 +519,7 @@
         "created_by": "digital_agency",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Vue.js Frontend Development",
@@ -565,8 +545,7 @@
         "created_by": "fintech_sol",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Business Strategy Consulting",
@@ -591,8 +570,7 @@
         "created_by": "startup_inc",
         "status": "completed",
         "connect": 2,
-        "privacy": "private",
-        "is_payment_verified": true
+        "privacy": "private"
     },
     {
         "title": "CI/CD Pipeline Setup",
@@ -618,8 +596,7 @@
         "created_by": "software_house",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Natural Language Processing Project",
@@ -645,8 +622,7 @@
         "created_by": "ai_research",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Graphic Design for Social Media",
@@ -671,8 +647,7 @@
         "created_by": "marketing_hub",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "React Native Mobile App",
@@ -698,8 +673,7 @@
         "created_by": "music_streaming",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Azure Cloud Migration",
@@ -725,8 +699,7 @@
         "created_by": "insurance_tech",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Financial Analysis and Reporting",
@@ -751,8 +724,7 @@
         "created_by": "fintech_sol",
         "status": "open",
         "connect": 2,
-        "privacy": "private",
-        "is_payment_verified": true
+        "privacy": "private"
     },
     {
         "title": "Angular Web Application",
@@ -778,8 +750,7 @@
         "created_by": "hr_solutions",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": false
+        "privacy": "public"
     },
     {
         "title": "Computer Vision Application",
@@ -805,8 +776,7 @@
         "created_by": "ai_research",
         "status": "in_progress",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "UX Research and Testing",
@@ -831,8 +801,7 @@
         "created_by": "design_studio",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Google Cloud Platform Setup",
@@ -858,8 +827,7 @@
         "created_by": "cloud_services",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Technical Documentation Writing",
@@ -883,8 +851,7 @@
         "created_by": "software_house",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Data Science Project",
@@ -910,8 +877,7 @@
         "created_by": "data_analytics",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Motion Graphics Video",
@@ -936,8 +902,7 @@
         "created_by": "startup_inc",
         "status": "completed",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Flask API Development",
@@ -963,8 +928,7 @@
         "created_by": "mobile_apps",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Email Marketing Campaign",
@@ -989,8 +953,7 @@
         "created_by": "ecommerce_store",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": false
+        "privacy": "public"
     },
     {
         "title": "Desktop Application Development",
@@ -1016,8 +979,7 @@
         "created_by": "software_house",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Power BI Dashboard Development",
@@ -1042,8 +1004,7 @@
         "created_by": "retail_biz",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Brand Identity Design",
@@ -1069,8 +1030,7 @@
         "created_by": "fashion_brand",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Deep Learning Research",
@@ -1096,8 +1056,7 @@
         "created_by": "ai_research",
         "status": "open",
         "connect": 3,
-        "privacy": "private",
-        "is_payment_verified": true
+        "privacy": "private"
     },
     {
         "title": "Ionic Mobile App Development",
@@ -1123,8 +1082,7 @@
         "created_by": "travel_tech",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Project Management Consulting",
@@ -1150,8 +1108,7 @@
         "created_by": "software_house",
         "status": "in_progress",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Ruby on Rails Development",
@@ -1176,8 +1133,7 @@
         "created_by": "startup_inc",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "R Programming for Statistical Analysis",
@@ -1202,8 +1158,7 @@
         "created_by": "healthcare_tech",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Adobe XD UI Design",
@@ -1228,8 +1183,7 @@
         "created_by": "mobile_apps",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "C++ Desktop Software",
@@ -1254,8 +1208,7 @@
         "created_by": "gaming_studio",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": ".NET Application Development",
@@ -1281,8 +1234,7 @@
         "created_by": "hr_solutions",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": false
+        "privacy": "public"
     },
     {
         "title": "Sketch Design for Website",
@@ -1307,8 +1259,7 @@
         "created_by": "design_studio",
         "status": "completed",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Java Enterprise Application",
@@ -1333,8 +1284,7 @@
         "created_by": "legal_tech",
         "status": "open",
         "connect": 3,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "NumPy Data Processing",
@@ -1360,8 +1310,7 @@
         "created_by": "data_analytics",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Scikit-learn ML Models",
@@ -1387,8 +1336,7 @@
         "created_by": "fintech_sol",
         "status": "open",
         "connect": 2,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "SEO Content Writing",
@@ -1413,8 +1361,7 @@
         "created_by": "digital_agency",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     },
     {
         "title": "Creative Writing for Blog",
@@ -1439,7 +1386,6 @@
         "created_by": "media_co",
         "status": "open",
         "connect": 1,
-        "privacy": "public",
-        "is_payment_verified": true
+        "privacy": "public"
     }
 ]

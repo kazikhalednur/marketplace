@@ -18,4 +18,4 @@ class JobAdmin(SimpleHistoryAdmin):
     list_per_page = 10
     list_max_show_all = 100
 
-    readonly_fields = ("id", "created_at", "updated_at", "is_payment_verified")
+    readonly_fields = ("id", "created_at", "updated_at")

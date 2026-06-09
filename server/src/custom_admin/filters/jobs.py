@@ -20,7 +20,6 @@ class JobAdminFilter(django_filters.FilterSet):
         choices=Job.JobPrivacy.choices,
         lookup_expr="exact",
     )
-    is_payment_verified = django_filters.BooleanFilter(field_name="is_payment_verified")
     created_by = django_filters.UUIDFilter(field_name="created_by", lookup_expr="exact")
     min_budget_gte = django_filters.NumberFilter(
         field_name="min_budget", lookup_expr="gte"
@@ -36,7 +35,7 @@ class JobAdminFilter(django_filters.FilterSet):
             "category",
             "experience_level",
             "privacy",
-            "is_payment_verified",
+            # "is_payment_verified",
             "created_by",
         ]
 
