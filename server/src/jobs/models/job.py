@@ -141,9 +141,7 @@ class Job(models.Model):
         default=JobPrivacy.PUBLIC,
         help_text="Visibility of the job",
     )
-    is_payment_verified = models.BooleanField(
-        default=False, help_text="Is the job payment verified?"
-    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()

@@ -8,6 +8,9 @@ from .skills import ClientSkillSerializer
 
 class ClientJobSerializer(serializers.ModelSerializer):
     created_by = ClientSerializer(read_only=True)
+    is_payment_verified = serializers.BooleanField(
+        source="created_by.client_profile.is_payment_verified", read_only=True
+    )
 
     class Meta:
         model = Job
