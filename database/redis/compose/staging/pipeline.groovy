@@ -6,7 +6,7 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd database/staging/redis
+                cd database/redis/compose/staging
 
                 export GNUPGHOME=$(mktemp -d)
 

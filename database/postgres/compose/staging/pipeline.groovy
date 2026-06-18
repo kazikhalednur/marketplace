@@ -6,7 +6,7 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd database/staging/postgres
+                cd database/postgres/compose/staging
                 export GNUPGHOME=$(mktemp -d)
 
                 gpg --batch --import "$GPG_KEY"
