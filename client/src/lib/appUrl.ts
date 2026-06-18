@@ -3,13 +3,8 @@
  * Prefer NEXT_PUBLIC_BASE_URL so links match the deployed domain, not dev localhost.
  */
 export function getAppOrigin(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_BASE_URL?.trim();
-  if (fromEnv) {
-    return fromEnv.replace(/\/$/, "");
-  }
-
   if (typeof window !== "undefined") {
-    return window.location.origin;
+    return window.location.origin.replace("/", "");
   }
 
   return "";
