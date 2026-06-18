@@ -82,8 +82,8 @@ pipeline {
                     def services = [
                         [name: 'Client', container: 'staging-marketplace-client', folder: 'client/'],
                         [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
-                        [name: 'Postgres', container: 'staging-marketplace-db', folder: 'database/staging/postgres/'],
-                        [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
+                        [name: 'Postgres', container: 'staging-marketplace-db', folder: 'database/postgres/compose/staging/'],
+                        [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/redis/compose/staging/'],
                         [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
                         [name: 'Jitsi', container: 'jitsi-web-1', folder: 'jitsi/'],
                         [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
@@ -162,7 +162,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            def postgres = load 'database/staging/postgres/pipeline.groovy'
+                            def postgres = load 'database/postgres/compose/staging/pipeline.groovy'
                             postgres()
                         }
                     }
@@ -176,7 +176,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            def redis = load 'database/staging/redis/pipeline.groovy'
+                            def redis = load 'database/redis/compose/staging/pipeline.groovy'
                             redis()
                         }
                     }
