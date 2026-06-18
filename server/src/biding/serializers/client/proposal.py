@@ -47,34 +47,37 @@ class ClientProposalSerializer(serializers.ModelSerializer):
                 proposal.job.status = Job.JobStatus.IN_PROGRESS
                 proposal.job.save(update_fields=["status"])
                 # Create a contract
-                Contract.objects.create(
-                    freelancer_profile=proposal.freelancer_sub_profile.freelancer_profile,  # noqa: E501
-                    freelancer_sub_profile=proposal.freelancer_sub_profile,
-                    client_profile=proposal.job.created_by.client_profile,
+                contract, created = Contract.objects.get_or_create(
                     proposal=proposal,
-                    job=proposal.job,
-                    budget=proposal.bid_amount,
+                    defaults={
+                        "freelancer_profile": proposal.freelancer_sub_profile.freelancer_profile,
+                        "freelancer_sub_profile": proposal.freelancer_sub_profile,
+                        "client_profile": proposal.job.created_by.client_profile,
+                        "job": proposal.job,
+                        "budget": proposal.bid_amount,
+                    }
                 )
 
-                Notification.objects.create(
-                    user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
-                    message=f"Your proposal for {proposal.job.title} has been accepted.",  # noqa: E501
-                    message_type=Notification.NotificationType.SUCCESS,
-                )
-                Notification.objects.create(
-                    user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
-                    message="You can chat with the client now.",
-                    message_type=Notification.NotificationType.INFO,
-                )
-                # Notify other freelancers
-                closed_proposal = Proposal.objects.filter(job=proposal.job).exclude(
-                    id=proposal.id
-                )
-                closed_proposal.update(status=Proposal.BidStatus.CLOSED)
-                for closed in closed_proposal:
+                if created:
                     Notification.objects.create(
-                        user=closed.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
-                        message=f"Your proposal for {closed.job.title} has been closed.",  # noqa: E501
+                        user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
+                        message=f"Your proposal for {proposal.job.title} has been accepted.",  # noqa: E501
+                        message_type=Notification.NotificationType.SUCCESS,
+                    )
+                    Notification.objects.create(
+                        user=proposal.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
+                        message="You can chat with the client now.",
                         message_type=Notification.NotificationType.INFO,
                     )
+                    # Notify other freelancers
+                    closed_proposal = Proposal.objects.filter(job=proposal.job).exclude(
+                        id=proposal.id
+                    )
+                    closed_proposal.update(status=Proposal.BidStatus.CLOSED)
+                    for closed in closed_proposal:
+                        Notification.objects.create(
+                            user=closed.freelancer_sub_profile.freelancer_profile.freelancer,  # noqa: E501
+                            message=f"Your proposal for {closed.job.title} has been closed.",  # noqa: E501
+                            message_type=Notification.NotificationType.INFO,
+                        )
         return proposal
