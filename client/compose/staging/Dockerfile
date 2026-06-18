@@ -45,6 +45,9 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 
 # Copy the rest of the source files into the image.
 COPY . .
+
+# Update npm to latest version
+RUN npm install -g npm@latest
 # Run the build script.
 RUN npm run build
 
