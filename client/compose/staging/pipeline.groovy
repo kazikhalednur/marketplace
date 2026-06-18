@@ -21,7 +21,7 @@ def call() {
     }
 
     stage('Build and Deploy') {
-        sh 'docker compose -f client/compose.staging.yaml --env-file client/compose/staging/.env up --build -d'
+        sh 'docker compose -f compose.staging.yaml up --build -d client'
     }
 }
 

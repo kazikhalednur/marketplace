@@ -1,0 +1,194 @@
+services:
+  nginx:
+    image: staging-marketplace-nginx
+    container_name: staging-marketplace-nginx
+    restart: unless-stopped
+    build:
+      context: ./nginx
+      dockerfile: compose/staging/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8443:8443"
+      - "8444:8444"
+      - "8445:8445"
+      - "8448:8448"
+    volumes:
+      - ./nginx/logs/staging:/var/log/nginx
+      - ./nginx/conf.d/staging:/etc/nginx/conf.d:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    networks:
+      - staging-marketplace-backend
+      - staging-marketplace
+      - staging-public
+    environment:
+      - TZ=Asia/Dhaka
+      - ENVIRONMENT=staging
+    labels:
+      - "com.cpchub.description=NGINX reverse proxy"
+      - "com.cpchub.service=nginx"
+      - "com.cpchub.environment=staging"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  django: &django
+    image: staging-marketplace-server
+    container_name: staging-marketplace-server
+    build:
+      context: ./server
+      dockerfile: compose/staging/django/Dockerfile
+    env_file:
+      - server/compose/staging/.env
+    environment:
+      DEBUG: true
+      SERVER_TYPE: staging
+    volumes:
+      - ./server/google_credentials.json:/app/google_credentials.json:ro
+    networks:
+      - staging-marketplace-database
+      - staging-marketplace-backend
+      - staging-marketplace
+      - staging-public
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  celeryworker:
+    <<: *django
+    container_name: staging-marketplace-celeryworker
+    command: /start-celeryworker
+    ports: []
+    expose: []
+    networks:
+      - staging-marketplace-database
+      - staging-marketplace-backend
+      - staging-marketplace
+      - staging-public
+    healthcheck:
+      test: [ "CMD", "celery", "-A", "config", "inspect", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  client:
+    image: staging-marketplace-client
+    container_name: staging-marketplace-client
+    build:
+      context: ./client
+      dockerfile: compose/staging/Dockerfile
+    env_file:
+      - client/compose/staging/.env
+    networks:
+      - staging-marketplace
+      - staging-marketplace-backend
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+
+  minio:
+    build:
+      context: ./minio
+      dockerfile: staging/Dockerfile
+    image: staging-aistor-server
+    container_name: staging-aistor-server
+    command: minio server /data --console-address ":9001"
+    restart: unless-stopped
+    env_file:
+      - minio/staging/.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ${HOME}/minio/data:/data
+      - ./minio/staging/minio.license:/minio.license
+    networks:
+      - staging-marketplace-backend
+      - staging-marketplace
+    security_opt:
+      - no-new-privileges:true
+
+  db:
+    image: staging-marketplace-postgres
+    container_name: staging-marketplace-db
+    build:
+      context: ./database/postgres
+      dockerfile: compose/staging/Dockerfile
+    volumes:
+      - staging-db-data:/var/lib/postgresql/18/docker
+      - staging-db-backups:/backups
+    env_file:
+      - database/postgres/compose/staging/.env
+    networks:
+      - staging-marketplace-database
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  redis:
+    image: redis:7.4
+    container_name: staging-marketplace-redis
+    env_file:
+      - database/redis/compose/staging/.env
+    volumes:
+      - staging-redis-data:/data
+    networks:
+      - staging-marketplace-database
+
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: staging-mailcatcher
+    restart: unless-stopped
+    expose:
+      - 1025
+    ports:
+      - 1080:1080
+    networks:
+      - staging-marketplace-backend
+      - staging-marketplace
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://0.0.0.0:1080" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  staging-marketplace-database:
+    external: true
+  staging-marketplace-backend:
+    external: true
+  staging-marketplace:
+    external: true
+  staging-public:
+    external: true
+
+volumes:
+  staging-db-data:
+  staging-db-backups:
+  staging-redis-data:

@@ -55,11 +55,11 @@ export default function StudentProfile({ user, onProfileUpdate, isOwner, onSendM
     
     // If it's a relative URL, prefix with base URL
     if (avatarUrl.startsWith('/')) {
-      return `${process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443'}${avatarUrl}`;
+      return `${process.env.NEXT_PUBLIC_API_URL}${avatarUrl}`;
     }
     
     // If it doesn't start with /, add it
-    return `${process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443'}/${avatarUrl}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}/${avatarUrl}`;
   }
 
   // Helper to calculate duration between two dates

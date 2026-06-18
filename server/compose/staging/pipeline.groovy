@@ -41,7 +41,7 @@ def call() {
     }
 
     stage('Build and Deploy') {
-        sh 'docker compose -f server/compose.staging.yaml up --build -d'
+        sh 'docker compose -f compose.staging.yaml up --build -d django celeryworker'
     }
 
     stage('Health Check') {

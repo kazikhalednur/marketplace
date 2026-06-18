@@ -1,6 +1,6 @@
 ARG NODE_VERSION=24.8.0
 
-FROM node:${NODE_VERSION}-alpine
+FROM node:${NODE_VERSION}-bookworm-slim
 
 WORKDIR /app
 

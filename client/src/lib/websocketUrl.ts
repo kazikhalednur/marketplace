@@ -1,5 +1,5 @@
 /** Default API origin when env vars are missing (matches apiSlice fallback). */
-const DEFAULT_API_URL = "https://cpchub.diu.edu.bd:8443";
+const DEFAULT_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 /** Reject empty or placeholder values baked in when env vars are unset at build time. */
 function isValidEnvUrl(value: string | undefined): value is string {

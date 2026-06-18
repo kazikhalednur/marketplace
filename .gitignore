@@ -2,3 +2,4 @@
 *.gpg
 !.env.gpg
 .data/
+*.tmp

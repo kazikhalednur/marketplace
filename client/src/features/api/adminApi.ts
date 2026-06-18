@@ -218,7 +218,7 @@ export type UpdateAdminContractPayload = Partial<CreateAdminContractPayload>;
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL,
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');

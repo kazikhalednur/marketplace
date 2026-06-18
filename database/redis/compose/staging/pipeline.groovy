@@ -6,7 +6,8 @@ def call() {
             string(credentialsId: 'gpg-passphrase', variable: 'GPG_PASSPHRASE')
         ]) {
             sh '''
-                cd database/staging/postgres
+                cd database/staging/redis
+
                 export GNUPGHOME=$(mktemp -d)
 
                 gpg --batch --import "$GPG_KEY"
@@ -19,8 +20,8 @@ def call() {
         }
     }
 
-    stage('Build and Deploy') {
-        sh 'docker compose -f database/staging/postgres/compose.yaml up --build -d'
+    stage('Deploy') {
+        sh 'docker compose -f compose.staging.yaml up --build -d redis'
     }
 
     stage('Health Check') {
@@ -30,13 +31,13 @@ def call() {
             counter=0
             max_attempts=$((timeout/sleep_time))
             
-            echo "Waiting for staging-marketplace-db to be healthy..."
+            echo "Waiting for staging-marketplace-redis to be healthy..."
             
             while [ $counter -lt $max_attempts ]; do
-                status=$(docker inspect --format '{{.State.Health.Status}}' staging-marketplace-db 2>/dev/null || echo "not-found")
+                status=$(docker inspect --format '{{.State.Health.Status}}' staging-marketplace-redis 2>/dev/null || echo "not-found")
                 
                 if [ "$status" = "healthy" ]; then
-                    echo "Container staging-marketplace-db is healthy!"
+                    echo "Container staging-marketplace-redis is healthy!"
                     exit 0
                 fi
                 
@@ -45,10 +46,11 @@ def call() {
                 counter=$((counter+1))
             done
             
-            echo "Timeout: staging-marketplace-db did not become healthy."
+            echo "Timeout: staging-marketplace-redis did not become healthy."
             exit 1
         '''
     }
 }
 
 return this
+

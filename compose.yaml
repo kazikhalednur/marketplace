@@ -1,0 +1,139 @@
+services:
+  django: &django
+    image: local-marketplace-server
+    container_name: local-marketplace-server
+    build:
+      context: ./server
+      dockerfile: compose/local/django/Dockerfile
+    env_file:
+      - server/compose/local/.env
+    environment:
+      DEBUG: true
+      SERVER_TYPE: local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/src:/app
+      - ./server/google_credentials.json:/app/google_credentials.json:ro
+    networks:
+      - local-public
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  celeryworker:
+    <<: *django
+    image: local-marketplace-server
+    container_name: local-marketplace-celeryworker
+    command: /start-celeryworker
+    ports: []
+    expose: []
+
+  client:
+    image: local-marketplace-client
+    container_name: local-marketplace-client
+    build:
+      context: ./client
+      dockerfile: compose/local/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - client/compose/local/.env
+    volumes:
+      - ./client:/app
+      - ./client/node_modules:/app/node_modules
+      - ./client/.next:/app/.next
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - local-public
+
+  minio:
+    image: local-aistor-server
+    container_name: local-aistor-server
+    build:
+      context: ./minio
+      dockerfile: local/Dockerfile
+    command: minio server /data --console-address ":9001"
+    restart: unless-stopped
+    environment:
+      MINIO_VOLUMES: /data
+    env_file:
+      - minio/local/.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ${MINIO_PATH:-./.data/minio}:/data
+      - ${MINIO_LICENSE_PATH:-./.data/minio.license}:/minio.license
+    networks:
+      - local-public
+
+  db:
+    image: local-marketplace-db
+    container_name: local-marketplace-db
+    build:
+      context: ./database/postgres
+      dockerfile: compose/local/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${POSTGRES_PATH:-./.data/postgres}:/var/lib/postgresql
+    env_file:
+      - database/postgres/compose/local/.env
+    networks:
+      - local-public
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-marketplace_local}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4
+    container_name: local-marketplace-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+      --lazyfree-lazy-server-del yes
+      --activedefrag yes
+    env_file:
+      - database/redis/compose/local/.env
+    volumes:
+      - ${REDIS_PATH:-./.data/redis}:/data
+    networks:
+      - local-public
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: local-marketplace-mailcatcher
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - local-public
+
+networks:
+  local-public:
+    external: true

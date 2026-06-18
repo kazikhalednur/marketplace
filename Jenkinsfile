@@ -84,7 +84,6 @@ pipeline {
                         [name: 'Server', container: 'staging-marketplace-server', folder: 'server/'],
                         [name: 'Postgres', container: 'staging-marketplace-db', folder: 'database/staging/postgres/'],
                         [name: 'Redis', container: 'staging-marketplace-redis', folder: 'database/staging/redis/'],
-                        [name: 'Mailcatcher', container: 'staging-mailcatcher', folder: 'mailcatcher/'],
                         [name: 'Minio', container: 'staging-aistor-server', folder: 'minio/staging/'],
                         [name: 'Jitsi', container: 'jitsi-web-1', folder: 'jitsi/'],
                         [name: 'NGINX', container: 'staging-marketplace-nginx', folder: 'nginx/']
@@ -183,20 +182,6 @@ pipeline {
                     }
                 }
 
-                stage('Mailcatcher') {
-                    when { 
-                        expression { 
-                            env.BUILD_MAILCATCHER == 'true'
-                        } 
-                    }
-                    steps {
-                        script {
-                            def mailcatcher = load 'mailcatcher/pipeline.groovy'
-                            mailcatcher()
-                        }
-                    }
-                }
-
                 stage('Minio') {
                     when { 
                         expression { 
@@ -249,7 +234,6 @@ pipeline {
                         env.BUILD_SERVER == 'true' ||
                         env.BUILD_POSTGRES == 'true' ||
                         env.BUILD_REDIS == 'true' ||
-                        env.BUILD_MAILCATCHER == 'true' ||
                         env.BUILD_MINIO == 'true'
                     )
                     return anyServiceBuilt

@@ -65,7 +65,7 @@ export interface ApiResponse<T> {
 export const meetingsApi = createApi({
   reducerPath: 'meetingsApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL,
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = Cookies.get('accessToken');

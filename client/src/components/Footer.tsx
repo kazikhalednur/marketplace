@@ -87,6 +87,7 @@ export default function Footer() {
           <form className="flex gap-2">
             <input
               type="email"
+              suppressHydrationWarning
               placeholder="Your email"
               className="rounded-md border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
             />

@@ -62,7 +62,7 @@ def call() {
 
     stage('Deploy') {
         sh '''
-            docker compose -f nginx/compose.staging.yaml up --build -d
+            docker compose -f compose.staging.yaml up --build -d nginx
         '''
     }
 

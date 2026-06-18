@@ -26,7 +26,7 @@ def call() {
     }
 
     stage('Deploy') {
-        sh 'docker compose -f minio/staging/compose.yaml up --build -d'
+        sh 'docker compose -f compose.staging.yaml up --build -d minio'
     }
 
     stage('Health Check') {

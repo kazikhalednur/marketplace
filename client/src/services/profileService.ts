@@ -31,7 +31,7 @@ export interface ProfileResponse {
 }
 
 class ProfileService {
-  private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cpchub.diu.edu.bd:8443';
+  private baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // Helper method to get authentication headers
   private getAuthHeaders() {
