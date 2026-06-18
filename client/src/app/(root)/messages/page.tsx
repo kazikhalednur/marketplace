@@ -304,16 +304,6 @@ export default function MessagesPage() {
     }
   }, [conversationUpdateTrigger, conversationMessages.size]);
 
-  // Debug logging for conversations
-  console.log('🔍 MessagesPage Debug:', {
-    user: user?.username,
-    isLoading,
-    error,
-    conversationsCount: conversations?.length || 0,
-    conversations: conversations,
-    hasUser: !!user,
-    userNotificationId: user?.notification_id
-  });
 
   // Show loading state only if we have a user and the API call is still loading
   const shouldShowLoading = isLoading && user?.username;
