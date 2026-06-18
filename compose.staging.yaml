@@ -61,6 +61,12 @@ services:
       - ALL
     cap_add:
       - NET_BIND_SERVICE
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health_check/')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   celeryworker:
     <<: *django
@@ -147,6 +153,11 @@ services:
     tmpfs:
       - /tmp
       - /var/run/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-marketplace_staging_db}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7.4
@@ -157,6 +168,11 @@ services:
       - staging-redis-data:/data
     networks:
       - staging-marketplace-database
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mailcatcher:
     image: sj26/mailcatcher
