@@ -13,16 +13,16 @@ def call() {
                 gpg --batch --yes \
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
-                    --decrypt cpchub_diu_edu_bd.crt.gpg > cpchub_diu_edu_bd.crt
+                    --decrypt server.crt.gpg > server.crt
                     
                 echo "SSL certificate decrypted successfully"
 
                 gpg --batch --yes \
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
-                    --decrypt cpchub_diu_edu_bd.key.gpg > cpchub_diu_edu_bd.key
+                    --decrypt server.key.gpg > server.key
                     
-                chmod 600 cpchub_diu_edu_bd.key
+                chmod 600 server.key
                 
                 echo "SSL private key decrypted successfully"
             '''
@@ -31,6 +31,11 @@ def call() {
 
     stage('Validate NGINX Configuration') {
         sh '''
+            if [ -z "${SERVER_NAME:-}" ]; then
+                echo "SERVER_NAME is not set. Define it in the Jenkins environment."
+                exit 1
+            fi
+
             cd nginx
             docker build -t nginx-validation-temp -f compose/staging/Dockerfile .
             
@@ -40,6 +45,7 @@ def call() {
                 -v "$(pwd)/../ssl:/etc/nginx/ssl:ro" \
                 -e TZ=Asia/Dhaka \
                 -e ENVIRONMENT=staging \
+                -e SERVER_NAME="$SERVER_NAME" \
                 nginx-validation-temp nginx -t 2>&1 | tee /tmp/nginx-validation.log; then
                 echo "✓ NGINX configuration is valid!"
             else

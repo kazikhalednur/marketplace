@@ -5,7 +5,7 @@
 # HTTP redirect for server
 server {
     listen 8080;
-    server_name cpchub.diu.edu.bd;
+    server_name ${SERVER_NAME};
 
     location / {
         return 301 https://$host:8443$request_uri;
@@ -17,11 +17,11 @@ server {
     listen 8443 ssl;
     listen [::]:8443 ssl;
     http2 on;
-    server_name cpchub.diu.edu.bd;
+    server_name ${SERVER_NAME};
 
     # SSL certificate paths
-    ssl_certificate /etc/nginx/ssl/cpchub_diu_edu_bd.crt;
-    ssl_certificate_key /etc/nginx/ssl/cpchub_diu_edu_bd.key;
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
 
     # Security headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;

@@ -31,12 +31,12 @@ def call() {
                 gpg --batch --yes \
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
-                    --decrypt ssl/cpchub_diu_edu_bd.crt.gpg > jitsi/web/keys/cert.crt
+                    --decrypt ssl/server.crt.gpg > jitsi/web/keys/cert.crt
 
                 gpg --batch --yes \
                     --pinentry-mode loopback \
                     --passphrase "$GPG_PASSPHRASE" \
-                    --decrypt ssl/cpchub_diu_edu_bd.key.gpg > jitsi/web/keys/cert.key
+                    --decrypt ssl/server.key.gpg > jitsi/web/keys/cert.key
 
                 chmod 600 jitsi/web/keys/cert.key
             '''

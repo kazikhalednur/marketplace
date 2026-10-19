@@ -20,7 +20,7 @@ class SignupGoogleSerializer(serializers.Serializer):
 
         if not match_email_domain(email):
             raise serializers.ValidationError(
-                {"email": "Try with your DIU email address"}
+                {"email": "Try with your university email address"}
             )
 
         user = Freelancer.objects.create_user(

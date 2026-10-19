@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Linkedin, Twitter, Github } from "lucide-react";
 import Icon from "@/components/ui/Icon";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 export default function Footer() {
   return (
@@ -13,7 +14,7 @@ export default function Footer() {
             href="/"
             className="text-2xl font-extrabold text-primary tracking-tight"
           >
-            CPCHUB
+            Marketplace
           </Link>
           <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
             The modern marketplace for students, employers, and professionals.
@@ -72,12 +73,14 @@ export default function Footer() {
           >
             About
           </Link>
-          <Link
-            href="mailto:contact@cpchub.diu.edu.bd"
-            className="text-muted-foreground hover:text-primary transition text-sm"
-          >
-            Contact
-          </Link>
+          {CONTACT_EMAIL && (
+            <Link
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="text-muted-foreground hover:text-primary transition text-sm"
+            >
+              Contact
+            </Link>
+          )}
         </div>
         {/* Newsletter or CTA */}
         <div className="flex-1 flex flex-col gap-3">
@@ -104,7 +107,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground bg-muted/60 mt-10">
-        © {new Date().getFullYear()} CPCHUB. All rights reserved. &nbsp;|&nbsp;
+        © {new Date().getFullYear()} Marketplace. All rights reserved. &nbsp;|&nbsp;
         <Link href="#" className="hover:text-primary">
           Privacy Policy
         </Link>{" "}

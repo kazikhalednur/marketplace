@@ -14,7 +14,7 @@ from .models import OTP, User
 def send_reset_mail(user):
     code = OTP.objects.get(user=user).code
     subject = "Reset Password"
-    from_mail = f"DIU CPC Workhub <{settings.DEFAULT_FROM_EMAIL}>"
+    from_mail = f"Marketplace <{settings.DEFAULT_FROM_EMAIL}>"
     to_mail = user.email
     frontend_url = base_settings.FRONTEND_URL
     frontend_parsed_url = urlparse(frontend_url)
@@ -45,7 +45,7 @@ def send_reset_mail(user):
 
 def send_signup_verification_email(user: User):
     subject = "Verify your email"
-    from_mail = f"DIU CPC Workhub <{settings.DEFAULT_FROM_EMAIL}>"
+    from_mail = f"Marketplace <{settings.DEFAULT_FROM_EMAIL}>"
     to_mail = user.email
 
     token = user.generate_email_verification_token()

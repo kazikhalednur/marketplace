@@ -32,3 +32,6 @@ export const JOB_STATUS_OPTIONS = [
   { value: 'in_progress', label: 'In Progress' },
   { value: 'completed', label: 'Completed' },
 ];
+
+// Public contact address shown in the UI; links are hidden when unset.
+export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || '';

@@ -12,7 +12,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN rm -f /etc/nginx/conf.d/default.conf
 
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY conf.d/staging/*.conf /etc/nginx/conf.d/
+# Rendered into /etc/nginx/conf.d at startup by the image entrypoint,
+# which substitutes ${SERVER_NAME} via envsubst.
+COPY templates/staging/ /etc/nginx/templates/
 RUN mkdir -p /var/log/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chmod -R 755 /var/log/nginx

@@ -21,7 +21,7 @@ class ClientSignupGoogleSerializer(serializers.Serializer):
 
         if not match_email_domain(email):
             raise serializers.ValidationError(
-                {"email": "Try with your DIU email address"}
+                {"email": "Try with your university email address"}
             )
 
         user = Client.objects.create_user(

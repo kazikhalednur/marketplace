@@ -12,6 +12,6 @@ class SettingsAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.site_header = "CPCHUB Admin"
-admin.site.site_title = "CPCHUB Admin"
-admin.site.index_title = "CPCHUB Admin Dashboard"
+admin.site.site_header = "Marketplace Admin"
+admin.site.site_title = "Marketplace Admin"
+admin.site.index_title = "Marketplace Admin Dashboard"
